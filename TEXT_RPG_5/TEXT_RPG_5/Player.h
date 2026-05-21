@@ -2,11 +2,6 @@
 #include "pch.h"
 //#include "Vector.h"
 
-//class Item
-//{
-//
-//};
-
 class Player
 {
 public:
@@ -18,9 +13,6 @@ public:
 
 	// 상태창 호출
 	void DisplayStatus();
-	
-	// 아이템 사용
-	void UseItem(int index);
 
 	// Getter
 	string GetName();
@@ -41,10 +33,8 @@ public:
 	void SetExp(int Exp);
 	void SetMax_Exp(int Max_Exp);
 	void SetGold(int Gold);
-	
 
 protected:
-	//vector<Item> *Invetory; // 향후 인벤토리 주소 받으면 될 예정
 	string Name;
 	int Level;
 	int HP;

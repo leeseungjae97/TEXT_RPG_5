@@ -21,13 +21,6 @@ void Player::DisplayStatus()
 	cout << "============================\n";
 }
 
-// 아이템 사용
-//void Player::UseItem(int index)
-//{
-//	cout << "아이템을 사용합니다.\n";
-//	//invento
-//}
-
 // Getter
 string Player::GetName()
 {
