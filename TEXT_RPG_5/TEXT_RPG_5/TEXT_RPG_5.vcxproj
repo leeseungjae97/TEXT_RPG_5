@@ -126,6 +126,7 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Goblin.cpp" />
     <ClCompile Include="Item.cpp" />
+    <ClCompile Include="LevelComponent.cpp" />
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -145,6 +146,7 @@
     <ClInclude Include="Goblin.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemData.h" />
+    <ClInclude Include="LevelComponent.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Orc.h" />
     <ClInclude Include="pch.h" />
