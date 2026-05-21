@@ -140,6 +140,8 @@
     <ClInclude Include="Define.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemData.h" />
+    <ClInclude Include="ItemDB.h" />
+    <ClInclude Include="ItemTypeEnum.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
