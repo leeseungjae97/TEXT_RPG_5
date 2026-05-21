@@ -15,6 +15,9 @@
       <Filter>Item</Filter>
     </ClCompile>
     <ClCompile Include="test_main.cpp" />
+    <ClCompile Include="LevelComponent.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
@@ -35,6 +38,9 @@
       <Filter>Item</Filter>
     </ClInclude>
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="LevelComponent.h">
+      <Filter>Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Player">
