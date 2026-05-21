@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿/*
+#pragma once
 #include "pch.h"
 
 struct Item
@@ -55,3 +56,4 @@ struct Items
 	int quantity;
 
 };
+*/
