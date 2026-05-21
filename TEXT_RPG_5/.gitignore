@@ -451,10 +451,11 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+*.sln
 
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 
-test_main.cpp
-
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,windows,c++
+
+test_main.cpp
