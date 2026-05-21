@@ -1,0 +1,14 @@
+#include "Slime.h"
+#include <cstdlib>
+
+Slime::Slime(int playerLevel)
+{
+	if (playerLevel <= 0)
+	{
+		playerLevel = 1;
+	}
+
+	Name = "Slime";
+	Health = playerLevel * 20 + rand() % (playerLevel * 10 + 1);
+	Attack = playerLevel * 5 + rand() % (playerLevel * 5 + 1);
+}
