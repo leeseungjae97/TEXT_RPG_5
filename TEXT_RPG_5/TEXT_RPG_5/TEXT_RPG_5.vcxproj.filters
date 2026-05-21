@@ -14,6 +14,7 @@
     <ClCompile Include="Item.cpp">
       <Filter>Item</Filter>
     </ClCompile>
+    <ClCompile Include="test_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
@@ -33,6 +34,7 @@
     <ClInclude Include="Item.h">
       <Filter>Item</Filter>
     </ClInclude>
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Player">
