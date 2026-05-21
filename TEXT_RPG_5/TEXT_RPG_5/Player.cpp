@@ -63,35 +63,35 @@ int Player::GetGold()
 }
 
 // Setter
-void Player::GetName(string Name)
+void Player::SetName(string Name)
 {
 	this->Name = Name;
 }
-void Player::GetLevel(int Level)
+void Player::SetLevel(int Level)
 {
 	this->Level = Level;
 }
-void Player::GetPower(int Power)
+void Player::SetPower(int Power)
 {
 	this->Power = Power;
 }
-void Player::GetHP(int HP)
+void Player::SetHP(int HP)
 {
 	this->HP = HP;
 }
-void Player::GetMax_HP(int Max_HP)
+void Player::SetMax_HP(int Max_HP)
 {
 	this->Max_HP = Max_HP;
 }
-void Player::GetExp(int Exp)
+void Player::SetExp(int Exp)
 {
 	this->Exp = Exp;
 }
-void Player::GetMax_Exp(int Max_Exp)
+void Player::SetMax_Exp(int Max_Exp)
 {
 	this->Max_Exp = Max_Exp;
 }
-void Player::GetGold(int Gold)
+void Player::SetGold(int Gold)
 {
 	this->Gold = Gold;
 }
