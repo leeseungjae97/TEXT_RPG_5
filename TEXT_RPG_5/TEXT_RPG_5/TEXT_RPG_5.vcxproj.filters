@@ -11,12 +11,16 @@
     <ClCompile Include="Component.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="Item.cpp">
-      <Filter>Item</Filter>
-    </ClCompile>
     <ClCompile Include="test_main.cpp" />
     <ClCompile Include="LevelComponent.cpp">
       <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Goblin.cpp" />
+    <ClCompile Include="Orc.cpp" />
+    <ClCompile Include="Slime.cpp" />
+    <ClCompile Include="Troll.cpp" />
+    <ClCompile Include="Inventory.cpp">
+      <Filter>Item</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,6 +45,22 @@
     <ClInclude Include="LevelComponent.h">
       <Filter>Component</Filter>
     </ClInclude>
+    <ClInclude Include="Goblin.h" />
+    <ClInclude Include="Orc.h" />
+    <ClInclude Include="Slime.h" />
+    <ClInclude Include="Troll.h" />
+    <ClInclude Include="Inventory.h">
+      <Filter>Item</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemTypeEnum.h">
+      <Filter>Enum</Filter>
+    </ClInclude>
+    <ClInclude Include="HP_Potion.h">
+      <Filter>Item\ItemList</Filter>
+    </ClInclude>
+    <ClInclude Include="MP_Potion.h">
+      <Filter>Item\ItemList</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Player">
@@ -60,6 +80,9 @@
     </Filter>
     <Filter Include="Enum">
       <UniqueIdentifier>{47fbe5f7-748d-4137-b0b4-95fbdc63beaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Item\ItemList">
+      <UniqueIdentifier>{be40c2ab-ef25-4aba-bc34-30fc3b515bb1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
