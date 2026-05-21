@@ -128,6 +128,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="test_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component.h" />
