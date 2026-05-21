@@ -18,6 +18,18 @@
     <ClCompile Include="LevelComponent.cpp">
       <Filter>Component</Filter>
     </ClCompile>
+    <ClCompile Include="Goblin.cpp">
+      <Filter>Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="Orc.cpp">
+      <Filter>Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="Slime.cpp">
+      <Filter>Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="Troll.cpp">
+      <Filter>Monster</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
@@ -40,6 +52,20 @@
     <ClInclude Include="Vector.h" />
     <ClInclude Include="LevelComponent.h">
       <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemDB.h" />
+    <ClInclude Include="ItemTypeEnum.h" />
+    <ClInclude Include="Goblin.h">
+      <Filter>Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="Orc.h">
+      <Filter>Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="Slime.h">
+      <Filter>Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="Troll.h">
+      <Filter>Monster</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
