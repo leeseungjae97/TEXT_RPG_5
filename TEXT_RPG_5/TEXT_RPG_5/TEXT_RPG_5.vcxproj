@@ -149,6 +149,7 @@
     <ClCompile Include="CombatComponent.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Slime.cpp" />
+    <ClCompile Include="SubActionComponent.cpp" />
     <ClCompile Include="Strength_Potion.cpp" />
     <ClCompile Include="test_main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -186,6 +187,7 @@
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
+    <ClInclude Include="SubActionComponent.h" />
     <ClInclude Include="Strength_Potion.h" />
     <ClInclude Include="TimeManager.h" />
     <ClInclude Include="Troll.h" />
