@@ -5,13 +5,7 @@
 
 struct MP_Potion : public Item
 {
-	MP_Potion()
-	{
-		Name = "MP포션";
-		Type = ItemType::Usable;
-		Price = 50;
-		EffectAmount = 50;
-	}
+	MP_Potion(string name, ItemType type, int price, int effectAmount = 0) : Item(name, type, price, effectAmount) {}
 
 	void Use(Player* player) override
 	{
