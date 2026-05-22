@@ -3,7 +3,8 @@
 #pragma once
 #include "pch.h"
 #include "ItemTypeEnum.h"
-#include "Player.h"
+
+class Player;
 
 struct UItem
 {
@@ -12,23 +13,10 @@ struct UItem
 	int Price;
 	int EffectAmount;
 
-	UItem(string name, ItemType type, int price, int effectAmount = 0)
-	{
-		Name = name;
-		Type = type;
-		Price = price;
-		EffectAmount = effectAmount;
-	}
+	UItem(string name, ItemType type, int price, int effectAmount = 0);
 	virtual ~UItem() {}
 
-	void printInfo() const
-	{
-		
-	}
-
-	virtual void Use(Player* player)
-	{
-
-	}
+	void printInfo() const;
+	virtual void Use(Player* player);
 
 };

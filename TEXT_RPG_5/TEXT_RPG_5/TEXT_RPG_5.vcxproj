@@ -127,7 +127,10 @@
   <ItemGroup>
     <ClCompile Include="BattleManager.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="HP_Potion.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="Misc.cpp" />
     <ClCompile Include="NPC.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="RenderManager.cpp" />
@@ -145,6 +148,7 @@
     <ClCompile Include="CombatComponent.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Slime.cpp" />
+    <ClCompile Include="Strength_Potion.cpp" />
     <ClCompile Include="test_main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>

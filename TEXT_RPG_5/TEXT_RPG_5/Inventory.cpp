@@ -1,8 +1,12 @@
 ﻿//Inventory.cpp
 
 #include "Inventory.h"
+#include "Item.h"
 
-InventoryManager* InventoryManager::Instance = nullptr;
+
+void InventoryManager::SetOwner(Player* Owner) { this->Owner = Owner; }
+
+Player* InventoryManager::GetOwner() { return Owner; }
 
 void InventoryManager::OpenInventory()
 {
@@ -54,7 +58,7 @@ bool InventoryManager::UseItem()
 
     if (Item->Type == ItemType::Usable)
     {
-        Item->Use(Player);
+        Item->Use(GetOwner());
         RemoveItem(Item);
         return true;
     }

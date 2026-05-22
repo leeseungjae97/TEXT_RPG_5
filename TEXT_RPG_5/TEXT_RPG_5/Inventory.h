@@ -3,27 +3,23 @@
 #pragma once
 
 #include "pch.h"
-#include "Item.h"
+
+class Player;
+class UItem;
 
 class InventoryManager
 {
 private:
-	static InventoryManager* Instance;
+	Player* Owner = nullptr;
 
-	InventoryManager() {}
+protected:
 
 	vector<UItem*> Container;
-	Player* Player;
 	
 
 public:
-	static InventoryManager* Get()
-	{
-
-		if (Instance == nullptr)
-			Instance = new InventoryManager();
-		return Instance;
-	}
+	void SetOwner(Player* Owner);
+	Player* GetOwner();
 
 	void OpenInventory();
 
