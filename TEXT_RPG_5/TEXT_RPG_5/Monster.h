@@ -4,6 +4,8 @@
 #include "Vector.h"
 #include "Object.h"
 
+class Player;
+
 class Monster : public AObject
 {
 protected:
@@ -11,18 +13,50 @@ protected:
 	int Health;
 	int Attack;
 
+protected:
+	
+	float MoveElapsedtime;
+
+	
+	float MoveInterval;
+
+	
+	int DetectionRange;
+
+
+
+
 public:
 	Monster();
+	virtual ~Monster();
+
 	string GetName();
 	int GetHealth();
 	int GetAttack();
+
 	void TakeDamage(int damage);
 	bool IsDead();
 
-	void Update(float DeltaTime);
+	
 
 public:
-	virtual void Init() {}
-	virtual void Tick(float DeltaTime){}
-	virtual void Destroy(){}
+	virtual void Init()	override{}
+	virtual void Tick(float DeltaTime) override;
+	virtual void Destroy() override;
+
+protected:
+	
+	void Update(float DeltaTime);
+
+	
+	Player* FindPlayer();
+
+	
+	int GetDistanceToPlayer(Player* player);
+
+
+	void MoveTowardPlayer(Player* player);
+
+
+	void MoveRandom();
 };
