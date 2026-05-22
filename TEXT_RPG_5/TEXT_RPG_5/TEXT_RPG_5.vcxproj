@@ -129,6 +129,7 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="HP_Potion.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="MoveComponent.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="NPC.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="MoveComponent.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="RenderManager.h" />

@@ -1,5 +1,6 @@
 ﻿#include "Player.h"
 #include "InputManager.h"
+#include "MoveComponent.h"
 
 // ������
 Player::Player(string str, int hp, int power) : Name(str), HP(hp), Power(power)
@@ -9,65 +10,28 @@ Player::Player(string str, int hp, int power) : Name(str), HP(hp), Power(power)
 	this->Exp = 0;
 	this->Max_Exp = 100;
 	this->Gold = 0;
-	Position = Vector(2, 2);
-	PrevPosition = Vector(2, 2);
+	this->MoveComponent = new UMoveComponent(this);
+
+	this->Position.Y = 2;
+	this->Position.X = 2;
+	//this->FacingDirection = EDirection::None;
+	//Position = Vector(2, 2);
+	//PrevPosition = Vector(2, 2);
 }
 
 Player::~Player()
 {
+	delete MoveComponent;
+	MoveComponent = nullptr;
 }
 
-// ����â ȣ�� ��
-void Player::DisplayStatus()
-{
-	cout << "============================\n";
-	cout << " " << Name << " �� ���� �ɷ�ġ\n";
-	cout << "============================\n";
-	cout << "Lv. " << Level << "    Exp : (" << Exp << " / " << Max_Exp << ")\n";
-	cout << "HP : " << HP << "    " << "���ݷ� : " << Power << "\n";
-	cout << "============================\n";
-
-}
 void Player::Tick(float DeltaTime)
 {
-	//3�ʵڿ� �������� �Դ´�.
-	// Elapsed�� ���������
-	float Elapsed = 0.0f;
-	Elapsed += DeltaTime;
-	if (Elapsed >= 3.f)
+	if (MoveComponent != nullptr)
 	{
-
+		MoveComponent->Tick(DeltaTime);
 	}
-
-	PrevPosition = Position;
-	//if (InputManager::GetInstance()->IsKeyDown(eKeyCode::UP))
-	//{
-	//	Position.Y--;
-	//	Sleep(120);
-	//}
-	//if (InputManager::GetInstance()->IsKeyDown(eKeyCode::DOWN))
-	//{
-	//	Position.Y++;
-	//	Sleep(120);
-	//}
-	//if (InputManager::GetInstance()->IsKeyDown(eKeyCode::RIGHT))
-	//{
-	//	Position.X++;
-	//	Sleep(120);
-	//}
-	//if (InputManager::GetInstance()->IsKeyDown(eKeyCode::LEFT))
-	//{
-	//	Position.X--;
-	//	Sleep(120);
-	//}
 }
-
-// ������ ���
-//void Player::UseItem(int index)
-//{
-//	cout << "�������� ����մϴ�.\n";
-//	//invento
-//}
 
 // Getter
 string Player::GetName()

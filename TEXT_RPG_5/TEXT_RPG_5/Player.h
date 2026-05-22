@@ -3,10 +3,7 @@
 #include "Vector.h"
 #include "Object.h"
 
-//class Item
-//{
-//
-//};
+class UMoveComponent;
 
 class Player : public AObject
 {
@@ -16,12 +13,6 @@ public:
 	
 	// 소멸자
 	~Player();
-
-	// 상태창 호출
-	void DisplayStatus();
-	
-	// 아이템 사용
-	void UseItem(int index);
 
 	// Getter
 	string GetName();
@@ -42,12 +33,14 @@ public:
 	void SetExp(int Exp);
 	void SetMax_Exp(int Max_Exp);
 	void SetGold(int Gold);
-	
+
+public:
 	virtual void Init(){}
 	virtual void Tick(float DeltaTime);
 	virtual void Destroy(){}
+
 protected:
-	//vector<Item> *Invetory; // 향후 인벤토리 주소 받으면 될 예정
+	// 플레이어 스탯으로
 	string Name;
 	int Level;
 	int HP;
@@ -56,4 +49,6 @@ protected:
 	int Exp;
 	int Max_Exp;
 	int Gold;
+	UMoveComponent* MoveComponent = nullptr;
+	//EDirection FacingDirection;
 };
