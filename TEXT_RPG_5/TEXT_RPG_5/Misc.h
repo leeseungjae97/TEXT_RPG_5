@@ -3,9 +3,9 @@
 
 #include "Item.h"
 
-struct Misc : public Item
+struct Misc : public UItem
 {
-	Misc(string name, ItemType type, int price, int effectAmount = 0) : Item(name, type, price, effectAmount) {}
-
+	Misc(string name, ItemType type, int price, int effectAmount = 0) : UItem(name, type, price, effectAmount) {}
+	~Misc() {}
 
 };

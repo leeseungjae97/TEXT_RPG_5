@@ -1,7 +1,7 @@
-#include "Player.h"
+ï»¿#include "Player.h"
 #include "InputManager.h"
 
-// »ý¼ºÀÚ
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Player::Player(string str, int hp, int power) : Name(str), HP(hp), Power(power)
 {
 	this->Level = 1;
@@ -17,21 +17,21 @@ Player::~Player()
 {
 }
 
-// »óÅÂÃ¢ È£Ãâ ½Ã
+// ï¿½ï¿½ï¿½ï¿½Ã¢ È£ï¿½ï¿½ ï¿½ï¿½
 void Player::DisplayStatus()
 {
 	cout << "============================\n";
-	cout << " " << Name << " ÀÇ ÇöÀç ´É·ÂÄ¡\n";
+	cout << " " << Name << " ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½É·ï¿½Ä¡\n";
 	cout << "============================\n";
 	cout << "Lv. " << Level << "    Exp : (" << Exp << " / " << Max_Exp << ")\n";
-	cout << "HP : " << HP << "    " << "°ø°Ý·Â : " << Power << "\n";
+	cout << "HP : " << HP << "    " << "ï¿½ï¿½ï¿½Ý·ï¿½ : " << Power << "\n";
 	cout << "============================\n";
 
 }
 void Player::Tick(float DeltaTime)
 {
-	//3ÃÊµÚ¿¡ µ¥¹ÌÁö¸¦ ÀÔ´Â´Ù.
-	// Elapsed´Â ¸â¹öº¯¼ö·Î
+	//3ï¿½ÊµÚ¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô´Â´ï¿½.
+	// Elapsedï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float Elapsed = 0.0f;
 	Elapsed += DeltaTime;
 	if (Elapsed >= 3.f)
@@ -62,10 +62,10 @@ void Player::Tick(float DeltaTime)
 	//}
 }
 
-// ¾ÆÀÌÅÛ »ç¿ë
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 //void Player::UseItem(int index)
 //{
-//	cout << "¾ÆÀÌÅÛÀ» »ç¿ëÇÕ´Ï´Ù.\n";
+//	cout << "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.\n";
 //	//invento
 //}
 

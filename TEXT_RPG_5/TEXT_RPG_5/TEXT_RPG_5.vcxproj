@@ -153,6 +153,7 @@
     <ClCompile Include="Troll.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AllItems.h" />
     <ClInclude Include="BattleManager.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Define.h" />
@@ -172,7 +173,6 @@
     <ClInclude Include="MapManager.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="Monster.h" />
-    <ClInclude Include="MP_Potion.h" />
     <ClInclude Include="Orc.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
@@ -180,6 +180,7 @@
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
+    <ClInclude Include="Strength_Potion.h" />
     <ClInclude Include="TimeManager.h" />
     <ClInclude Include="Troll.h" />
     <ClInclude Include="Vector.h" />

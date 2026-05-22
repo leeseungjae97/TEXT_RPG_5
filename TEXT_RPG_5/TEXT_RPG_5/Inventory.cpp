@@ -2,43 +2,42 @@
 
 #include "Inventory.h"
 
+InventoryManager* InventoryManager::Instance = nullptr;
 
-void Inventory::printInventory()
+void InventoryManager::OpenInventory()
 {
     int currentCount = 0;
-    std::cout << "\n[ 인벤토리 (" << Container.size() << "/" << "10" << ") ]\n";
-    currentCount = 0;
-    for (Item* item : Container)
+    for (UItem* Item : Container)
     {
-        std::cout << ++currentCount << ". ";
-        item->printInfo();
+        ++currentCount;
+        Item->printInfo();
     }
 }
 
 
-vector<Item*> Inventory::GetContainer()
+vector<UItem*>& InventoryManager::GetContainer()
 {
     return Container;
+
 }
 
-int Inventory::GetItemIndex(Item* item)
+int InventoryManager::GetItemIndex(UItem* Item)
 {
-    auto it = find(Container.begin(), Container.end(), item);
+    auto it = find(Container.begin(), Container.end(), Item);
     if (it != Container.end())
         return it - Container.begin();
     else
         return -1;
 }
 
-void Inventory::AddItem(Item* item)
+void InventoryManager::AddItem(UItem* Item)
 {
-    Container.push_back(item);
-    cout << "-> " << item->Name << "을(를) 획득하였습니다.\n";
+    Container.push_back(Item);
 }
 
-bool Inventory::RemoveItem(Item* item)
+bool InventoryManager::RemoveItem(UItem* Item)
 { 
-    auto it = find(Container.begin(), Container.end(), item);
+    auto it = find(Container.begin(), Container.end(), Item);
     if (it != Container.end())
     {
         Container.erase(it);
@@ -48,19 +47,19 @@ bool Inventory::RemoveItem(Item* item)
     return false;
 }
 
-bool Inventory::UseItem()
+bool InventoryManager::UseItem()
 {
     int n = rand() % Container.size();
-    Item* item = Container[n];
+    UItem* Item = Container[n];
 
-    if (item->Type == ItemType::Usable)
+    if (Item->Type == ItemType::Usable)
     {
-        item->Use(Player);
+        Item->Use(Player);
+        RemoveItem(Item);
         return true;
     }
     else
     {
-        cout << "\n 사용할 수 없는 아이템입니다.\n";
         return false;
     }
 }

@@ -5,20 +5,32 @@
 #include "pch.h"
 #include "Item.h"
 
-class Inventory
+class InventoryManager
 {
-protected:
-	vector<Item*> Container;
-	Player* Player;
+private:
+	static InventoryManager* Instance;
 
+	InventoryManager() {}
+
+	vector<UItem*> Container;
+	Player* Player;
+	
 
 public:
-	void printInventory();
+	static InventoryManager* Get()
+	{
 
-	vector<Item*> GetContainer();
-	int GetItemIndex(Item* item);
-	void AddItem(Item* item);
-	bool RemoveItem(Item* item);
+		if (Instance == nullptr)
+			Instance = new InventoryManager();
+		return Instance;
+	}
+
+	void OpenInventory();
+
+	vector<UItem*>& GetContainer();
+	int GetItemIndex(UItem* Item);
+	void AddItem(UItem* Item);
+	bool RemoveItem(UItem* Item);
 	bool UseItem();
 
 	

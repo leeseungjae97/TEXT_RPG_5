@@ -5,33 +5,30 @@
 #include "ItemTypeEnum.h"
 #include "Player.h"
 
-struct Item
+struct UItem
 {
 	string Name;
 	ItemType Type;
 	int Price;
 	int EffectAmount;
 
-	Item(string name, ItemType type, int price, int effectAmount = 0)
+	UItem(string name, ItemType type, int price, int effectAmount = 0)
 	{
 		Name = name;
 		Type = type;
 		Price = price;
 		EffectAmount = effectAmount;
 	}
-
+	virtual ~UItem() {}
 
 	void printInfo() const
 	{
-		std::cout << Name << " (" << Price << "G)\n";
+		
 	}
 
 	virtual void Use(Player* player)
 	{
 
-		cout << "\n" << Name << " 사용!\n";
-
 	}
-
 
 };

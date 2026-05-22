@@ -3,16 +3,14 @@
 
 #include "Item.h"
 
-struct HP_Potion : public Item
+struct HP_Potion : public UItem
 {
-	HP_Potion(string name, ItemType type, int price, int effectAmount = 0) : Item(name, type, price, effectAmount) {}
-
+	HP_Potion(string name, ItemType type, int price, int effectAmount = 0) : UItem(name, type, price, effectAmount) {}
+	~HP_Potion() {}
 
 	void Use(Player* player) override
 	{
-		Item::Use(player);
-
-		cout << "HP + " << EffectAmount << "\n";
-
+		UItem::Use(player);
+		player->SetHP(max(player->GetMax_HP(), (player->GetHP()+EffectAmount)));
 	}
 };
