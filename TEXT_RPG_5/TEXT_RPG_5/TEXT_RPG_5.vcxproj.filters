@@ -61,6 +61,15 @@
     <ClInclude Include="MP_Potion.h">
       <Filter>Item\ItemList</Filter>
     </ClInclude>
+    <ClInclude Include="AllItems.h">
+      <Filter>Item\ItemList</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemDB.h">
+      <Filter>Item\ItemList</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc.h">
+      <Filter>Item\ItemList</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Player">

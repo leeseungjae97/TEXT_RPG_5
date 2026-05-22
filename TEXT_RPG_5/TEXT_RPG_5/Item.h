@@ -12,6 +12,13 @@ struct Item
 	int Price;
 	int EffectAmount;
 
+	Item(string name, ItemType type, int price, int effectAmount = 0)
+	{
+		Name = name;
+		Type = type;
+		Price = price;
+		EffectAmount = effectAmount;
+	}
 
 
 	void printInfo() const
