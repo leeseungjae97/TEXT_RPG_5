@@ -3,22 +3,30 @@
 #pragma once
 
 #include "pch.h"
-#include "Item.h"
 
-class Inventory
+class Player;
+class UItem;
+
+class InventoryManager
 {
-protected:
-	vector<Item*> Container;
-	Player* Player;
+private:
+	Player* Owner = nullptr;
 
+protected:
+
+	vector<UItem*> Container;
+	
 
 public:
-	void printInventory();
+	void SetOwner(Player* Owner);
+	Player* GetOwner();
 
-	vector<Item*> GetContainer();
-	int GetItemIndex(Item* item);
-	void AddItem(Item* item);
-	bool RemoveItem(Item* item);
+	void OpenInventory();
+
+	vector<UItem*>& GetContainer();
+	int GetItemIndex(UItem* Item);
+	void AddItem(UItem* Item);
+	bool RemoveItem(UItem* Item);
 	bool UseItem();
 
 	
