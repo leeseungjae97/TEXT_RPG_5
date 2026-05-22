@@ -20,9 +20,9 @@ void GameInstance::Init()
 void GameInstance::Tick()
 {
 	RenderManager::GetInstance()->ClearScreen();
-
+	
 	TimeManager::GetInstance()->Tick();
-	double DeltaTime= TimeManager::GetInstance()->GetDeltaTime();
+	double DeltaTime = TimeManager::GetInstance()->GetDeltaTime();
 	InputManager::GetInstance()->Tick(DeltaTime);
 
 	BattleManager::GetInstance()->Tick(DeltaTime);

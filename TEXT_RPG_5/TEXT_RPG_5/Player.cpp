@@ -40,26 +40,26 @@ void Player::Tick(float DeltaTime)
 	}
 
 	PrevPosition = Position;
-	//if (InputManager::GetInstance()->IsKeyDown(eKeyCode::UP))
-	//{
-	//	Position.Y--;
-	//	Sleep(120);
-	//}
-	//if (InputManager::GetInstance()->IsKeyDown(eKeyCode::DOWN))
-	//{
-	//	Position.Y++;
-	//	Sleep(120);
-	//}
-	//if (InputManager::GetInstance()->IsKeyDown(eKeyCode::RIGHT))
-	//{
-	//	Position.X++;
-	//	Sleep(120);
-	//}
-	//if (InputManager::GetInstance()->IsKeyDown(eKeyCode::LEFT))
-	//{
-	//	Position.X--;
-	//	Sleep(120);
-	//}
+	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::UP))
+	{
+		Position.Y--;
+		Sleep(120);
+	}
+	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::DOWN))
+	{
+		Position.Y++;
+		Sleep(120);
+	}
+	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::RIGHT))
+	{
+		Position.X++;
+		Sleep(120);
+	}
+	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::LEFT))
+	{
+		Position.X--;
+		Sleep(120);
+	}
 }
 
 // 아이템 사용

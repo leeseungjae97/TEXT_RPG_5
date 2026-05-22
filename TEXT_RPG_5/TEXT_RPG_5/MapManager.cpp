@@ -7,7 +7,7 @@
 
 MapManager::MapManager()
 {
-
+	map<Vector, Vector> m;
 }
 
 MapManager::~MapManager()
