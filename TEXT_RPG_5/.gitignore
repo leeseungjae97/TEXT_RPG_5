@@ -443,6 +443,7 @@ FodyWeavers.xsd
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+*.vcxproj.filters
 
 # Local History for Visual Studio Code
 .history/
@@ -451,7 +452,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-*.sln
 
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio

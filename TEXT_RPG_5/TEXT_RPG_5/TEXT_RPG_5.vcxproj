@@ -125,7 +125,7 @@
   <ItemGroup>
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Goblin.cpp" />
-    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="LevelComponent.cpp" />
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -144,10 +144,14 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Goblin.h" />
+    <ClInclude Include="HP_Potion.h" />
+    <ClInclude Include="Inventory.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemData.h" />
     <ClInclude Include="LevelComponent.h" />
+    <ClInclude Include="ItemTypeEnum.h" />
     <ClInclude Include="Monster.h" />
+    <ClInclude Include="MP_Potion.h" />
     <ClInclude Include="Orc.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
