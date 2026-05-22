@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿//ItemTypeEnum.h
+
+#pragma once
 
 enum class ItemType
 {
