@@ -16,6 +16,20 @@ void Inventory::printInventory()
 }
 
 
+vector<Item*> Inventory::GetContainer()
+{
+    return Container;
+}
+
+int Inventory::GetItemIndex(Item* item)
+{
+    auto it = find(Container.begin(), Container.end(), item);
+    if (it != Container.end())
+        return it - Container.begin();
+    else
+        return -1;
+}
+
 void Inventory::AddItem(Item* item)
 {
     Container.push_back(item);
@@ -34,8 +48,11 @@ bool Inventory::RemoveItem(Item* item)
     return false;
 }
 
-bool Inventory::UseItem(Item* item)
+bool Inventory::UseItem()
 {
+    int n = rand() % Container.size();
+    Item* item = Container[n];
+
     if (item->Type == ItemType::Usable)
     {
         item->Use(Player);

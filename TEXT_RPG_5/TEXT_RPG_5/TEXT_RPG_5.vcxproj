@@ -141,6 +141,7 @@
     <ClCompile Include="Troll.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AllItems.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Goblin.h" />
@@ -148,8 +149,10 @@
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemData.h" />
+    <ClInclude Include="ItemDB.h" />
     <ClInclude Include="LevelComponent.h" />
     <ClInclude Include="ItemTypeEnum.h" />
+    <ClInclude Include="Misc.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="MP_Potion.h" />
     <ClInclude Include="Orc.h" />
