@@ -5,7 +5,8 @@ Monster::Monster()
 	Name = "Monster";
 	Health = 100;
 	Attack = 10;
-
+	Position = Vector(4, 4);
+	PrevPosition = Position;
 }
 
 string Monster::GetName()
@@ -36,6 +37,11 @@ void Monster::TakeDamage(int Damage)
 bool Monster::IsDead()
 {
 	return Health <= 0;
+}
+
+void Monster::Update(float DeltaTime)
+{
+
 }
 
 

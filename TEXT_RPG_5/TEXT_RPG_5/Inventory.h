@@ -14,10 +14,13 @@ protected:
 
 public:
 	void printInventory();
-	void AddItem(Item* item);
 
+	vector<Item*> GetContainer();
+	int GetItemIndex(Item* item);
+	void AddItem(Item* item);
 	bool RemoveItem(Item* item);
-	bool UseItem(Item* item);
+	bool UseItem();
+
 	
 
 
