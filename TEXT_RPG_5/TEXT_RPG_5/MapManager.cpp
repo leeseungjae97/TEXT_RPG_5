@@ -1,4 +1,4 @@
-#include "MapManager.h"
+ï»¿#include "MapManager.h"
 #include "Define.h"
 #include "RenderManager.h"
 #include "SceneManager.h"
@@ -53,7 +53,7 @@ void MapManager::UpdateMap()
 
 void MapManager::Init()
 {
-	// MAP_MAX_X * MAP_MAX_Y ¸Ê ¸¸µé±â
+	// MAP_MAX_X * MAP_MAX_Y ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
 	Map.resize(MAP_MAX_Y, vector<int>(MAP_MAX_X, 1));
 	//MapOrigin.resize(MAP_MAX_X, vector<int>(MAP_MAX_Y, 1));
 	

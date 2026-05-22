@@ -1,8 +1,8 @@
-#include "Player.h"
+ï»¿#include "Player.h"
 #include "InputManager.h"
 #include "MoveComponent.h"
 
-// »ý¼ºÀÚ
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Player::Player(string str, int hp, int power) : Name(str), HP(hp), Power(power)
 {
 	this->Level = 1;
