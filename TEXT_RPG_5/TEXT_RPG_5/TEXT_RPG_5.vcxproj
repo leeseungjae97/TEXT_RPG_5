@@ -102,6 +102,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,26 +125,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BattleManager.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="NPC.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="GameInstance.cpp" />
     <ClCompile Include="Goblin.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="LevelComponent.cpp" />
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="MapManager.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Orc.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="CombatComponent.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Slime.cpp" />
     <ClCompile Include="test_main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="TimeManager.cpp" />
     <ClCompile Include="Troll.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BattleManager.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Define.h" />
+    <ClInclude Include="InputManager.h" />
+    <ClInclude Include="NPC.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="GameInstance.h" />
     <ClInclude Include="Goblin.h" />
     <ClInclude Include="HP_Potion.h" />
     <ClInclude Include="Inventory.h" />
@@ -150,12 +168,17 @@
     <ClInclude Include="ItemData.h" />
     <ClInclude Include="LevelComponent.h" />
     <ClInclude Include="ItemTypeEnum.h" />
+    <ClInclude Include="MapManager.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="MP_Potion.h" />
     <ClInclude Include="Orc.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="CombatComponent.h" />
+    <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
+    <ClInclude Include="TimeManager.h" />
     <ClInclude Include="Troll.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>

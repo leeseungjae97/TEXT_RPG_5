@@ -2,8 +2,9 @@
 
 #include "pch.h"
 #include "Vector.h"
+#include "Object.h"
 
-class Monster
+class Monster : public AObject
 {
 protected:
 	string Name;
@@ -17,4 +18,11 @@ public:
 	int GetAttack();
 	void TakeDamage(int damage);
 	bool IsDead();
+
+	void Update(float DeltaTime);
+
+public:
+	virtual void Init() {}
+	virtual void Tick(float DeltaTime){}
+	virtual void Destroy(){}
 };

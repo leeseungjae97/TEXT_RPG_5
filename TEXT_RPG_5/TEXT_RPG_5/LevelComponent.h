@@ -1,12 +1,11 @@
 #pragma once
 #include "Component.h";
-class Player;
+class AObject;
 
-class LevelComponent : public Component
+class LevelComponent : public UComponent
 {
 public:
-    Player* player;
-    LevelComponent(Player* player) : player(player) {}
+    LevelComponent(AObject* InOwner) : UComponent(InOwner) {}
 
     const int MaxLevel = 10;
     void StatsUpdate();

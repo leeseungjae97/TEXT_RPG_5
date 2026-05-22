@@ -2,6 +2,7 @@
 
 #include "pch.h"
 
+#include <Windows.h>
 #ifndef _GLIBCXX_NO_ASSERT
 #endif
 #include <climits>
@@ -78,3 +79,4 @@
 #endif
 
 using namespace std;
+
