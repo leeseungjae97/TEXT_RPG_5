@@ -3,7 +3,7 @@
 
 NPC::NPC()
 {
-	CombatComponent = new UCombatComponent(this);
+	CombatComponent = CreateDefaultComponent<UCombatComponent>();
 }
 
 NPC::~NPC()

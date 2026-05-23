@@ -11,7 +11,7 @@ public:
 
 public:
 	void Tick(float DeltaTime);
-	void Init();
+	void BeginPlay();
 	void Destroy();
 
 public:

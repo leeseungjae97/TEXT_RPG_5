@@ -1,5 +1,7 @@
 #pragma once
 #include "Vector.h"
+#include "Component.h"
+#include "ComponentTypeEnum.h"
 #include "pch.h"
 
 class UComponent;
@@ -7,7 +9,7 @@ class AObject
 {
 public:
 	AObject();
-	~AObject();
+	virtual ~AObject();
 
 protected:
 	bool bIsDestroy;
@@ -26,10 +28,49 @@ public:
 	Vector GetPrevPosition() { return PrevPosition; }
 	void SetPrevPosition(Vector InPosition) { PrevPosition = InPosition; }
 
+	template<typename T>
+	T* CreateDefaultComponent()
+	{
+		static_assert(is_base_of<UComponent, T>::value, "T must derive from UComponent");
+		const int Index = static_cast<int>(T::Type);
+		if (Index < 0 || Index >= static_cast<int>(Components.size()))
+		{
+			return nullptr;
+		}
+
+		if (Components[Index])
+		{
+			return static_cast<T*>(Components[Index].get());
+		}
+
+		unique_ptr<T> NewComponent(new T(this));
+		T* RawPtr = NewComponent.get();
+
+		Components[Index] = move(NewComponent);
+		return RawPtr;
+	}
+
+	template<typename T>
+	T* GetComponent()
+	{
+		static_assert(is_base_of<UComponent, T>::value, "T must derive from UComponent");
+		const int Index = static_cast<int>(T::Type);
+		if (Index < 0 || Index >= static_cast<int>(Components.size()))
+		{
+			return nullptr;
+		}
+
+		if (!Components[Index])
+		{
+			return nullptr;
+		}
+
+		return static_cast<T*>(Components[Index].get());
+	}
+
 protected:
 	Vector Position;
 	Vector PrevPosition;
+	vector<unique_ptr<UComponent>> Components;
 
-private:
-	vector<UComponent*> Components;
 };

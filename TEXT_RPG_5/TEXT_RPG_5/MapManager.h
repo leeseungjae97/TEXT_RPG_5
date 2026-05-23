@@ -9,7 +9,7 @@ public:
 	~MapManager();
 
 public:
-	void Init();
+	void BeginPlay();
 	void Tick(float DeltaTime);
 
 	void UpdateMap();

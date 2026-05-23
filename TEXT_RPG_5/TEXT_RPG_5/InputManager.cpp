@@ -15,7 +15,7 @@ InputManager::InputManager()
 InputManager::~InputManager()
 {
 }
-void InputManager::Init()
+void InputManager::BeginPlay()
 {
     Keys.resize((UINT)eKeyCode::END, false);
 }

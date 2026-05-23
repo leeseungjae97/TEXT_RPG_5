@@ -20,7 +20,7 @@ void TimeManager::Tick()
 {
 	if (CpuFrequency.QuadPart == 0)
 	{
-		Init();
+		BeginPlay();
 	}
 
 	QueryPerformanceCounter(&CurFrequency);
@@ -30,7 +30,7 @@ void TimeManager::Tick()
 	PrevFrequency.QuadPart = CurFrequency.QuadPart;
 
 }
-void TimeManager::Init()
+void TimeManager::BeginPlay()
 {
 	QueryPerformanceFrequency(&CpuFrequency);
 

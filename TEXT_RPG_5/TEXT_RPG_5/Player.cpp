@@ -1,6 +1,7 @@
 ﻿#include "Player.h"
 #include "InputManager.h"
 #include "MoveComponent.h"
+#include "RenderManager.h"
 
 // ������
 Player::Player(string str, int hp, int power) : Name(str), HP(hp), Power(power)
@@ -10,7 +11,7 @@ Player::Player(string str, int hp, int power) : Name(str), HP(hp), Power(power)
 	this->Exp = 0;
 	this->Max_Exp = 100;
 	this->Gold = 0;
-	this->MoveComponent = new UMoveComponent(this);
+	this->MoveComponent = CreateDefaultComponent<UMoveComponent>();
 
 	this->Position.Y = 2;
 	this->Position.X = 2;
@@ -21,16 +22,12 @@ Player::Player(string str, int hp, int power) : Name(str), HP(hp), Power(power)
 
 Player::~Player()
 {
-	delete MoveComponent;
-	MoveComponent = nullptr;
+
 }
 
 void Player::Tick(float DeltaTime)
 {
-	if (MoveComponent != nullptr)
-	{
-		MoveComponent->Tick(DeltaTime);
-	}
+	AObject::Tick(DeltaTime);
 }
 
 // Getter

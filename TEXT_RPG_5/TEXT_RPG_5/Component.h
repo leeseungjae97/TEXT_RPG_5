@@ -1,11 +1,11 @@
 #pragma once
 
+
 class AObject;
 class UComponent
 {
 public:
-    UComponent(AObject* InOwner);
-    ~UComponent();
+    virtual ~UComponent() = default;
     UComponent() = delete;
 
     AObject* GetOwner() { return Owner; }
@@ -16,4 +16,7 @@ public:
 
 private:
     AObject* Owner;
+
+protected:
+    UComponent(AObject* InOwner);
 };
