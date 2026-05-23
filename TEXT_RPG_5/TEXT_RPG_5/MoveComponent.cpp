@@ -1,4 +1,5 @@
 #include "MoveComponent.h"
+#include "RenderManager.h"
 #include "InputManager.h"
 #include "Object.h"
 #include "Player.h"
@@ -27,42 +28,44 @@ void UMoveComponent::SetFacingDirection(EDirection Str)
 
 void UMoveComponent::Tick(float DeltaTime)
 {
+	if(nullptr == PlayerPtr)
+		PlayerPtr = dynamic_cast<Player*>(GetOwner());
+
+	if (PlayerPtr == nullptr)
+	{
+		return;
+	}
+
 	PlayerPtr->SetPrevPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y }); 
+	MoveElapsedTime += DeltaTime;
+
+	if (MoveElapsedTime < MoveInterval)
+	{
+		return;
+	}
 
 	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::UP))
 	{
-		if (PlayerPtr != nullptr)
-		{
-			PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y - 1 });
-			SetFacingDirection(EDirection::UP);
-			Sleep(120);
-		}
+		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y - 1 });
+		SetFacingDirection(EDirection::UP);
+		MoveElapsedTime = 0.0f;
 	}
-	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::DOWN))
+	else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::DOWN))
 	{
-		if (PlayerPtr != nullptr)
-		{
-			PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y + 1 });
-			SetFacingDirection(EDirection::DOWN);
-			Sleep(120);
-		}
+		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y + 1 });
+		SetFacingDirection(EDirection::DOWN);
+		MoveElapsedTime = 0.0f;
 	}
-	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::LEFT))
+	else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::LEFT))
 	{
-		if (PlayerPtr != nullptr)
-		{
-			PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y});
-			SetFacingDirection(EDirection::LEFT);
-			Sleep(120);
-		}
+		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y});
+		SetFacingDirection(EDirection::LEFT);
+		MoveElapsedTime = 0.0f;
 	}
-	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::RIGHT))
+	else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::RIGHT))
 	{
-		if (PlayerPtr != nullptr)
-		{
-			PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y});
-			SetFacingDirection(EDirection::RIGHT);
-			Sleep(120);
-		}
+		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y});
+		SetFacingDirection(EDirection::RIGHT);
+		MoveElapsedTime = 0.0f;
 	}
 }

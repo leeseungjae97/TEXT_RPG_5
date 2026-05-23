@@ -14,6 +14,11 @@ class UCombatComponent : public UComponent
 public:
 	static constexpr ComponentType Type = ComponentType::CombatComponent;
 
+protected:
+	UCombatComponent(AObject* InOwner);
+	UCombatComponent() = delete;
+
+public:
 	~UCombatComponent();
 
 	vector<Vector> GetAttackValue();
