@@ -1,7 +1,11 @@
 #pragma once
-
+#include "Vector.h"
+#include "pch.h"
 #include "Component.h"
 #include "ComponentTypeEnum.h"
+
+class Player;
+class UMoveComponent;
 
 class UCombatComponent : public UComponent
 {
@@ -12,9 +16,16 @@ public:
 
 	~UCombatComponent();
 
+	vector<Vector> GetAttackValue();
+	// void SetAttackValue();
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UCombatComponent(AObject* InOwner);
+	vector<Vector> AttackValue;
+	Player* PlayerPtr;
+	UMoveComponent* MoveComponentPtr;
+	float TotalTime;
+	float DelayTime;
 };

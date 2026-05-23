@@ -1,16 +1,19 @@
 #pragma once
 #include "pch.h"
 #include "Vector.h"
+#include "PlayerStat.h"
 #include "Object.h"
 
 class UMoveComponent;
+class UCombatComponent;
+
 class Player : public AObject
 {
 public:
-	// »ı¼ºÀÚ
+	// ìƒì„±ì
 	Player(string str, int hp, int power);
 	
-	// ¼Ò¸êÀÚ
+	// ì†Œë©¸ì
 	~Player();
 
 	// Getter
@@ -22,6 +25,9 @@ public:
 	int GetExp();
 	int GetMax_Exp();
 	int GetGold();
+	bool GetIsAttack();
+	UMoveComponent* GetMoveComponent(); // ì—†ì–´ë„ ë ê±° ê°™ê¸°ëŠ” í•¨
+	UCombatComponent* GetCombatComponent();
 
 	// Setter
 	void SetName(string Name);
@@ -32,6 +38,7 @@ public:
 	void SetExp(int Exp);
 	void SetMax_Exp(int Max_Exp);
 	void SetGold(int Gold);
+	void SetIsAttack(bool Value);
 
 public:
 	virtual void Init(){}
@@ -39,15 +46,9 @@ public:
 	virtual void Destroy(){}
 
 protected:
-	// ÇÃ·¹ÀÌ¾î ½ºÅÈÀ¸·Î
-	string Name;
-	int Level;
-	int HP;
-	int Max_HP;
-	int Power;
-	int Exp;
-	int Max_Exp;
-	int Gold;
-	UMoveComponent* MoveComponent;
-	//EDirection FacingDirection;
+	PlayerStat TotalStat;
+
+private:
+	UMoveComponent* MoveComponent = nullptr;
+	UCombatComponent* CombatComponent = nullptr;
 };

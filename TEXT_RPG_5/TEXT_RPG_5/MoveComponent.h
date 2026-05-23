@@ -2,18 +2,16 @@
 #include "Component.h"
 #include "ComponentTypeEnum.h"
 
-enum class EDirection
+enum class EDirection : int
 {
-	LeftUp = 1,
-	Up = 2,
-	RightUp = 3,
-	Left = 4,
-	None = 5,
-	Right = 6,
-	LeftDown = 7,
-	Down = 8,
-	RightDown = 9
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	NONE
 };
+
+class Player;
 
 class UMoveComponent : public UComponent
 {
@@ -24,16 +22,15 @@ public:
 
 	~UMoveComponent();
 
-	void SetFacingDirection(EDirection Str);
 	EDirection GetFacingDirection();
+	void SetFacingDirection(EDirection Str);
+	
 
 public:
 	virtual void Tick(float DeltaTime) override;
 
-
 private:
-	UMoveComponent(AObject* InOwner);
-
+	Player* PlayerPtr;
 	EDirection FacingDirection;
 };
 

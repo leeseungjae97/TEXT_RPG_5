@@ -1,99 +1,135 @@
 ﻿#include "Player.h"
 #include "InputManager.h"
 #include "MoveComponent.h"
-#include "RenderManager.h"
+#include "CombatComponent.h"
 
-// ������
-Player::Player(string str, int hp, int power) : Name(str), HP(hp), Power(power)
+Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 {
-	this->Level = 1;
-	this->Max_HP = HP;
-	this->Exp = 0;
-	this->Max_Exp = 100;
-	this->Gold = 0;
-	this->MoveComponent = CreateDefaultComponent<UMoveComponent>();
+	this->TotalStat.Level = 1;
+	this->TotalStat.Max_HP = TotalStat.HP;
+	this->TotalStat.Exp = 0;
+	this->TotalStat.Max_Exp = 100;
+	this->TotalStat.Gold = 0;
+	this->TotalStat.IsAttack = false;
+
+	this->MoveComponent = new UMoveComponent(this);
+	this->CombatComponent = new UCombatComponent(this);
 
 	this->Position.Y = 2;
 	this->Position.X = 2;
-	//this->FacingDirection = EDirection::None;
+
 	//Position = Vector(2, 2);
 	//PrevPosition = Vector(2, 2);
 }
 
 Player::~Player()
 {
-
+	if (MoveComponent != nullptr)
+	{
+		delete MoveComponent;
+		MoveComponent = nullptr;
+	}
+	
+	if (CombatComponent != nullptr)
+	{
+		delete CombatComponent;
+		CombatComponent = nullptr;
+	}
 }
 
 void Player::Tick(float DeltaTime)
 {
-	AObject::Tick(DeltaTime);
+	if (MoveComponent != nullptr)
+	{
+		MoveComponent->Tick(DeltaTime);
+	}
+
+	if (CombatComponent != nullptr)
+	{
+		CombatComponent->Tick(DeltaTime);
+	}
 }
 
 // Getter
 string Player::GetName()
 {
-	return Name;
+	return this->TotalStat.Name;
 }
 int Player::GetLevel()
 {
-	return Level;
+	return this->TotalStat.Level;
 }
 int Player::GetPower()
 {
-	return Power;
+	return this->TotalStat.Power;
 }
 int Player::GetHP()
 {
-	return HP;
+	return this->TotalStat.HP;
 }
 int Player::GetMax_HP()
 {
-	return Max_HP;
+	return this->TotalStat.Max_HP;
 }
 int Player::GetExp()
 {
-	return Exp;
+	return this->TotalStat.Exp;
 }
 int Player::GetMax_Exp()
 {
-	return Max_Exp;
+	return this->TotalStat.Max_Exp;
 }
 int Player::GetGold()
 {
-	return Gold;
+	return this->TotalStat.Gold;
+}
+bool Player::GetIsAttack()
+{
+	return this->TotalStat.IsAttack;
+}
+UMoveComponent* Player::GetMoveComponent()
+{
+	return MoveComponent;
+}
+UCombatComponent* Player::GetCombatComponent()
+{
+	return CombatComponent;
 }
 
 // Setter
 void Player::SetName(string Name)
 {
-	this->Name = Name;
+	this->TotalStat.Name = Name;
 }
 void Player::SetLevel(int Level)
 {
-	this->Level = Level;
+	this->TotalStat.Level = Level;
 }
 void Player::SetPower(int Power)
 {
-	this->Power = Power;
+	this->TotalStat.Power = Power;
 }
 void Player::SetHP(int HP)
 {
-	this->HP = HP;
+	this->TotalStat.HP = HP;
 }
 void Player::SetMax_HP(int Max_HP)
 {
-	this->Max_HP = Max_HP;
+	this->TotalStat.Max_HP = Max_HP;
 }
 void Player::SetExp(int Exp)
 {
-	this->Exp = Exp;
+	this->TotalStat.Exp = Exp;
 }
 void Player::SetMax_Exp(int Max_Exp)
 {
-	this->Max_Exp = Max_Exp;
+	this->TotalStat.Max_Exp = Max_Exp;
 }
 void Player::SetGold(int Gold)
 {
-	this->Gold = Gold;
+	this->TotalStat.Gold = Gold;
+}
+void Player::SetIsAttack(bool Value)
+{
+	this->TotalStat.IsAttack = Value;
 }
