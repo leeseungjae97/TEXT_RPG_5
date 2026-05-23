@@ -1,4 +1,5 @@
 #pragma once
+
 template<typename T>
 class Singleton
 {
@@ -7,7 +8,7 @@ private:
 
 public:
 	static T* GetInstance();
-	static void Destroy();
+	static void Delete();
 
 protected:
 	Singleton() {}
@@ -23,13 +24,14 @@ inline T* Singleton<T>::GetInstance()
 	if (nullptr == Instance)
 	{
 		Instance = new T;
+		atexit(&Singleton<T>::Delete);
 	}
 
 	return Instance;
 }
 
 template<typename T>
-inline void Singleton<T>::Destroy()
+inline void Singleton<T>::Delete()
 {
 	if (nullptr != Instance)
 	{

@@ -7,10 +7,7 @@ void BattleManager::Tick(float DeltaTime)
 {
 
 }
-void BattleManager::Destroy()
-{
 
-}
 void BattleManager::BeginPlay()
 {
 

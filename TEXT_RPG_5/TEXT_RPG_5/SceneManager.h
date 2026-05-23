@@ -3,7 +3,7 @@
 #include "pch.h"
 
 class AObject;
-class SceneManager : public Singleton<SceneManager >
+class SceneManager : public Singleton<SceneManager>
 {
 public:
 	SceneManager();

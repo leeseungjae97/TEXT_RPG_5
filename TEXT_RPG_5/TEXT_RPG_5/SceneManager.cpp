@@ -15,7 +15,7 @@ SceneManager::~SceneManager()
 	{
 		if (nullptr != Objects[i])
 		{
-			Objects[i]->Destroy();
+			delete Objects[i];
 		}
 	}
 	Objects.clear();
@@ -61,9 +61,13 @@ void SceneManager::RemoveObject(AObject* object)
 	{
 		if ((*it) == object)
 		{
-			Objects.erase(it);
 			delete (*it);
+			it = Objects.erase(it);
 			break;
+		}
+		else
+		{
+			++it;
 		}
 	}
 }
