@@ -8,7 +8,7 @@ UMoveComponent::UMoveComponent(AObject* InOwner)
 	: UComponent(InOwner)
 {
 	PlayerPtr = dynamic_cast<Player*>(InOwner);
-	this->FacingDirection = EDirection::NONE;
+	this->FacingDirection = EDirection::UP;
 }
 
 UMoveComponent::~UMoveComponent()
