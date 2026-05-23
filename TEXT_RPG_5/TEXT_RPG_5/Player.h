@@ -45,7 +45,6 @@ public:
 
 protected:
 	PlayerStat TotalStat;
-	int a;
 
 private:
 	UMoveComponent* MoveComponent = nullptr;
