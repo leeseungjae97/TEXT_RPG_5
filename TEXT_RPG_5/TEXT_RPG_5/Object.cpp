@@ -3,7 +3,6 @@
 AObject::AObject()
 	: bIsDestroy(false)
 {
-	Components.resize((int)ComponentType::MAX);
 }
 
 AObject::~AObject()

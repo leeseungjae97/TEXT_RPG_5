@@ -8,12 +8,13 @@ UCombatComponent::UCombatComponent(AObject* InOwner)
 	: UComponent(InOwner)
 {
 	PlayerPtr = dynamic_cast<Player*>(InOwner);
-	MoveComponentPtr = PlayerPtr->GetMoveComponent();
+	MoveComponentPtr = PlayerPtr->GetComponent<UMoveComponent>();
 	this->TotalTime = 0.0f;
 	this->DelayTime = 2.0f;
 }
 UCombatComponent::~UCombatComponent()
 {
+
 }
 
 vector<Vector> UCombatComponent::GetAttackValue()
@@ -23,6 +24,9 @@ vector<Vector> UCombatComponent::GetAttackValue()
 
 void UCombatComponent::Tick(float DeltaTime)
 {
+	if (nullptr == MoveComponentPtr)
+		return;
+
 	if (PlayerPtr != nullptr)
 	{
 		if (InputManager::GetInstance()->IsKeyDown(eKeyCode::Z) && (TotalTime >= DelayTime))

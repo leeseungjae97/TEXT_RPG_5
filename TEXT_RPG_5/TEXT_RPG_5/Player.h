@@ -26,8 +26,6 @@ public:
 	int GetMax_Exp();
 	int GetGold();
 	bool GetIsAttack();
-	UMoveComponent* GetMoveComponent(); // 없어도 될거 같기는 함
-	UCombatComponent* GetCombatComponent();
 
 	// Setter
 	void SetName(string Name);

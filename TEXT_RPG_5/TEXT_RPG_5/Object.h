@@ -32,6 +32,10 @@ public:
 	T* CreateDefaultComponent()
 	{
 		static_assert(is_base_of<UComponent, T>::value, "T must derive from UComponent");
+
+		if(Components.empty())
+			Components.resize((int)ComponentType::MAX);
+
 		const int Index = static_cast<int>(T::Type);
 		if (Index < 0 || Index >= static_cast<int>(Components.size()))
 		{
@@ -54,6 +58,7 @@ public:
 	T* GetComponent()
 	{
 		static_assert(is_base_of<UComponent, T>::value, "T must derive from UComponent");
+
 		const int Index = static_cast<int>(T::Type);
 		if (Index < 0 || Index >= static_cast<int>(Components.size()))
 		{
@@ -71,6 +76,8 @@ public:
 protected:
 	Vector Position;
 	Vector PrevPosition;
+
+private:
 	vector<unique_ptr<UComponent>> Components;
 
 };

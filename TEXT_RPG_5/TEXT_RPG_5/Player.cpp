@@ -12,8 +12,8 @@ Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 	this->TotalStat.Gold = 0;
 	this->TotalStat.IsAttack = false;
 
-	this->MoveComponent = new UMoveComponent(this);
-	this->CombatComponent = new UCombatComponent(this);
+	this->MoveComponent = CreateDefaultComponent<UMoveComponent>();
+	this->CombatComponent = CreateDefaultComponent<UCombatComponent>();
 
 	this->Position.Y = 2;
 	this->Position.X = 2;
@@ -24,30 +24,11 @@ Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 
 Player::~Player()
 {
-	if (MoveComponent != nullptr)
-	{
-		delete MoveComponent;
-		MoveComponent = nullptr;
-	}
-	
-	if (CombatComponent != nullptr)
-	{
-		delete CombatComponent;
-		CombatComponent = nullptr;
-	}
 }
 
 void Player::Tick(float DeltaTime)
 {
-	if (MoveComponent != nullptr)
-	{
-		MoveComponent->Tick(DeltaTime);
-	}
-
-	if (CombatComponent != nullptr)
-	{
-		CombatComponent->Tick(DeltaTime);
-	}
+	AObject::Tick(DeltaTime);
 }
 
 // Getter
@@ -86,14 +67,6 @@ int Player::GetGold()
 bool Player::GetIsAttack()
 {
 	return this->TotalStat.IsAttack;
-}
-UMoveComponent* Player::GetMoveComponent()
-{
-	return MoveComponent;
-}
-UCombatComponent* Player::GetCombatComponent()
-{
-	return CombatComponent;
 }
 
 // Setter
