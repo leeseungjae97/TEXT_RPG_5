@@ -1,9 +1,11 @@
 #pragma once
 #include "pch.h"
 #include "Vector.h"
+#include "PlayerStat.h"
 #include "Object.h"
 
 class UMoveComponent;
+class UCombatComponent;
 
 class Player : public AObject
 {
@@ -23,6 +25,9 @@ public:
 	int GetExp();
 	int GetMax_Exp();
 	int GetGold();
+	bool GetIsAttack();
+	UMoveComponent* GetMoveComponent(); // 없어도 될거 같기는 함
+	UCombatComponent* GetCombatComponent();
 
 	// Setter
 	void SetName(string Name);
@@ -33,6 +38,7 @@ public:
 	void SetExp(int Exp);
 	void SetMax_Exp(int Max_Exp);
 	void SetGold(int Gold);
+	void SetIsAttack(bool Value);
 
 public:
 	virtual void Init(){}
@@ -40,15 +46,9 @@ public:
 	virtual void Destroy(){}
 
 protected:
-	// 플레이어 스탯으로
-	string Name;
-	int Level;
-	int HP;
-	int Max_HP;
-	int Power;
-	int Exp;
-	int Max_Exp;
-	int Gold;
+	PlayerStat TotalStat;
+
+private:
 	UMoveComponent* MoveComponent = nullptr;
-	//EDirection FacingDirection;
+	UCombatComponent* CombatComponent = nullptr;
 };

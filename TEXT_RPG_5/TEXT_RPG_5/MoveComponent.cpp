@@ -1,11 +1,13 @@
 #include "MoveComponent.h"
 #include "InputManager.h"
 #include "Object.h"
+#include "Player.h"
 
 UMoveComponent::UMoveComponent(AObject* InOwner)
 	: UComponent(InOwner)
 {
-	FacingDirection = EDirection::None;
+	PlayerPtr = dynamic_cast<Player*>(InOwner);
+	this->FacingDirection = EDirection::NONE;
 }
 
 UMoveComponent::~UMoveComponent()
@@ -13,53 +15,54 @@ UMoveComponent::~UMoveComponent()
 
 }
 
-void UMoveComponent::SetFacingDirection(EDirection Str)
-{
-	this->FacingDirection = Str;
-}
 EDirection UMoveComponent::GetFacingDirection()
 {
 	return FacingDirection;
 }
 
+void UMoveComponent::SetFacingDirection(EDirection Str)
+{
+	this->FacingDirection = Str;
+}
+
 void UMoveComponent::Tick(float DeltaTime)
 {
-	// GetOwner() 변수로 받아라.
-	AObject* OwnerObject= GetOwner();
-
-	OwnerObject->SetPrevPosition({ OwnerObject->GetPosition().X, OwnerObject->GetPosition().Y }); //
+	PlayerPtr->SetPrevPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y }); 
 
 	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::UP))
 	{
-		if (OwnerObject != nullptr)
+		if (PlayerPtr != nullptr)
 		{
-			OwnerObject->SetPosition({ OwnerObject->GetPosition().X, OwnerObject->GetPosition().Y - 1 });
+			PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y - 1 });
+			SetFacingDirection(EDirection::UP);
 			Sleep(120);
 		}
 	}
 	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::DOWN))
 	{
-		if (OwnerObject != nullptr)
+		if (PlayerPtr != nullptr)
 		{
-			OwnerObject->SetPosition({ OwnerObject->GetPosition().X, OwnerObject->GetPosition().Y + 1 });
+			PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y + 1 });
+			SetFacingDirection(EDirection::DOWN);
 			Sleep(120);
 		}
 	}
 	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::LEFT))
 	{
-		if (OwnerObject != nullptr)
+		if (PlayerPtr != nullptr)
 		{
-			OwnerObject->SetPosition({ OwnerObject->GetPosition().X - 1, OwnerObject->GetPosition().Y});
+			PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y});
+			SetFacingDirection(EDirection::LEFT);
 			Sleep(120);
 		}
 	}
 	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::RIGHT))
 	{
-		if (OwnerObject != nullptr)
+		if (PlayerPtr != nullptr)
 		{
-			OwnerObject->SetPosition({ OwnerObject->GetPosition().X + 1, OwnerObject->GetPosition().Y});
+			PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y});
+			SetFacingDirection(EDirection::RIGHT);
 			Sleep(120);
 		}
 	}
-
 }

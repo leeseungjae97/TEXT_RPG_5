@@ -167,6 +167,7 @@
     <ClInclude Include="MoveComponent.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="PlayerStat.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="GameInstance.h" />
     <ClInclude Include="Goblin.h" />
