@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "ComponentTypeEnum.h"
 
 enum class EDirection
 {
@@ -16,8 +17,11 @@ enum class EDirection
 
 class UMoveComponent : public UComponent
 {
+	friend class AObject;
+
 public:
-	UMoveComponent(AObject* InOwner);
+	static constexpr ComponentType Type = ComponentType::MovementComponent;
+
 	~UMoveComponent();
 
 	void SetFacingDirection(EDirection Str);
@@ -28,6 +32,8 @@ public:
 
 
 private:
+	UMoveComponent(AObject* InOwner);
+
 	EDirection FacingDirection;
 };
 

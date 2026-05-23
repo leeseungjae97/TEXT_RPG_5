@@ -7,4 +7,6 @@ enum class ItemType
 	Equipment,
 	Usable,
 	Misc,
+
+	MAX
 };

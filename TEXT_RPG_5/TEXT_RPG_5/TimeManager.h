@@ -22,6 +22,6 @@ public:
 
 public:
 	void Tick();
-	void Init();
+	void BeginPlay();
 	void CalcFPS();
 };

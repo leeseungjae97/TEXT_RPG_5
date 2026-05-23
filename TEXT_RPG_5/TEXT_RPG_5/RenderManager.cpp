@@ -3,6 +3,7 @@
 #include "Define.h"
 #include "Item.h"
 
+
 RenderManager::~RenderManager()
 {
     delete[] screen;
@@ -15,7 +16,7 @@ RenderManager::~RenderManager()
     }
 }
 
-void RenderManager::Init()
+void RenderManager::BeginPlay()
 {
     screen = new wchar_t[SCREEN_WIDTH * SCREEN_HEIGHT];
     hConsole = CreateConsoleScreenBuffer(
@@ -49,6 +50,7 @@ void RenderManager::AddRender(int Y, int X, string Content)
 {
 	AddRender(Y, X, ToWideString(Content));
 }
+
 void RenderManager::AddRender(int Y, int X, wstring Content)
 {
 	for (int i = 0; i < Content.length(); ++i)
@@ -60,7 +62,7 @@ void RenderManager::AddRender(int Y, int X, wstring Content)
 		{
 			continue;
 		}
-
+        
 		screen[drawY * SCREEN_WIDTH + drawX] = Content[i];
 	}
 }
@@ -112,25 +114,25 @@ void RenderManager::DrawBox(int Y, int X, int Width, int Height)
 
 void RenderManager::DrawItemSlot(int Y, int X, int Width, int Height, const Item* item)
 {
-	DrawBox(Y, X, Width, Height);
+	//DrawBox(Y, X, Width, Height);
 
-	if (item == nullptr)
-	{
-		return;
-	}
+	//if (item == nullptr)
+	//{
+	//	return;
+	//}
 
-	wchar_t icon[2] = { GetItemIcon(item), L'\0' };
-	AddRender(Y + 1, X + Width / 2, icon);
+	//wchar_t icon[2] = { GetItemIcon(item), L'\0' };
+	//AddRender(Y + 1, X + Width / 2, icon);
 
-	wstring itemName = ToWideString(item->Name);
-	int maxNameLength = Width - 2;
-	if (itemName.length() > maxNameLength)
-	{
-		itemName = itemName.substr(0, maxNameLength);
-	}
+	//wstring itemName = ToWideString(item->Name);
+	//int maxNameLength = Width - 2;
+	//if (itemName.length() > maxNameLength)
+	//{
+	//	itemName = itemName.substr(0, maxNameLength);
+	//}
 
-	int nameX = X + 1 + max(0, (maxNameLength - static_cast<int>(itemName.length())) / 2);
-	AddRender(Y + Height - 2, nameX, itemName);
+	//int nameX = X + 1 + max(0, (maxNameLength - static_cast<int>(itemName.length())) / 2);
+	//AddRender(Y + Height - 2, nameX, itemName);
 }
 
 void RenderManager::DrawInventoryPanel(int Y, int X, const vector<Item*>& Items, int Capacity, int Columns, int Rows)
@@ -184,28 +186,31 @@ wstring RenderManager::ToWideString(const string& Text)
 
 	wstring result(length - 1, L'\0');
 	MultiByteToWideChar(CP_ACP, 0, Text.c_str(), -1, &result[0], length);
+
 	return result;
 }
 
 wchar_t RenderManager::GetItemIcon(const Item* item)
 {
-	if (item == nullptr)
-	{
-		return L' ';
-	}
+	//if (item == nullptr)
+	//{
+	//	return L' ';
+	//}
 
-	switch (item->Type)
-	{
-	case ItemType::Equipment:
-		return L'E';
-	case ItemType::Usable:
-		return L'U';
-	case ItemType::Misc:
-		return L'*';
-	default:
-		return L'?';
-	}
+	//switch (item->Type)
+	//{
+	//case ItemType::Equipment:
+	//	return L'E';
+	//case ItemType::Usable:
+	//	return L'U';
+	//case ItemType::Misc:
+	//	return L'*';
+	//default:
+	//	return L'?';
+	//}
+    return L' ';
 }
+
 void RenderManager::ClearScreen()
 {
     for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; ++i)

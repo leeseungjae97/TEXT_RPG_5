@@ -6,15 +6,15 @@
 #include "SceneManager.h"
 #include "InputManager.h"
 
-void GameInstance::Init()
+void GameInstance::BeginPlay()
 {
-	InputManager::GetInstance()->Init();
-	RenderManager::GetInstance()->Init();
-	TimeManager::GetInstance()->Init();
+	InputManager::GetInstance()->BeginPlay();
+	RenderManager::GetInstance()->BeginPlay();
+	TimeManager::GetInstance()->BeginPlay();
 
-	SceneManager::GetInstance()->Init();
-	MapManager::GetInstance()->Init();
-	BattleManager::GetInstance()->Init();
+	SceneManager::GetInstance()->BeginPlay();
+	MapManager::GetInstance()->BeginPlay();
+	BattleManager::GetInstance()->BeginPlay();
 }
 
 void GameInstance::Tick()

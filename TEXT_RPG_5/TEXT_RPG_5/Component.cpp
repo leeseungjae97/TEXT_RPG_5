@@ -4,7 +4,3 @@ UComponent::UComponent(AObject* InOwner)
 	: Owner(InOwner)
 {
 }
-
-UComponent::~UComponent()
-{
-}

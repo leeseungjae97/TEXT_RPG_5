@@ -11,7 +11,7 @@ void BattleManager::Destroy()
 {
 
 }
-void BattleManager::Init()
+void BattleManager::BeginPlay()
 {
 
 }

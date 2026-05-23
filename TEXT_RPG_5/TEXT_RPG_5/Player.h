@@ -4,7 +4,6 @@
 #include "Object.h"
 
 class UMoveComponent;
-
 class Player : public AObject
 {
 public:
@@ -49,6 +48,6 @@ protected:
 	int Exp;
 	int Max_Exp;
 	int Gold;
-	UMoveComponent* MoveComponent = nullptr;
+	UMoveComponent* MoveComponent;
 	//EDirection FacingDirection;
 };
