@@ -148,6 +148,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="CombatComponent.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="Shop.cpp" />
     <ClCompile Include="Slime.cpp" />
     <ClCompile Include="SubActionComponent.cpp" />
     <ClCompile Include="Strength_Potion.cpp" />
@@ -187,6 +188,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="CombatComponent.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="Shop.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
     <ClInclude Include="SubActionComponent.h" />

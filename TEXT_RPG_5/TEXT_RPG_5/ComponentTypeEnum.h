@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 enum class ComponentType
 {
@@ -6,6 +6,7 @@ enum class ComponentType
 	LevelComponent,
 	MovementComponent,
 	SubActionComponent,
+	InventoryComponent,
 
 	MAX
 };
