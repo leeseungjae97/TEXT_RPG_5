@@ -12,6 +12,7 @@ UCombatComponent::UCombatComponent(AObject* InOwner)
 	this->TotalTime = 0.0f;
 	this->DelayTime = 2.0f;
 }
+
 UCombatComponent::~UCombatComponent()
 {
 
@@ -33,6 +34,7 @@ void UCombatComponent::Tick(float DeltaTime)
 		{
 			if (!(PlayerPtr->GetIsAttack()))
 			{
+				AttackValue.clear();
 				PlayerPtr->SetIsAttack(true);
 
 				if (MoveComponentPtr->GetFacingDirection() == EDirection::UP)
