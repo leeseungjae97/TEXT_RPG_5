@@ -45,10 +45,6 @@ public:
 	virtual void Destroy() override;
 
 protected:
-	
-	void Update(float DeltaTime);
-
-	
 	Player* FindPlayer();
 
 	

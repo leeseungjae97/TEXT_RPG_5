@@ -17,7 +17,7 @@ public:
 
 public:
 	void Tick(float DeltaTime);
-	void Init();
+	void BeginPlay();
 
 private:
 	vector<bool> Keys;

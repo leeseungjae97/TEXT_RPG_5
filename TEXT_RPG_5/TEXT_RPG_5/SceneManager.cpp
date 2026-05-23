@@ -40,7 +40,7 @@ void SceneManager::Destroy()
 	}
 }
 
-void SceneManager::Init()
+void SceneManager::BeginPlay()
 {
 	Player* player = new Player("name", 10, 10);
 	AddObject(player);

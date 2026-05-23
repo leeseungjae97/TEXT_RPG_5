@@ -10,10 +10,10 @@ class UCombatComponent;
 class Player : public AObject
 {
 public:
-	// »ı¼ºÀÚ
+	// ìƒì„±ì
 	Player(string str, int hp, int power);
 	
-	// ¼Ò¸êÀÚ
+	// ì†Œë©¸ì
 	~Player();
 
 	// Getter
@@ -26,7 +26,7 @@ public:
 	int GetMax_Exp();
 	int GetGold();
 	bool GetIsAttack();
-	UMoveComponent* GetMoveComponent(); // ¾ø¾îµµ µÉ°Å °°±â´Â ÇÔ
+	UMoveComponent* GetMoveComponent(); // ì—†ì–´ë„ ë ê±° ê°™ê¸°ëŠ” í•¨
 	UCombatComponent* GetCombatComponent();
 
 	// Setter

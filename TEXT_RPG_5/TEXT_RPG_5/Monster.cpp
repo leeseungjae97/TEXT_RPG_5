@@ -57,51 +57,35 @@ bool Monster::IsDead()
 
 void Monster::Tick(float DeltaTime)
 {
-
-	
-	
 	AObject::Tick(DeltaTime);
-	
-	Update(DeltaTime);
-}
-
-void Monster::Destroy()
-{
-	
-	bIsDestroy = true;
-}
-
-void Monster::Update(float DeltaTime)
-{
-	
 	if (IsDead())
 	{
 		Destroy();
 		return;
 	}
-	
+
 	MoveElapsedtime += DeltaTime;
 
-	
+
 	if (MoveElapsedtime < MoveInterval)
 	{
 		return;
 	}
-	
+
 	MoveElapsedtime = 0.0f;
 
-	
+
 	Player* player = FindPlayer();
 
-	
+
 	if (player == nullptr)
 	{
 		MoveRandom();
 		return;
 	}
-	
+
 	int Distance = GetDistanceToPlayer(player);
-	
+
 	if (Distance <= DetectionRange)
 	{
 		MoveTowardPlayer(player);
@@ -110,6 +94,11 @@ void Monster::Update(float DeltaTime)
 	{
 		MoveRandom();
 	}
+}
+
+void Monster::Destroy()
+{
+	bIsDestroy = true;
 }
 
 Player* Monster::FindPlayer()

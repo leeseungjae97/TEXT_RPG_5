@@ -7,7 +7,7 @@
 
 MapManager::MapManager()
 {
-
+	map<Vector, Vector> m;
 }
 
 MapManager::~MapManager()
@@ -51,7 +51,7 @@ void MapManager::UpdateMap()
 	}
 }
 
-void MapManager::Init()
+void MapManager::BeginPlay()
 {
 	// MAP_MAX_X * MAP_MAX_Y �� �����
 	Map.resize(MAP_MAX_Y, vector<int>(MAP_MAX_X, 1));

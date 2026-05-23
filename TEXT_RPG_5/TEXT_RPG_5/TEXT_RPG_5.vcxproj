@@ -162,6 +162,7 @@
     <ClInclude Include="AllItems.h" />
     <ClInclude Include="BattleManager.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentTypeEnum.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="MoveComponent.h" />

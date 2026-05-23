@@ -3,19 +3,11 @@
 AObject::AObject()
 	: bIsDestroy(false)
 {
-
+	Components.resize((int)ComponentType::MAX);
 }
 
 AObject::~AObject()
 {
-	if (Components.empty())
-		return;
-
-	for (int i = 0; i < Components.size(); ++i)
-	{
-		if(Components[i])
-			delete Components[i];
-	}
 }
 
 void AObject::Tick(float DeltaTime)
@@ -25,6 +17,9 @@ void AObject::Tick(float DeltaTime)
 
 	for (int i = 0; i < Components.size(); ++i)
 	{
-		Components[i]->Tick(DeltaTime);
+		if (Components[i])
+		{
+			Components[i]->Tick(DeltaTime);
+		}
 	}
 }

@@ -2,14 +2,18 @@
 #include "Vector.h"
 #include "pch.h"
 #include "Component.h"
+#include "ComponentTypeEnum.h"
 
 class Player;
 class UMoveComponent;
 
 class UCombatComponent : public UComponent
 {
+	friend class AObject;
+
 public:
-	UCombatComponent(AObject* InOwner);
+	static constexpr ComponentType Type = ComponentType::CombatComponent;
+
 	~UCombatComponent();
 
 	vector<Vector> GetAttackValue();
