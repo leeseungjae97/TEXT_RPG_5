@@ -44,7 +44,7 @@ public:
 	int GetGold();
 	void AddGold(int Amount);
 
-	vector<UItem*>& GetContainer();
+	vector<UItem*>& GetContainer() { return Container; }
 	int GetItemIndex(UItem* Item);
 	UItem* GetItem(int Index);
 	void AddItem(UItem* Item);
