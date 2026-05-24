@@ -77,11 +77,11 @@ void UMoveComponent::Tick(float DeltaTime)
 	{
 		return;
 	}
-
+	
 	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::UP))
 	{
 		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y - 1 });
+		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, max(PlayerPtr->GetPosition().Y - 1, 0) });
 		SetFacingDirection(EDirection::UP);
 		MoveElapsedTime = 0.0f;
 	}
@@ -95,7 +95,7 @@ void UMoveComponent::Tick(float DeltaTime)
 	else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::LEFT))
 	{
 		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y});
+		PlayerPtr->SetPosition({ max(PlayerPtr->GetPosition().X - 1, 0 ), PlayerPtr->GetPosition().Y});
 		SetFacingDirection(EDirection::LEFT);
 		MoveElapsedTime = 0.0f;
 	}

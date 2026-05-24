@@ -1,10 +1,11 @@
 #pragma once
-#include "Vector.h"
-#include "Component/Component.h"
-#include "ComponentTypeEnum.h"
+
 #include "pch.h"
+#include "Vector.h"
+#include "ComponentTypeEnum.h"
 
 class UComponent;
+
 class AObject
 {
 public:
@@ -20,20 +21,20 @@ public:
 	virtual void Destroy() = 0;
 
 public:
-	bool IsDestroy() { return bIsDestroy; }
+	bool IsDestroy() const { return bIsDestroy; }
 
-	Vector GetPosition() { return Position; }
+	Vector GetPosition() const { return Position; }
 	void SetPosition(Vector InPosition) { Position = InPosition; }
 
-	Vector GetPrevPosition() { return PrevPosition; }
+	Vector GetPrevPosition() const { return PrevPosition; }
 	void SetPrevPosition(Vector InPosition) { PrevPosition = InPosition; }
 
-	template<typename T>
+	template <typename T>
 	T* CreateDefaultComponent()
 	{
 		static_assert(is_base_of<UComponent, T>::value, "T must derive from UComponent");
 
-		if(Components.empty())
+		if (Components.empty())
 			Components.resize((int)ComponentType::MAX);
 
 		const int Index = static_cast<int>(T::Type);
@@ -54,7 +55,7 @@ public:
 		return RawPtr;
 	}
 
-	template<typename T>
+	template <typename T>
 	T* GetComponent()
 	{
 		static_assert(is_base_of<UComponent, T>::value, "T must derive from UComponent");
@@ -79,5 +80,4 @@ protected:
 
 private:
 	vector<unique_ptr<UComponent>> Components;
-
 };
