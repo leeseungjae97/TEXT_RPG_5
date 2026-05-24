@@ -2,13 +2,23 @@
 
 #include "Inventory.h"
 #include "Item.h"
+#include "RenderManager.h"
+#include "Player.h"
+#include "InputManager.h"
 
 
-void InventoryManager::SetOwner(Player* Owner) { this->Owner = Owner; }
+UInventoryComponent::UInventoryComponent(AObject* InOwner)
+    : UComponent(InOwner)
+{
+    PlayerPtr = dynamic_cast<Player*>(InOwner);
+}
 
-Player* InventoryManager::GetOwner() { return Owner; }
+UInventoryComponent::~UInventoryComponent()
+{
 
-void InventoryManager::OpenInventory()
+}
+
+void UInventoryComponent::OpenInventory()
 {
     int currentCount = 0;
     for (UItem* Item : Container)
@@ -19,25 +29,25 @@ void InventoryManager::OpenInventory()
 }
 
 
-int InventoryManager::GetGold()
+int UInventoryComponent::GetGold()
 {
     return Gold;
 }
 
-void InventoryManager::AddGold(int Amount)
+void UInventoryComponent::AddGold(int Amount)
 {
     Gold += Amount;
 }
 
 
 
-vector<UItem*>& InventoryManager::GetContainer()
+vector<UItem*>& UInventoryComponent::GetContainer()
 {
     return Container;
 
 }
 
-int InventoryManager::GetItemIndex(UItem* Item)
+int UInventoryComponent::GetItemIndex(UItem* Item)
 {
     auto it = find(Container.begin(), Container.end(), Item);
     if (it != Container.end())
@@ -46,17 +56,18 @@ int InventoryManager::GetItemIndex(UItem* Item)
         return -1;
 }
 
-UItem* InventoryManager::GetItem(int Index)
+UItem* UInventoryComponent::GetItem(int Index)
 {
     return Container[Index];
 }
 
-void InventoryManager::AddItem(UItem* Item)
+void UInventoryComponent::AddItem(UItem* Item)
 {
     Container.push_back(Item);
+    RenderManager::GetInstance();
 }
 
-bool InventoryManager::RemoveItem(UItem* Item)
+bool UInventoryComponent::RemoveItem(UItem* Item)
 { 
     auto it = find(Container.begin(), Container.end(), Item);
     if (it != Container.end())
@@ -68,14 +79,14 @@ bool InventoryManager::RemoveItem(UItem* Item)
     return false;
 }
 
-bool InventoryManager::UseRandomItem()
+bool UInventoryComponent::UseRandomItem()
 {
     int n = rand() % Container.size();
     UItem* Item = Container[n];
 
     if (Item->Type == ItemType::Usable)
     {
-        Item->Use(GetOwner());
+        Item->Use(PlayerPtr);
         RemoveItem(Item);
         return true;
     }
@@ -85,12 +96,12 @@ bool InventoryManager::UseRandomItem()
     }
 }
 
-bool InventoryManager::UseItem(UItem* Item)
+bool UInventoryComponent::UseItem(UItem* Item)
 {
 
     if (Item->Type == ItemType::Usable)
     {
-        Item->Use(GetOwner());
+        Item->Use(PlayerPtr);
         RemoveItem(Item);
         return true;
     }
@@ -102,24 +113,45 @@ bool InventoryManager::UseItem(UItem* Item)
 
 
 
+void UInventoryComponent::UpdateInventorySlot()
+{
 
-map<int, UItem*> InventoryManager::GetQuickSlot()
+    memset(InventorySlot, 0, sizeof(InventorySlot));
+
+    for (int i = 0; i < Container.size(); i++)
+    {
+        if(i<16)
+        {
+            InventorySlot[i / 4][i % 4] = Container[i];
+        }
+
+    }
+   
+}
+
+UItem* UInventoryComponent::GetItemFromCursor()
+{
+    return InventorySlot[CurrentCursor.first][CurrentCursor.second];
+}
+
+
+map<int, UItem*> UInventoryComponent::GetQuickSlot()
 {
     return QuickSlot;
 }
 
 
-void InventoryManager::RegisterOnQuickSlot(int Number, UItem* Item)
+void UInventoryComponent::RegisterOnQuickSlot(int Number, UItem* Item)
 {
     QuickSlot[Number] = Item;
 }
 
-UItem* InventoryManager::GetItemFromQuickSlot(int Number)
+UItem* UInventoryComponent::GetItemFromQuickSlot(int Number)
 {
     return QuickSlot[Number];
 }
 
-void InventoryManager::UseQuickSlot(int Number)
+void UInventoryComponent::UseQuickSlot(int Number)
 {
     UseItem(QuickSlot[Number]);
 }
@@ -127,7 +159,7 @@ void InventoryManager::UseQuickSlot(int Number)
 
 
 
-void InventoryManager::BuyItem(UItem* Item)
+void UInventoryComponent::BuyItem(UItem* Item)
 {
     if (Gold >= Item->Price)
     {
@@ -140,8 +172,48 @@ void InventoryManager::BuyItem(UItem* Item)
     }
 }
 
-void InventoryManager::SellItem(UItem* Item)
+void UInventoryComponent::SellItem(UItem* Item)
 {
     if (RemoveItem(Item))
         AddGold(Item->Price);
+}
+
+void UInventoryComponent::Tick(float DeltaTime)
+{
+    if (nullptr == PlayerPtr)
+        PlayerPtr = dynamic_cast<Player*>(GetOwner());
+
+    if (PlayerPtr == nullptr)
+    {
+        return;
+    }
+
+    PlayerPtr->SetPrevPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y });
+    MoveElapsedTime += DeltaTime;
+
+    if (MoveElapsedTime < MoveInterval)
+    {
+        return;
+    }
+
+    if (InputManager::GetInstance()->IsKeyDown(eKeyCode::UP))
+    {
+        PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y - 1 });
+        MoveElapsedTime = 0.0f;
+    }
+    else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::DOWN))
+    {
+        PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y + 1 });
+        MoveElapsedTime = 0.0f;
+    }
+    else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::LEFT))
+    {
+        PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y });
+        MoveElapsedTime = 0.0f;
+    }
+    else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::RIGHT))
+    {
+        PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y });
+        MoveElapsedTime = 0.0f;
+    }
 }

@@ -2,25 +2,42 @@
 
 #pragma once
 
+#include "Vector.h"
 #include "pch.h"
+#include "Component.h"
+#include "ComponentTypeEnum.h"
 
 class Player;
 class UItem;
 
-class InventoryManager
+class UInventoryComponent : public UComponent
 {
+	friend class AObject;
+
+public:
+	static constexpr ComponentType Type = ComponentType::InventoryComponent;
+
 private:
-	Player* Owner = nullptr;
+	Player* PlayerPtr = nullptr;
+
+	float MoveElapsedTime = 0.0f;
+	float MoveInterval = 0.12f;
+	UItem* InventorySlot[4][4] = { nullptr };
+	pair<int, int> CurrentCursor = { 0,0 };
 
 protected:
+	UInventoryComponent(AObject* InOwner);
+	UInventoryComponent() = delete;
+
 	vector<UItem*> Container;
 	map<int, UItem*> QuickSlot;
 	int Gold = 0;
 	int SelectedIndex;
 
 public:
-	void SetOwner(Player* Owner);
-	Player* GetOwner();
+	~UInventoryComponent();
+
+	virtual void Tick(float DeltaTime) override;
 
 	void OpenInventory();
 
@@ -34,6 +51,9 @@ public:
 	bool RemoveItem(UItem* Item);
 	bool UseRandomItem();
 	bool UseItem(UItem* Item);
+	
+	void UpdateInventorySlot();
+	UItem* GetItemFromCursor();
 
 	map<int, UItem*> GetQuickSlot();
 	void RegisterOnQuickSlot(int Number, UItem* Item);
@@ -43,7 +63,6 @@ public:
 	
 	void BuyItem(UItem* Item);
 	void SellItem(UItem* Item);
-	//d
 
 };
 

@@ -17,3 +17,8 @@ void UItem::printInfo() const
 void UItem::Use(Player* player)
 {
 }
+
+void UItem::Tick(float DeltaTime)
+{
+
+}
