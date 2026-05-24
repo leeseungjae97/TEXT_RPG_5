@@ -165,33 +165,4 @@ void UInventoryComponent::Tick(float DeltaTime)
     {
         return;
     }
-
-    PlayerPtr->SetPrevPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y });
-    MoveElapsedTime += DeltaTime;
-
-    if (MoveElapsedTime < MoveInterval)
-    {
-        return;
-    }
-
-    if (InputManager::GetInstance()->IsKeyDown(eKeyCode::UP))
-    {
-        PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y - 1 });
-        MoveElapsedTime = 0.0f;
-    }
-    else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::DOWN))
-    {
-        PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y + 1 });
-        MoveElapsedTime = 0.0f;
-    }
-    else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::LEFT))
-    {
-        PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y });
-        MoveElapsedTime = 0.0f;
-    }
-    else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::RIGHT))
-    {
-        PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y });
-        MoveElapsedTime = 0.0f;
-    }
 }

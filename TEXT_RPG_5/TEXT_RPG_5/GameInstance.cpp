@@ -28,8 +28,8 @@ void GameInstance::Tick()
 	BattleManager::GetInstance()->Tick(DeltaTime);
 	SceneManager::GetInstance()->Tick(DeltaTime);
 
-	RenderManager::GetInstance()->Tick(DeltaTime);
 	MapManager::GetInstance()->Tick(DeltaTime);
+	RenderManager::GetInstance()->Tick(DeltaTime);
 }
 void GameInstance::Render()
 {
