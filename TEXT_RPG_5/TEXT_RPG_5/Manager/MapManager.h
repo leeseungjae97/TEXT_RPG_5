@@ -1,7 +1,8 @@
 #pragma once
-#include "Singleton.h"
-#include "pch.h"
+#include "../Singleton.h"
+#include "../pch.h"
 
+class Player;
 class MapManager : public Singleton<MapManager>
 {
 public:

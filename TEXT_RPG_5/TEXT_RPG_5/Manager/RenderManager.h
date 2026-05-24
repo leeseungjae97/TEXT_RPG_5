@@ -1,6 +1,6 @@
 #pragma once
-#include "Singleton.h"
-#include "pch.h"
+#include "../Singleton.h"
+#include "../pch.h"
 
 enum ConsoleColor {
 	CC_BLACK,
@@ -55,6 +55,7 @@ public:
 
 public:
 	void _2DTO3D(float DeltaTime);
+	void _2DTOISO(float DeltaTime);
 
 public:
 	void SetColor(int Color, int Bgcolor);
@@ -69,7 +70,9 @@ private:
 private:
 	wstring ToWideString(const string& Text);
 	wchar_t GetItemIcon(const Item* item);
+	void PutCell(int Y, int X, wchar_t Character, WORD Attribute);
 
 	wchar_t* screen = nullptr;
+	WORD* attributes = nullptr;
 	HANDLE hConsole = INVALID_HANDLE_VALUE;
 };

@@ -1,8 +1,8 @@
 #pragma once
-#include "Vector.h"
-#include "pch.h"
+#include "../Vector.h"
+#include "../pch.h"
 #include "Component.h"
-#include "ComponentTypeEnum.h"
+#include "../ComponentTypeEnum.h"
 
 class Player;
 class UMoveComponent;

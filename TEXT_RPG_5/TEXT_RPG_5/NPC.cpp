@@ -1,5 +1,5 @@
 #include "NPC.h"
-#include "CombatComponent.h"
+#include "Component/CombatComponent.h"
 
 NPC::NPC()
 {
@@ -10,7 +10,7 @@ NPC::~NPC()
 {
 }
 
-void NPC::Init()
+void NPC::BeginPlay()
 {
 	
 }

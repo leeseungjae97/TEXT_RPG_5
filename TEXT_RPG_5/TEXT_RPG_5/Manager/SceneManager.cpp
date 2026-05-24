@@ -1,8 +1,7 @@
 #include "SceneManager.h"
-#include "Object.h"
-#include "Player.h"
-#include "Monster.h"
-
+#include "../Object.h"
+#include "../Player.h"
+#include "../Monster.h"
 
 SceneManager::SceneManager()
 {
@@ -42,11 +41,13 @@ void SceneManager::Destroy()
 
 void SceneManager::BeginPlay()
 {
-	Player* player = new Player("name", 10, 10);
-	AddObject(player);
-
-	Monster* monster = new Monster();
-	AddObject(monster);
+	CurrentPlayer = SpawnObject<Player>("name", 10, 10);
+	SpawnObject<Monster>();
+	SpawnObject<Monster>();
+	SpawnObject<Monster>();
+	SpawnObject<Monster>();
+	SpawnObject<Monster>();
+	SpawnObject<Monster>();
 }
 
 void SceneManager::AddObject(AObject* object)
@@ -61,6 +62,11 @@ void SceneManager::RemoveObject(AObject* object)
 	{
 		if ((*it) == object)
 		{
+			if ((*it) == CurrentPlayer)
+			{
+				CurrentPlayer = nullptr;
+			}
+
 			delete (*it);
 			it = Objects.erase(it);
 			break;

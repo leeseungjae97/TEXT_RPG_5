@@ -1,5 +1,5 @@
 #include "Object.h"
-#include "Component.h"
+#include "Component/Component.h"
 AObject::AObject()
 	: bIsDestroy(false)
 {

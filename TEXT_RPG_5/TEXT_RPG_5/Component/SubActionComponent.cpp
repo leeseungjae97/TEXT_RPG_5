@@ -1,6 +1,6 @@
 #include "SubActionComponent.h"
-#include "InputManager.h"
-#include "Player.h"
+#include "../Manager/InputManager.h"
+#include "../Player.h"
 
 void SubActionComponent::Tick(float DeltaTime)
 {

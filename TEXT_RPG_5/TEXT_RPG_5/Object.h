@@ -1,6 +1,6 @@
 #pragma once
 #include "Vector.h"
-#include "Component.h"
+#include "Component/Component.h"
 #include "ComponentTypeEnum.h"
 #include "pch.h"
 
@@ -15,7 +15,7 @@ protected:
 	bool bIsDestroy;
 
 public:
-	virtual void Init() = 0;
+	virtual void BeginPlay() = 0;
 	virtual void Tick(float DeltaTime);
 	virtual void Destroy() = 0;
 
