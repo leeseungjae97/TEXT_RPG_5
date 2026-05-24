@@ -39,14 +39,6 @@ void UInventoryComponent::AddGold(int Amount)
     Gold += Amount;
 }
 
-
-
-vector<UItem*>& UInventoryComponent::GetContainer()
-{
-    return Container;
-
-}
-
 int UInventoryComponent::GetItemIndex(UItem* Item)
 {
     auto it = find(Container.begin(), Container.end(), Item);
