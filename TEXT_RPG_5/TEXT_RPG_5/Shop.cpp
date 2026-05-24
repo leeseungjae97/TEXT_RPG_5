@@ -16,6 +16,11 @@ Shop::Shop()
 
 }
 
+static Shop::GetInstance()
+{
+    
+}
+
 const UItem* Shop::GetRandomItem()
 {
     int n = rand() % 2;

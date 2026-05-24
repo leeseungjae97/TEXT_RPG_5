@@ -1,10 +1,10 @@
 ﻿//Inventory.cpp
 
-#include "Inventory.h"
-#include "Item.h"
-#include "RenderManager.h"
-#include "Player.h"
-#include "InputManager.h"
+#include "InventoryComponent.h"
+#include "../Item.h"
+#include "../Manager/RenderManager.h"
+#include "../Player.h"
+#include "../Manager/InputManager.h"
 
 
 UInventoryComponent::UInventoryComponent(AObject* InOwner)
@@ -94,6 +94,7 @@ bool UInventoryComponent::UseRandomItem()
     {
         return false;
     }
+    
 }
 
 bool UInventoryComponent::UseItem(UItem* Item)
@@ -133,6 +134,17 @@ UItem* UInventoryComponent::GetItemFromCursor()
 {
     return InventorySlot[CurrentCursor.first][CurrentCursor.second];
 }
+
+bool UInventoryComponent::UseCursorItem()
+{
+    if (UseItem(GetItemFromCursor()) == true)
+    {
+        UpdateInventorySlot();
+    }
+    return true;
+}
+
+
 
 
 map<int, UItem*> UInventoryComponent::GetQuickSlot()

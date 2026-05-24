@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "Vector.h"
-#include "pch.h"
-#include "Component.h"
-#include "ComponentTypeEnum.h"
+#include "../Vector.h"
+#include "../pch.h"
+#include "component.h"
+#include "../ComponentTypeEnum.h"
 
 class Player;
 class UItem;
@@ -23,13 +23,13 @@ private:
 	float MoveElapsedTime = 0.0f;
 	float MoveInterval = 0.12f;
 	UItem* InventorySlot[4][4] = { nullptr };
-	pair<int, int> CurrentCursor = { 0,0 };
+	Vector CurrentCursor = { 0,0 };
 
 protected:
 	UInventoryComponent(AObject* InOwner);
 	UInventoryComponent() = delete;
 
-	vector<UItem*> Container;
+	vector<UItem*> Container; 
 	map<int, UItem*> QuickSlot;
 	int Gold = 0;
 	int SelectedIndex;
@@ -54,6 +54,7 @@ public:
 	
 	void UpdateInventorySlot();
 	UItem* GetItemFromCursor();
+	bool UseCursorItem();
 
 	map<int, UItem*> GetQuickSlot();
 	void RegisterOnQuickSlot(int Number, UItem* Item);
