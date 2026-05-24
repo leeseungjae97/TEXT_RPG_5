@@ -2,7 +2,6 @@
 
 #include "InventoryComponent.h"
 #include "../Item.h"
-#include "../Manager/RenderManager.h"
 #include "../Player.h"
 #include "../Manager/InputManager.h"
 
@@ -11,6 +10,11 @@ UInventoryComponent::UInventoryComponent(AObject* InOwner)
     : UComponent(InOwner)
 {
     PlayerPtr = dynamic_cast<Player*>(InOwner);
+    
+    
+    Container.resize(1, vector<UItem*>(4, nullptr));
+
+   
 }
 
 UInventoryComponent::~UInventoryComponent()
@@ -21,51 +25,77 @@ UInventoryComponent::~UInventoryComponent()
 void UInventoryComponent::OpenInventory()
 {
     int currentCount = 0;
-    for (UItem* Item : Container)
+    for (vector<UItem*> Cont : Container)
     {
-        ++currentCount;
-        Item->printInfo();
+        for (UItem* Item : Cont)
+        {
+            ++currentCount;
+            Item->printInfo();
+        }
     }
 }
 
 
-int UInventoryComponent::GetGold()
+Vector UInventoryComponent::GetItemIndex(UItem* Item)
 {
-    return Gold;
+    for (int y = 0; y < Container.size(); ++y)
+    {
+        for (int x = 0; x < MaxColumn; ++x)
+        {
+            if (Container[y][x] == Item)
+            {
+                return { x, y };
+            }
+        }
+    }
+
+    return { -1, -1 };
 }
 
-void UInventoryComponent::AddGold(int Amount)
-{
-    Gold += Amount;
-}
 
-int UInventoryComponent::GetItemIndex(UItem* Item)
-{
-    auto it = find(Container.begin(), Container.end(), Item);
-    if (it != Container.end())
-        return it - Container.begin();
-    else
-        return -1;
-}
 
-UItem* UInventoryComponent::GetItem(int Index)
+UItem* UInventoryComponent::GetItem(Vector Index)
 {
-    return Container[Index];
+    return Container[Index.X][Index.Y];
 }
 
 void UInventoryComponent::AddItem(UItem* Item)
 {
-    Container.push_back(Item);
-    RenderManager::GetInstance();
+    for (int y = 0; y < Container.size(); ++y)
+    {
+        for (int x = 0; x < MaxColumn; ++x)
+        {
+            if (Container[y][x] == nullptr)
+            {
+                Container[y][x] = Item;
+                
+                return;
+            }
+        }
+    }
+    
+    vector<UItem*> NewRow(MaxColumn, nullptr);
+
+    NewRow[0] = Item;
+
+    Container.push_back(NewRow);
+    
 }
 
 bool UInventoryComponent::RemoveItem(UItem* Item)
-{ 
-    auto it = find(Container.begin(), Container.end(), Item);
-    if (it != Container.end())
+{
+    for (int y = 0; y < Container.size(); ++y)
     {
-        Container.erase(it);
-        return true;
+        for (int x = 0; x < MaxColumn; ++x)
+        {
+            if (Container[y][x] == Item)
+            {
+                delete Container[y][x];
+                Container[y][x] = nullptr;
+
+                return true;
+            }
+        }
     }
 
     return false;
@@ -73,8 +103,9 @@ bool UInventoryComponent::RemoveItem(UItem* Item)
 
 bool UInventoryComponent::UseRandomItem()
 {
-    int n = rand() % Container.size();
-    UItem* Item = Container[n];
+    int y = rand() % Container.size();
+    int x = rand() % Container[y].size();
+    UItem* Item = Container[y][x];
 
     if (Item->Type == ItemType::Usable)
     {
@@ -105,64 +136,6 @@ bool UInventoryComponent::UseItem(UItem* Item)
 }
 
 
-
-void UInventoryComponent::UpdateInventorySlot()
-{
-
-    memset(InventorySlot, 0, sizeof(InventorySlot));
-
-    for (int i = 0; i < Container.size(); i++)
-    {
-        if(i<16)
-        {
-            InventorySlot[i / 4][i % 4] = Container[i];
-        }
-
-    }
-   
-}
-
-UItem* UInventoryComponent::GetItemFromCursor()
-{
-    return InventorySlot[CurrentCursor.X][CurrentCursor.Y];
-}
-
-bool UInventoryComponent::UseCursorItem()
-{
-    if (UseItem(GetItemFromCursor()) == true)
-    {
-        UpdateInventorySlot();
-    }
-    return true;
-}
-
-
-
-
-map<int, UItem*> UInventoryComponent::GetQuickSlot()
-{
-    return QuickSlot;
-}
-
-
-void UInventoryComponent::RegisterOnQuickSlot(int Number, UItem* Item)
-{
-    QuickSlot[Number] = Item;
-}
-
-UItem* UInventoryComponent::GetItemFromQuickSlot(int Number)
-{
-    return QuickSlot[Number];
-}
-
-void UInventoryComponent::UseQuickSlot(int Number)
-{
-    UseItem(QuickSlot[Number]);
-}
-
-
-
-
 void UInventoryComponent::BuyItem(UItem* Item)
 {
     if (Gold >= Item->Price)
@@ -175,6 +148,7 @@ void UInventoryComponent::BuyItem(UItem* Item)
         
     }
 }
+
 
 void UInventoryComponent::SellItem(UItem* Item)
 {

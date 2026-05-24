@@ -22,14 +22,14 @@ private:
 
 	float MoveElapsedTime = 0.0f;
 	float MoveInterval = 0.12f;
-	UItem* InventorySlot[4][4] = { nullptr };
 	Vector CurrentCursor = { 0,0 };
 
 protected:
 	UInventoryComponent(AObject* InOwner);
 	UInventoryComponent() = delete;
 
-	vector<UItem*> Container; 
+	vector<vector<UItem*>> Container;
+	int MaxColumn = 4;
 	map<int, UItem*> QuickSlot;
 	int Gold = 0;
 	int SelectedIndex;
@@ -41,25 +41,24 @@ public:
 
 	void OpenInventory();
 
-	int GetGold();
-	void AddGold(int Amount);
+	int GetGold(){return Gold;}
+	void AddGold(int Amount) {Gold += Amount;} 
 
-	vector<UItem*>& GetContainer() { return Container; }
-	int GetItemIndex(UItem* Item);
-	UItem* GetItem(int Index);
+	vector<vector<UItem*>>& GetContainer() { return Container; }
+	Vector GetItemIndex(UItem* Item);
+	UItem* GetItem(Vector Index);
 	void AddItem(UItem* Item);
 	bool RemoveItem(UItem* Item);
 	bool UseRandomItem();
 	bool UseItem(UItem* Item);
 	
-	void UpdateInventorySlot();
-	UItem* GetItemFromCursor();
-	bool UseCursorItem();
+	UItem* GetItemFromCursor(){return Container[CurrentCursor.Y][CurrentCursor.X];}
+	bool UseCursorItem(){return UseItem(GetItemFromCursor());}
 
-	map<int, UItem*> GetQuickSlot();
-	void RegisterOnQuickSlot(int Number, UItem* Item);
-	UItem* GetItemFromQuickSlot(int Number);
-	void UseQuickSlot(int Number);
+	map<int, UItem*> GetQuickSlot(){return QuickSlot;}
+	void RegisterOnQuickSlot(int Number, UItem* Item){QuickSlot[Number] = Item;}
+	UItem* GetItemFromQuickSlot(int Number){return QuickSlot[Number];}
+	void UseQuickSlot(int Number){UseItem(QuickSlot[Number]);}
 
 	
 	void BuyItem(UItem* Item);
