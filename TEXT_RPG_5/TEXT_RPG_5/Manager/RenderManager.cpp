@@ -3,7 +3,7 @@
 #include "InputManager.h"
 #include "MapManager.h"
 #include "SceneManager.h"
-#include "../Inventory.h"
+#include "../Component/InventoryComponent.h"
 #include "../Define.h"
 #include "../Item.h"
 #include "../Player.h"
@@ -783,41 +783,48 @@ void RenderManager::_2DTOISO(float DeltaTime)
 
 void RenderManager::INVEN(float DeltaTime)
 {
-    // vector<UItem*>& container = InventoryManager::GetInstance()->GetContainer();
-    // vector<UItem*> inventoryItems;
-    // vector<UItem*> equipmentItems;
-    //
-    // for (UItem* item : container)
-    // {
-    //     if (item == nullptr)
-    //     {
-    //         continue;
-    //     }
-    //
-    //     if (item->Type == ItemType::Equipment)
-    //     {
-    //         equipmentItems.push_back(item);
-    //     }
-    //     else
-    //     {
-    //         inventoryItems.push_back(item);
-    //     }
-    // }
-    //
-    // constexpr int inventoryColumns = 7;
-    // constexpr int inventoryRows = 3;
-    // constexpr int inventoryCapacity = inventoryColumns * inventoryRows;
-    // constexpr int equipmentColumns = 2;
-    // constexpr int equipmentRows = 3;
-    //
-    // const int inventoryX = 3;
-    // const int inventoryY = 3;
-    // const int equipmentX = inventoryX + inventoryColumns * 15 + 8;
-    // const int equipmentY = inventoryY;
-    //
-    // DrawInventoryPanel(inventoryY, inventoryX, inventoryItems, inventoryCapacity, inventoryColumns, inventoryRows);
-    // DrawEquipmentPanel(equipmentY, equipmentX, equipmentItems, equipmentColumns, equipmentRows);
-    // screen[SCREEN_WIDTH * SCREEN_HEIGHT - 1] = L'\0';
+    Player* PlayerPtr = SceneManager::GetInstance()->GetPlayer();
+    if (!PlayerPtr)
+        return;
+    UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>();
+    if (!InventoryComponent)
+        return;
+    
+    vector<UItem*>& container = InventoryComponent->GetContainer();
+    vector<UItem*> inventoryItems;
+    vector<UItem*> equipmentItems;
+    
+    for (UItem* item : container)
+    {
+        if (item == nullptr)
+        {
+            continue;
+        }
+    
+        if (item->Type == ItemType::Equipment)
+        {
+            equipmentItems.push_back(item);
+        }
+        else
+        {
+            inventoryItems.push_back(item);
+        }
+    }
+    
+    constexpr int inventoryColumns = 7;
+    constexpr int inventoryRows = 3;
+    constexpr int inventoryCapacity = inventoryColumns * inventoryRows;
+    constexpr int equipmentColumns = 2;
+    constexpr int equipmentRows = 3;
+    
+    const int inventoryX = 3;
+    const int inventoryY = 3;
+    const int equipmentX = inventoryX + inventoryColumns * 15 + 8;
+    const int equipmentY = inventoryY;
+    
+    DrawInventoryPanel(inventoryY, inventoryX, inventoryItems, inventoryCapacity, inventoryColumns, inventoryRows);
+    DrawEquipmentPanel(equipmentY, equipmentX, equipmentItems, equipmentColumns, equipmentRows);
+    screen[SCREEN_WIDTH * SCREEN_HEIGHT - 1] = L'\0';
 }
 
 void RenderManager::_2DTO3D(float DeltaTime)

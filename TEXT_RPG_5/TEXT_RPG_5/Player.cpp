@@ -2,6 +2,7 @@
 #include "./Manager/InputManager.h"
 #include "Component/MoveComponent.h"
 #include "Component/CombatComponent.h"
+#include "Component/InventoryComponent.h"
 
 Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 {
@@ -14,6 +15,7 @@ Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 
 	this->MoveComponent = CreateDefaultComponent<UMoveComponent>();
 	this->CombatComponent = CreateDefaultComponent<UCombatComponent>();
+	this->InventoryComponent = CreateDefaultComponent<UInventoryComponent>();
 
 	this->Position.Y = 2;
 	this->Position.X = 2;
