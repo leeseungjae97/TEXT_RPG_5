@@ -25,7 +25,7 @@ enum ConsoleColor {
 	CC_ORIGINALBG = 0
 };
 
-struct Item;
+struct UItem;
 
 class RenderManager : public Singleton<RenderManager>
 {
@@ -47,15 +47,19 @@ public:
 	void AddRender(int Y, int X, vector<vector<int>>& Map);
 	void AddRender(int Y, int X, wstring Content);
 
+	bool bIso = false;
+	bool bInven = false;
+	bool bPrevInvenKey = false;
 public:
 	void DrawBox(int Y, int X, int Width, int Height);
-	void DrawItemSlot(int Y, int X, int Width, int Height, const Item* item);
-	void DrawInventoryPanel(int Y, int X, const vector<Item*>& Items, int Capacity, int Columns, int Rows);
-	void DrawEquipmentPanel(int Y, int X, const vector<Item*>& Items, int Columns, int Rows);
+	void DrawItemSlot(int Y, int X, int Width, int Height, const UItem* item);
+	void DrawInventoryPanel(int Y, int X, const vector<UItem*>& Items, int Capacity, int Columns, int Rows);
+	void DrawEquipmentPanel(int Y, int X, const vector<UItem*>& Items, int Columns, int Rows);
 
 public:
 	void _2DTO3D(float DeltaTime);
 	void _2DTOISO(float DeltaTime);
+	void INVEN(float DeltaTime);
 
 public:
 	void SetColor(int Color, int Bgcolor);
@@ -69,7 +73,7 @@ private:
 
 private:
 	wstring ToWideString(const string& Text);
-	wchar_t GetItemIcon(const Item* item);
+	wchar_t GetItemIcon(const UItem* item);
 	void PutCell(int Y, int X, wchar_t Character, WORD Attribute);
 
 	wchar_t* screen = nullptr;

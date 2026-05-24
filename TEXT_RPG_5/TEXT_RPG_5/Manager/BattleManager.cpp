@@ -3,6 +3,11 @@
 #include "../pch.h"
 #include "../Object.h"
 
+BattleManager::BattleManager()
+{
+	
+}
+
 void BattleManager::Tick(float DeltaTime)
 {
 	
