@@ -13,10 +13,12 @@ struct UItem
 	int Price;
 	int EffectAmount;
 
+
 	UItem(string name, ItemType type, int price, int effectAmount = 0);
 	virtual ~UItem() {}
 
 	void printInfo() const;
 	virtual void Use(Player* player);
+	virtual void Tick(float DeltaTime);
 
 };

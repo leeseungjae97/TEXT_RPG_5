@@ -5,13 +5,21 @@ class UItem;
 
 class Shop
 {
-protected:
+private:
+	static Shop* Instance;
+	Shop() {}
+	
 	int NumberOfItems = 8;
 	vector<const UItem*> Container;
 
+
 public:
-	Shop();
-	~Shop() {}
+	static Shop* GetInstance()
+	{
+		if (Instance == nullptr)
+			Instance = new Shop();
+		return Instance;
+	}
 
 	const UItem* GetRandomItem();
 
