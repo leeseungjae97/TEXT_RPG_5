@@ -1,5 +1,5 @@
 #include "Monster.h"
-#include "SceneManager.h"
+#include "Manager/SceneManager.h"
 #include "Player.h"
 #include <cstdlib>
 #include <cmath>
@@ -38,6 +38,16 @@ int Monster::GetHealth()
 int Monster::GetAttack()
 {
 	return Attack;
+}
+
+float Monster::GetMoveAlpha() const
+{
+	if (MoveInterval <= 0.0f)
+	{
+		return 1.0f;
+	}
+
+	return min(MoveElapsedtime / MoveInterval, 1.0f);
 }
 
 void Monster::TakeDamage(int Damage)

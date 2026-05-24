@@ -1,5 +1,5 @@
 #include "LevelComponent.h"
-#include "Player.h"
+#include "../Player.h"
 
 void LevelComponent::StatsUpdate(int LevelUpCount)
 {

@@ -1,7 +1,7 @@
 ﻿#include "Player.h"
-#include "InputManager.h"
-#include "MoveComponent.h"
-#include "CombatComponent.h"
+#include "./Manager/InputManager.h"
+#include "Component/MoveComponent.h"
+#include "Component/CombatComponent.h"
 
 Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 {
@@ -17,6 +17,7 @@ Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 
 	this->Position.Y = 2;
 	this->Position.X = 2;
+	this->PrevPosition = this->Position;
 
 	//Position = Vector(2, 2);
 	//PrevPosition = Vector(2, 2);

@@ -1,10 +1,10 @@
 #include "GameInstance.h"
-#include "RenderManager.h"
-#include "BattleManager.h"
-#include "MapManager.h"
-#include "TimeManager.h"
-#include "SceneManager.h"
-#include "InputManager.h"
+#include "Manager/RenderManager.h"
+#include "Manager/BattleManager.h"
+#include "Manager/MapManager.h"
+#include "Manager/TimeManager.h"
+#include "Manager/SceneManager.h"
+#include "Manager/InputManager.h"
 
 void GameInstance::BeginPlay()
 {
@@ -27,9 +27,9 @@ void GameInstance::Tick()
 
 	BattleManager::GetInstance()->Tick(DeltaTime);
 	SceneManager::GetInstance()->Tick(DeltaTime);
-	MapManager::GetInstance()->Tick(DeltaTime);
 
 	RenderManager::GetInstance()->Tick(DeltaTime);
+	MapManager::GetInstance()->Tick(DeltaTime);
 }
 void GameInstance::Render()
 {
