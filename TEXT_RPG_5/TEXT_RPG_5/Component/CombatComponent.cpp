@@ -1,8 +1,8 @@
-#include "CombatComponent.h"
+﻿#include "CombatComponent.h"
 #include "MoveComponent.h"
-#include "InputManager.h"
-#include "Player.h"
-#include "RenderManager.h"
+#include "../Manager/InputManager.h"
+#include "../Manager/RenderManager.h"
+#include "../Player.h"
 
 UCombatComponent::UCombatComponent(AObject* InOwner)
 	: UComponent(InOwner)
@@ -70,12 +70,13 @@ void UCombatComponent::Tick(float DeltaTime)
 				}
 			}
 			TotalTime = 0.0f;
-			RenderManager::GetInstance()->AddRender(1, 1, "Timer1 : " + to_string(TotalTime));
+			
 		}
 		else
 		{
 			TotalTime += DeltaTime;
-			RenderManager::GetInstance()->AddRender(2, 2, "Timer2 : " + to_string(TotalTime));
+			RenderManager::GetInstance()->AddRender(2, 2, "타이머 : " + to_string(DeltaTime));
 		}
+		
 	}
 }

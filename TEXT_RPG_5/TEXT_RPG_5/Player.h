@@ -39,7 +39,7 @@ public:
 	void SetIsAttack(bool Value);
 
 public:
-	virtual void Init(){}
+	virtual void BeginPlay(){}
 	virtual void Tick(float DeltaTime);
 	virtual void Destroy(){}
 

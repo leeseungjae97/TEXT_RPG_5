@@ -11,7 +11,7 @@ public:
 	UCombatComponent* CombatComponent;
 
 public:
-	virtual void Init() override;
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroy() override;
 };

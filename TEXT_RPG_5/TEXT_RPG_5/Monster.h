@@ -33,6 +33,7 @@ public:
 	string GetName();
 	int GetHealth();
 	int GetAttack();
+	float GetMoveAlpha() const;
 
 	void TakeDamage(int damage);
 	bool IsDead();
@@ -40,7 +41,7 @@ public:
 	
 
 public:
-	virtual void Init()	override{}
+	virtual void BeginPlay()	override{}
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroy() override;
 

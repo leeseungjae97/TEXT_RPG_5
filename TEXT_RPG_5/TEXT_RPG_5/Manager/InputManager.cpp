@@ -1,5 +1,5 @@
 #include "InputManager.h"
-#include "pch.h"
+#include "../pch.h"
 
 int ASCII[(UINT)eKeyCode::END] =
 {

@@ -1,6 +1,6 @@
 #pragma once
-#include "Singleton.h"
-#include "pch.h"
+#include "../Singleton.h"
+#include "../pch.h"
 
 class TimeManager : public Singleton<TimeManager>
 {

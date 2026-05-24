@@ -1,0 +1,3 @@
+# Visual Studio 프로젝트 파일 — 양쪽 변경사항 합치기
+*.vcxproj           merge=union
+*.vcxproj.filters   merge=union
