@@ -11,6 +11,7 @@ class Monster : public AObject
 protected:
 	string Name;
 	int Health;
+	int MaxHealth;
 	int Attack;
 
 protected:
@@ -32,6 +33,7 @@ public:
 
 	string GetName();
 	int GetHealth();
+	int GetMaxHealth();
 	int GetAttack();
 	float GetMoveAlpha() const;
 

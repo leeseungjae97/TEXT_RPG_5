@@ -8,6 +8,7 @@ Monster::Monster()
 {
 	Name = "Monster";
 	Health = 100;
+	MaxHealth = Health;
 	Attack = 10;
 	
 	Position = Vector(4, 4);
@@ -33,6 +34,11 @@ string Monster::GetName()
 int Monster::GetHealth()
 {
 	return Health;
+}
+
+int Monster::GetMaxHealth()
+{
+	return MaxHealth;
 }
 
 int Monster::GetAttack()
