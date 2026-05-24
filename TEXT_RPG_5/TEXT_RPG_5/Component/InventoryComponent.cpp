@@ -132,7 +132,7 @@ void UInventoryComponent::UpdateInventorySlot()
 
 UItem* UInventoryComponent::GetItemFromCursor()
 {
-    return InventorySlot[CurrentCursor.first][CurrentCursor.second];
+    return InventorySlot[CurrentCursor.X][CurrentCursor.Y];
 }
 
 bool UInventoryComponent::UseCursorItem()
