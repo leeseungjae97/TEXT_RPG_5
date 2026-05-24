@@ -5,7 +5,7 @@ class BattleManager : public Singleton<BattleManager>
 {
 
 public:
-	BattleManager() {}
+	BattleManager();
 	~BattleManager() {}
 
 public:

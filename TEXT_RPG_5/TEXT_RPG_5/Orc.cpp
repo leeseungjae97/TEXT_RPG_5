@@ -10,5 +10,6 @@ Orc::Orc(int playerLevel)
 
 	Name = "Orc";
 	Health = playerLevel * 20 + rand() % (playerLevel * 10 + 1);
+	MaxHealth = Health;
 	Attack = playerLevel * 5 + rand() % (playerLevel * 5 + 1);
 }

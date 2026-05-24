@@ -1,6 +1,9 @@
 ﻿#include "RenderManager.h"
+
+#include "InputManager.h"
 #include "MapManager.h"
 #include "SceneManager.h"
+#include "../Inventory.h"
 #include "../Define.h"
 #include "../Item.h"
 #include "../Player.h"
@@ -29,6 +32,59 @@ namespace
     WORD MakeAttribute(int Color, int BackgroundColor = CC_BLACK)
     {
         return static_cast<WORD>(((BackgroundColor & 0xf) << 4) | (Color & 0xf));
+    }
+
+    bool IsWideCharacter(wchar_t Character)
+    {
+        return
+            (Character >= 0x1100 && Character <= 0x11FF) ||
+            (Character >= 0x2E80 && Character <= 0xA4CF) ||
+            (Character >= 0xAC00 && Character <= 0xD7A3) ||
+            (Character >= 0xF900 && Character <= 0xFAFF) ||
+            (Character >= 0xFE10 && Character <= 0xFE6F) ||
+            (Character >= 0xFF00 && Character <= 0xFF60) ||
+            (Character >= 0xFFE0 && Character <= 0xFFE6);
+    }
+
+    int GetCharacterDisplayWidth(wchar_t Character)
+    {
+        if (Character == L'\0')
+        {
+            return 0;
+        }
+
+        return IsWideCharacter(Character) ? 2 : 1;
+    }
+
+    int GetTextDisplayWidth(const wstring& Text)
+    {
+        int width = 0;
+        for (wchar_t character : Text)
+        {
+            width += GetCharacterDisplayWidth(character);
+        }
+
+        return width;
+    }
+
+    wstring TrimTextToDisplayWidth(const wstring& Text, int MaxWidth)
+    {
+        wstring result;
+        int width = 0;
+
+        for (wchar_t character : Text)
+        {
+            int characterWidth = GetCharacterDisplayWidth(character);
+            if (width + characterWidth > MaxWidth)
+            {
+                break;
+            }
+
+            result.push_back(character);
+            width += characterWidth;
+        }
+
+        return result;
     }
 
     RenderPosition InterpolatePosition(const Vector& PrevPosition, const Vector& CurrentPosition, float Alpha)
@@ -121,8 +177,8 @@ namespace
         constexpr int TileHalfHeight = 2;
 
         return {
-            OriginX + static_cast<int>((WorldX - WorldY) * TileHalfWidth),
-            OriginY + static_cast<int>((WorldX + WorldY) * TileHalfHeight)
+            OriginX + static_cast<int>(roundf((WorldX - WorldY) * TileHalfWidth)),
+            OriginY + static_cast<int>(roundf((WorldX + WorldY) * TileHalfHeight))
         };
     }
 }
@@ -159,8 +215,26 @@ void RenderManager::BeginPlay()
 
 void RenderManager::Tick(float DeltaTime)
 {
-    _2DTOISO(DeltaTime);
-    // _2DTO3D(DeltaTime);
+    bool bCurrentInvenKey = InputManager::GetInstance()->IsKeyDown(eKeyCode::_3);
+    if (bCurrentInvenKey && !bPrevInvenKey)
+    {
+        bInven = !bInven;
+    }
+    bPrevInvenKey = bCurrentInvenKey;
+    
+    if (InputManager::GetInstance()->IsKeyDown(eKeyCode::_1))
+        bIso = true;
+    
+    if (InputManager::GetInstance()->IsKeyDown(eKeyCode::_2))
+        bIso = false;
+    
+    if (bIso)
+        _2DTOISO(DeltaTime);
+    else
+        _2DTO3D(DeltaTime);
+    
+    if (bInven)
+        INVEN(DeltaTime);
 }
 
 void RenderManager::Render(float DeltaTime)
@@ -182,12 +256,25 @@ void RenderManager::AddRender(int Y, int X, string Content)
 
 void RenderManager::AddRender(int Y, int X, wstring Content)
 {
+    int drawX = X;
+
 	for (int i = 0; i < Content.length(); ++i)
 	{
-		int drawX = X + i;
 		int drawY = Y;
+        int characterWidth = GetCharacterDisplayWidth(Content[i]);
+        WORD attribute = MakeAttribute(CC_GRAY);
 
-		PutCell(drawY, drawX, Content[i], MakeAttribute(CC_GRAY));
+        if (characterWidth == 2)
+        {
+            PutCell(drawY, drawX, Content[i], attribute | COMMON_LVB_LEADING_BYTE);
+            PutCell(drawY, drawX + 1, L' ', attribute | COMMON_LVB_TRAILING_BYTE);
+            drawX += characterWidth;
+            continue;
+        }
+
+		PutCell(drawY, drawX, Content[i], attribute);
+
+        drawX += characterWidth;
 	}
 }
 
@@ -236,60 +323,74 @@ void RenderManager::DrawBox(int Y, int X, int Width, int Height)
 	AddRender(Y + Height - 1, X + Width - 1, L"\x2518");
 }
 
-void RenderManager::DrawItemSlot(int Y, int X, int Width, int Height, const Item* item)
+void RenderManager::DrawItemSlot(int Y, int X, int Width, int Height, const UItem* item)
 {
-	//DrawBox(Y, X, Width, Height);
+    DrawBox(Y, X, Width, Height);
 
-	//if (item == nullptr)
-	//{
-	//	return;
-	//}
+    if (item == nullptr)
+    {
+        return;
+    }
 
-	//wchar_t icon[2] = { GetItemIcon(item), L'\0' };
-	//AddRender(Y + 1, X + Width / 2, icon);
+    WORD iconAttribute = MakeAttribute(CC_CYAN);
+    if (item->Type == ItemType::Equipment)
+    {
+        iconAttribute = MakeAttribute(CC_WHITE);
+    }
+    else if (item->Type == ItemType::Usable)
+    {
+        iconAttribute = MakeAttribute(CC_GREEN);
+    }
+    else if (item->Type == ItemType::Misc)
+    {
+        iconAttribute = MakeAttribute(CC_YELLOW);
+    }
 
-	//wstring itemName = ToWideString(item->Name);
-	//int maxNameLength = Width - 2;
-	//if (itemName.length() > maxNameLength)
-	//{
-	//	itemName = itemName.substr(0, maxNameLength);
-	//}
+    wchar_t icon = GetItemIcon(item);
+    PutCell(Y + 2, X + Width / 2, icon, iconAttribute);
 
-	//int nameX = X + 1 + max(0, (maxNameLength - static_cast<int>(itemName.length())) / 2);
-	//AddRender(Y + Height - 2, nameX, itemName);
+    wstring itemName = ToWideString(item->Name);
+    int maxNameWidth = max(1, Width - 2);
+    if (GetTextDisplayWidth(itemName) > maxNameWidth)
+    {
+        itemName = TrimTextToDisplayWidth(itemName, maxNameWidth);
+    }
+
+    int nameX = X + 1 + max(0, (maxNameWidth - GetTextDisplayWidth(itemName)) / 2);
+    AddRender(Y + Height - 2, nameX, itemName);
 }
 
-void RenderManager::DrawInventoryPanel(int Y, int X, const vector<Item*>& Items, int Capacity, int Columns, int Rows)
+void RenderManager::DrawInventoryPanel(int Y, int X, const vector<UItem*>& Items, int Capacity, int Columns, int Rows)
 {
-	const int slotWidth = 14;
-	const int slotHeight = 5;
+	const int slotWidth = 16;
+	const int slotHeight = 7;
 
-	AddRender(Y, X, L"Inventory (" + to_wstring(Items.size()) + L"/" + to_wstring(Capacity) + L")");
+	AddRender(Y, X, L"인벤토리 (" + to_wstring(Items.size()) + L"/" + to_wstring(Capacity) + L")");
 
 	for (int row = 0; row < Rows; ++row)
 	{
 		for (int col = 0; col < Columns; ++col)
 		{
 			int index = row * Columns + col;
-			const Item* item = index < Items.size() ? Items[index] : nullptr;
+			const UItem* item = index < Items.size() ? Items[index] : nullptr;
 			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, item);
 		}
 	}
 }
 
-void RenderManager::DrawEquipmentPanel(int Y, int X, const vector<Item*>& Items, int Columns, int Rows)
+void RenderManager::DrawEquipmentPanel(int Y, int X, const vector<UItem*>& Items, int Columns, int Rows)
 {
-	const int slotWidth = 14;
-	const int slotHeight = 5;
+	const int slotWidth = 16;
+	const int slotHeight = 7;
 
-	AddRender(Y, X, L"Equipment");
+	AddRender(Y, X, L"장비");
 
 	for (int row = 0; row < Rows; ++row)
 	{
 		for (int col = 0; col < Columns; ++col)
 		{
 			int index = row * Columns + col;
-			const Item* item = index < Items.size() ? Items[index] : nullptr;
+			const UItem* item = index < Items.size() ? Items[index] : nullptr;
 			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, item);
 		}
 	}
@@ -314,24 +415,24 @@ wstring RenderManager::ToWideString(const string& Text)
 	return result;
 }
 
-wchar_t RenderManager::GetItemIcon(const Item* item)
+wchar_t RenderManager::GetItemIcon(const UItem* item)
 {
-	//if (item == nullptr)
-	//{
-	//	return L' ';
-	//}
+	if (item == nullptr)
+	{
+		return L' ';
+	}
 
-	//switch (item->Type)
-	//{
-	//case ItemType::Equipment:
-	//	return L'E';
-	//case ItemType::Usable:
-	//	return L'U';
-	//case ItemType::Misc:
-	//	return L'*';
-	//default:
-	//	return L'?';
-	//}
+	switch (item->Type)
+	{
+	case ItemType::Equipment:
+		return L'@';
+	case ItemType::Usable:
+		return L'^';
+	case ItemType::Misc:
+		return L'■';
+	default:
+		return L'?';
+	}
     return L' ';
 }
 
@@ -370,26 +471,25 @@ void RenderManager::DrawScreen()
         return;
     }
 
-    DWORD dwBytesWritten = 0;
     screen[SCREEN_WIDTH * SCREEN_HEIGHT - 1] = L'\0';
-    WriteConsoleOutputCharacterW(
-        hConsole,
-        screen,
-        SCREEN_WIDTH * SCREEN_HEIGHT,
-        { 0, 0 },
-        &dwBytesWritten
-    );
 
-    if (attributes != nullptr)
+    vector<CHAR_INFO> buffer(SCREEN_WIDTH * SCREEN_HEIGHT);
+    for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; ++i)
     {
-        WriteConsoleOutputAttribute(
-            hConsole,
-            attributes,
-            SCREEN_WIDTH * SCREEN_HEIGHT,
-            { 0, 0 },
-            &dwBytesWritten
-        );
+        buffer[i].Char.UnicodeChar = screen[i];
+        buffer[i].Attributes = attributes != nullptr ? attributes[i] : MakeAttribute(CC_GRAY);
     }
+
+    COORD bufferSize = { static_cast<SHORT>(SCREEN_WIDTH), static_cast<SHORT>(SCREEN_HEIGHT) };
+    COORD bufferCoord = { 0, 0 };
+    SMALL_RECT writeRegion = {
+        0,
+        0,
+        static_cast<SHORT>(SCREEN_WIDTH - 1),
+        static_cast<SHORT>(SCREEN_HEIGHT - 1)
+    };
+
+    WriteConsoleOutputW(hConsole, buffer.data(), bufferSize, bufferCoord, &writeRegion);
 }
 
 void RenderManager::SetColor(int Color, int BackgroundColor)
@@ -525,6 +625,30 @@ void RenderManager::_2DTOISO(float DeltaTime)
             PutCell(iso.Y - 1, iso.X + 1, L'\\', attribute);
         };
 
+    auto drawMonsterHpBar = [&](IsoScreenPosition iso, Monster* monster)
+        {
+            if (monster == nullptr)
+            {
+                return;
+            }
+
+            constexpr int barWidth = 8;
+            int maxHealth = max(1, monster->GetMaxHealth());
+            int currentHealth = min(max(monster->GetHealth(), 0), maxHealth);
+            int filledWidth = static_cast<int>(roundf(static_cast<float>(currentHealth) / static_cast<float>(maxHealth) * barWidth));
+
+            int startX = iso.X - barWidth / 2 - 1;
+            int y = iso.Y - 6;
+
+            PutCell(y, startX, L'[', MakeAttribute(CC_GRAY));
+            for (int i = 0; i < barWidth; ++i)
+            {
+                bool filled = i < filledWidth;
+                PutCell(y, startX + 1 + i, filled ? L'=' : L'-', MakeAttribute(filled ? CC_RED : CC_DARKGRAY));
+            }
+            PutCell(y, startX + barWidth + 1, L']', MakeAttribute(CC_GRAY));
+        };
+
     auto drawIsoTile = [&](int mapX, int mapY, bool wall)
         {
             IsoScreenPosition iso = WorldToIso(
@@ -587,6 +711,7 @@ void RenderManager::_2DTOISO(float DeltaTime)
         RenderPosition renderPosition;
         wchar_t objectIcon = L'?';
         WORD objectAttribute = MakeAttribute(CC_WHITE);
+        Monster* monsterForHpBar = nullptr;
 
         if (Player* player = dynamic_cast<Player*>(object))
         {
@@ -629,6 +754,7 @@ void RenderManager::_2DTOISO(float DeltaTime)
             renderPosition = InterpolatePosition(monster->GetPrevPosition(), monster->GetPosition(), monster->GetMoveAlpha());
             objectIcon = L'M';
             objectAttribute = MakeAttribute(CC_MAGENTA);
+            monsterForHpBar = monster;
         }
         else
         {
@@ -648,10 +774,50 @@ void RenderManager::_2DTOISO(float DeltaTime)
             originY
         );
         drawIsoActor(iso, objectIcon, objectAttribute, dynamic_cast<Player*>(object) != nullptr);
+        drawMonsterHpBar(iso, monsterForHpBar);
     }
 
     AddRender(1, 1, L"ISO");
     screen[SCREEN_WIDTH * SCREEN_HEIGHT - 1] = L'\0';
+}
+
+void RenderManager::INVEN(float DeltaTime)
+{
+    // vector<UItem*>& container = InventoryManager::GetInstance()->GetContainer();
+    // vector<UItem*> inventoryItems;
+    // vector<UItem*> equipmentItems;
+    //
+    // for (UItem* item : container)
+    // {
+    //     if (item == nullptr)
+    //     {
+    //         continue;
+    //     }
+    //
+    //     if (item->Type == ItemType::Equipment)
+    //     {
+    //         equipmentItems.push_back(item);
+    //     }
+    //     else
+    //     {
+    //         inventoryItems.push_back(item);
+    //     }
+    // }
+    //
+    // constexpr int inventoryColumns = 7;
+    // constexpr int inventoryRows = 3;
+    // constexpr int inventoryCapacity = inventoryColumns * inventoryRows;
+    // constexpr int equipmentColumns = 2;
+    // constexpr int equipmentRows = 3;
+    //
+    // const int inventoryX = 3;
+    // const int inventoryY = 3;
+    // const int equipmentX = inventoryX + inventoryColumns * 15 + 8;
+    // const int equipmentY = inventoryY;
+    //
+    // DrawInventoryPanel(inventoryY, inventoryX, inventoryItems, inventoryCapacity, inventoryColumns, inventoryRows);
+    // DrawEquipmentPanel(equipmentY, equipmentX, equipmentItems, equipmentColumns, equipmentRows);
+    // screen[SCREEN_WIDTH * SCREEN_HEIGHT - 1] = L'\0';
 }
 
 void RenderManager::_2DTO3D(float DeltaTime)
