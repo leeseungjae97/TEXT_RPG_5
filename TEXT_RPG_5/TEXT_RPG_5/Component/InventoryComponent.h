@@ -30,9 +30,11 @@ protected:
 
 	vector<vector<UItem*>> Container;
 	int MaxColumn = 4;
+	int MaxRow = 4;
 	map<int, UItem*> QuickSlot;
 	int Gold = 0;
 	int SelectedIndex;
+	bool bOnShop = false;
 
 public:
 	~UInventoryComponent();
@@ -47,22 +49,38 @@ public:
 	vector<vector<UItem*>>& GetContainer() { return Container; }
 	Vector GetItemIndex(UItem* Item);
 	UItem* GetItem(Vector Index);
-	void AddItem(UItem* Item);
+	bool IsFull();
+	bool AddItem(UItem* Item);
 	bool RemoveItem(UItem* Item);
 	bool UseRandomItem();
 	bool UseItem(UItem* Item);
 	
+	void SelectCursor();
+	void ExpandRow(int Amount){MaxRow += Amount;}
+	Vector GetCursor() {return CurrentCursor;}
+	void ResetCursor() {CurrentCursor = Vector(0,0);}
+	Vector CursorUp();
+	Vector CursorDown();
+	Vector CursorLeft();
+	Vector CursorRight();
 	UItem* GetItemFromCursor(){return Container[CurrentCursor.Y][CurrentCursor.X];}
 	bool UseCursorItem(){return UseItem(GetItemFromCursor());}
 
+	
 	map<int, UItem*> GetQuickSlot(){return QuickSlot;}
-	void RegisterOnQuickSlot(int Number, UItem* Item){QuickSlot[Number] = Item;}
+	void RegisterOnQuickSlot(int Number);
 	UItem* GetItemFromQuickSlot(int Number){return QuickSlot[Number];}
 	void UseQuickSlot(int Number){UseItem(QuickSlot[Number]);}
-
+	void ClearQuickSlot(UItem* Item);
 	
+	void SetOnShop(bool OnShop){bOnShop = OnShop;}
 	void BuyItem(UItem* Item);
 	void SellItem(UItem* Item);
+	
+	
+	
+	
+	
 
 };
 

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Misc.h"
-#include "HP_Potion.h"
-#include "Strength_Potion.h"
+#include "MiscItem.h"
+#include "UsableItem.h"
+#include "EquipmentItem.h"
 

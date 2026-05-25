@@ -2,14 +2,6 @@
 #include "Item.h"
 #include "Player.h"
 
-UItem::UItem(string name, ItemType type, int price, int effectAmount)
-{
-    Name = name;
-    Type = type;
-    Price = price;
-    EffectAmount = effectAmount;
-}
-
 void UItem::printInfo() const
 {
 }
