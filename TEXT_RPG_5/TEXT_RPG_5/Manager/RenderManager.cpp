@@ -5,7 +5,7 @@
 #include "SceneManager.h"
 #include "../Component/InventoryComponent.h"
 #include "../Define.h"
-#include "../Struct/Item.h"
+#include "../Item/Item.h"
 #include "../Player.h"
 #include "../Monster.h"
 #include "../Component/MoveComponent.h"
@@ -353,21 +353,23 @@ void RenderManager::DrawItemSlot(int Y, int X, int Width, int Height, const UIte
 {
     DrawBox(Y, X, Width, Height);
 
+    
     if (item == nullptr)
     {
         return;
     }
 
+    FItemInfo itemInfo = item->GetItemInfo();
     WORD iconAttribute = MakeAttribute(CC_CYAN);
-    if (item->Type == ItemType::Equipment)
+    if (itemInfo.Type== ItemType::Equipment)
     {
         iconAttribute = MakeAttribute(CC_WHITE);
     }
-    else if (item->Type == ItemType::Usable)
+    else if (itemInfo.Type == ItemType::Usable)
     {
         iconAttribute = MakeAttribute(CC_GREEN);
     }
-    else if (item->Type == ItemType::Misc)
+    else if (itemInfo.Type == ItemType::Misc)
     {
         iconAttribute = MakeAttribute(CC_YELLOW);
     }
@@ -375,7 +377,7 @@ void RenderManager::DrawItemSlot(int Y, int X, int Width, int Height, const UIte
     wchar_t icon = GetItemIcon(item);
     PutCell(Y + 2, X + Width / 2, icon, iconAttribute);
 
-    wstring itemName = ToWideString(item->Name);
+    wstring itemName = ToWideString(itemInfo.Name);
     int maxNameWidth = max(1, Width - 2);
     if (GetTextDisplayWidth(itemName) > maxNameWidth)
     {
@@ -448,7 +450,7 @@ wchar_t RenderManager::GetItemIcon(const UItem* item)
 		return L' ';
 	}
 
-	switch (item->Type)
+	switch (item->GetItemInfo().Type)
 	{
 	case ItemType::Equipment:
 		return L'@';
@@ -816,24 +818,28 @@ void RenderManager::INVEN(float DeltaTime)
     if (!InventoryComponent)
         return;
     
-    vector<UItem*>& container = InventoryComponent->GetContainer();
+    vector<vector<UItem*>>& container = InventoryComponent->GetContainer();
     vector<UItem*> inventoryItems;
     vector<UItem*> equipmentItems;
     
-    for (UItem* item : container)
+    for (int y = 0; y < container.size(); ++y)
     {
-        if (item == nullptr)
+        for (int x = 0; x < container[y].size(); ++x)
         {
-            continue;
-        }
-    
-        if (item->Type == ItemType::Equipment)
-        {
-            equipmentItems.push_back(item);
-        }
-        else
-        {
-            inventoryItems.push_back(item);
+            UItem* item = container[y][x];
+            if (item == nullptr)
+            {
+                continue;
+            }
+        
+            if (item->GetItemInfo().Type == ItemType::Equipment)
+            {
+                equipmentItems.push_back(item);
+            }
+            else
+            {
+                inventoryItems.push_back(item);
+            }
         }
     }
     

@@ -1,71 +1,150 @@
 ﻿//Inventory.cpp
 
 #include "InventoryComponent.h"
-#include "../Struct/Item.h"
+#include "../Item/Item.h"
 #include "../Manager/RenderManager.h"
 #include "../Player.h"
 #include "../Manager/InputManager.h"
+#include "../Manager/RenderManager.h"
+#include "../Manager/ShopManager.h"
 
 
 UInventoryComponent::UInventoryComponent(AObject* InOwner)
     : UComponent(InOwner)
 {
     PlayerPtr = dynamic_cast<Player*>(InOwner);
+    
+    
+    Container.resize(MaxRow, vector<UItem*>(MaxColumn, nullptr));
+
+   
 }
 
 UInventoryComponent::~UInventoryComponent()
 {
+    for (int y = 0; y < Container.size(); ++y)
+    {
+        for (int x = 0; x < MaxColumn; ++x)
+        {
+            delete Container[y][x];
+            Container[y][x] = nullptr;
+        }
+    }
 
+    Container.clear();
 }
 
 void UInventoryComponent::OpenInventory()
 {
-    int currentCount = 0;
-    for (UItem* Item : Container)
+    /*int currentCount = 0;
+    for (vector<UItem*> Cont : Container)
     {
-        ++currentCount;
-        Item->printInfo();
+        for (UItem* Item : Cont)
+        {
+            ++currentCount;
+            if (Item != nullptr)
+                Item->printInfo();
+        }
+    }*/
+    
+    bOpenedInventory = true;
+    
+}
+
+
+Vector UInventoryComponent::GetItemIndex(UItem* Item)
+{
+    for (int y = 0; y < Container.size(); ++y)
+    {
+        for (int x = 0; x < MaxColumn; ++x)
+        {
+            if (Container[y][x] == Item)
+            {
+                return { x, y };
+            }
+        }
     }
+
+    return { -1, -1 };
 }
 
 
-int UInventoryComponent::GetGold()
+UItem* UInventoryComponent::GetItem(Vector Index)
 {
-    return Gold;
+    if (Index.Y < 0 || Index.Y >= (int)Container.size())
+    {
+        return nullptr;
+    }
+    
+    if (Index.X < 0 || Index.X >= MaxColumn) 
+    {
+        return nullptr;
+    }
+    
+    return Container[Index.Y][Index.X];
 }
 
-void UInventoryComponent::AddGold(int Amount)
+
+bool UInventoryComponent::IsFull()
 {
-    Gold += Amount;
+    if ((int)Container.size() < MaxRow) return false;
+    
+    for (int y = 0; y < Container.size(); ++y)
+        for (int x = 0; x < MaxColumn; ++x)
+            if (Container[y][x] == nullptr) return false;
+    
+    return true;
 }
 
-int UInventoryComponent::GetItemIndex(UItem* Item)
-{
-    auto it = find(Container.begin(), Container.end(), Item);
-    if (it != Container.end())
-        return it - Container.begin();
-    else
-        return -1;
-}
 
-UItem* UInventoryComponent::GetItem(int Index)
+bool UInventoryComponent::AddItem(UItem* Item)
 {
-    return Container[Index];
-}
+    
+    if (IsFull())
+    {
+        //인벤토리 가득 찼다는 피드백 넣어주기
+        return false;
+    }
+    
+    for (int y = 0; y < Container.size(); ++y)
+    {
+        for (int x = 0; x < MaxColumn; ++x)
+        {
+            if (Container[y][x] == nullptr)
+            {
+                Container[y][x] = Item;
+                
+                return true;
+            }
+        }
+    }
+    
 
-void UInventoryComponent::AddItem(UItem* Item)
-{
-    Container.push_back(Item);
-    RenderManager::GetInstance();
+    vector<UItem*> NewRow(MaxColumn, nullptr);
+    NewRow[0] = Item;
+    Container.push_back(NewRow);
+    return true;
+    
 }
 
 bool UInventoryComponent::RemoveItem(UItem* Item)
-{ 
-    auto it = find(Container.begin(), Container.end(), Item);
-    if (it != Container.end())
+{
+    
+    ClearQuickSlot(Item);
+    
+    
+    for (int y = 0; y < Container.size(); ++y)
     {
-        Container.erase(it);
-        return true;
+        for (int x = 0; x < MaxColumn; ++x)
+        {
+            if (Container[y][x] == Item)
+            {
+                delete Container[y][x];
+                Container[y][x] = nullptr;
+
+                return true;
+            }
+        }
     }
 
     return false;
@@ -73,10 +152,11 @@ bool UInventoryComponent::RemoveItem(UItem* Item)
 
 bool UInventoryComponent::UseRandomItem()
 {
-    int n = rand() % Container.size();
-    UItem* Item = Container[n];
+    int y = rand() % Container.size();
+    int x = rand() % Container[y].size();
+    UItem* Item = Container[y][x];
 
-    if (Item->Type == ItemType::Usable)
+    if (Item != nullptr && Item->GetItemInfo().Type == ItemType::Usable)
     {
         Item->Use(PlayerPtr);
         RemoveItem(Item);
@@ -91,8 +171,12 @@ bool UInventoryComponent::UseRandomItem()
 
 bool UInventoryComponent::UseItem(UItem* Item)
 {
-
-    if (Item->Type == ItemType::Usable)
+    if (Item == nullptr)
+    {
+        return false;
+    }
+    
+    if (Item->GetItemInfo().Type == ItemType::Usable)
     {
         Item->Use(PlayerPtr);
         RemoveItem(Item);
@@ -106,80 +190,91 @@ bool UInventoryComponent::UseItem(UItem* Item)
 
 
 
-void UInventoryComponent::UpdateInventorySlot()
+void UInventoryComponent::SelectCursor()
 {
-
-    memset(InventorySlot, 0, sizeof(InventorySlot));
-
-    for (int i = 0; i < Container.size(); i++)
+    if (GetItem(GetCursor()) != nullptr)
     {
-        if(i<16)
+        if (bOnShop == true)
         {
-            InventorySlot[i / 4][i % 4] = Container[i];
+            ShopManager::GetInstance()->SelectCursor();
         }
-
+        else
+        {
+            UseItem(GetItem(GetCursor()));
+        }
     }
-   
 }
 
-UItem* UInventoryComponent::GetItemFromCursor()
+Vector UInventoryComponent::CursorUp()
 {
-    return InventorySlot[CurrentCursor.X][CurrentCursor.Y];
+    if (CurrentCursor.Y > 0)
+        CurrentCursor.Y -= 1;
+    return CurrentCursor;
 }
 
-bool UInventoryComponent::UseCursorItem()
+Vector UInventoryComponent::CursorDown()
 {
-    if (UseItem(GetItemFromCursor()) == true)
+    if (CurrentCursor.Y < Container.size() - 1)
+        CurrentCursor.Y += 1;
+    return CurrentCursor;
+}
+
+Vector UInventoryComponent::CursorLeft()
+{
+    if (CurrentCursor.X > 0)
+        CurrentCursor.X -= 1;
+    return CurrentCursor;
+}
+
+Vector UInventoryComponent::CursorRight()
+{
+    if (CurrentCursor.X < MaxColumn - 1)
+        CurrentCursor.X += 1;
+    return CurrentCursor;
+}
+
+
+
+void UInventoryComponent::RegisterOnQuickSlot(int Number)
+{
+    if (GetItem(GetCursor()) != nullptr)
     {
-        UpdateInventorySlot();
+        QuickSlot[Number] = GetItem(GetCursor());
     }
-    return true;
 }
 
 
-
-
-map<int, UItem*> UInventoryComponent::GetQuickSlot()
+void UInventoryComponent::ClearQuickSlot(UItem* Item)
 {
-    return QuickSlot;
-}
-
-
-void UInventoryComponent::RegisterOnQuickSlot(int Number, UItem* Item)
-{
-    QuickSlot[Number] = Item;
-}
-
-UItem* UInventoryComponent::GetItemFromQuickSlot(int Number)
-{
-    return QuickSlot[Number];
-}
-
-void UInventoryComponent::UseQuickSlot(int Number)
-{
-    UseItem(QuickSlot[Number]);
-}
-
-
-
-
-void UInventoryComponent::BuyItem(UItem* Item)
-{
-    if (Gold >= Item->Price)
+    for (auto& slot : QuickSlot)
     {
-        AddGold(-(Item->Price));
-        AddItem(Item);
-    }
-    else
-    {
-        
+        if (slot.second == Item)
+            slot.second = nullptr;
     }
 }
+
+
+
+bool UInventoryComponent::BuyItem(UItem* Item)
+{
+    if (Gold >= Item->GetItemInfo().Price)
+    {
+        if (AddItem(Item))
+        {
+            AddGold(-(Item->GetItemInfo().Price));
+            return true;
+        }
+    }
+    
+    return false;
+//돈부족 및 가방 가득 찼다는 피드백은 상점의 TryButItem이 처리 중.
+}
+
 
 void UInventoryComponent::SellItem(UItem* Item)
 {
     if (RemoveItem(Item))
-        AddGold(Item->Price);
+        AddGold(Item->GetItemInfo().Price);
 }
 
 void UInventoryComponent::Tick(float DeltaTime)
