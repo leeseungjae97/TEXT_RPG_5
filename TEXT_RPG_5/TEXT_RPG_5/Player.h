@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "Vector.h"
+#include "Struct/Vector.h"
 #include "PlayerStat.h"
 #include "Object.h"
 

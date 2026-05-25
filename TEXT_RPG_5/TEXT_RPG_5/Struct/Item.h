@@ -1,9 +1,9 @@
 ﻿//Item.h
-
 #pragma once
-#include "pch.h"
-#include "ItemTypeEnum.h"
-#include "ItemIdEnum.h"
+
+#include "../pch.h"
+#include "../Enum/ItemTypeEnum.h"
+#include "../Enum/ItemIdEnum.h"
 
 class Player;
 

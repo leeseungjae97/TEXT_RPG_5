@@ -1,8 +1,8 @@
 #pragma once
 
 #include "pch.h"
-#include "Vector.h"
-#include "ComponentTypeEnum.h"
+#include "Struct/Vector.h"
+#include "Enum/ComponentTypeEnum.h"
 
 class UComponent;
 
@@ -19,6 +19,8 @@ public:
 	virtual void BeginPlay() = 0;
 	virtual void Tick(float DeltaTime);
 	virtual void Destroy() = 0;
+	virtual void OnSpawnFromPool();
+	virtual void OnReturnToPool();
 
 public:
 	bool IsDestroy() const { return bIsDestroy; }
@@ -78,6 +80,12 @@ protected:
 	Vector Position;
 	Vector PrevPosition;
 
+	static int IDGenerator;
+	int ID;
+	
+public:
+	const int GetID() const {return ID;}
+	
 private:
 	vector<unique_ptr<UComponent>> Components;
 };

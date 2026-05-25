@@ -1,6 +1,7 @@
 #pragma once
 #include "../Singleton.h"
 #include "../pch.h"
+#include "../Struct/Coordinate.h"
 
 class Player;
 class MapManager : public Singleton<MapManager>
@@ -14,9 +15,9 @@ public:
 	void Tick(float DeltaTime);
 
 	void UpdateMap();
-	vector<vector<int>>& GetMap() { return Map; }
+	vector<vector<Coordinate>>& GetMap() { return Map; }
 
 private:
-	vector<vector<int>> Map;
+	vector<vector<Coordinate>> Map;
 	//vector<vector<int>> MapOrigin;
 };

@@ -1,4 +1,6 @@
 #include "SceneManager.h"
+
+#include "ObjectPoolManager.h"
 #include "../Object.h"
 #include "../Player.h"
 #include "../Monster.h"
@@ -10,48 +12,57 @@ SceneManager::SceneManager()
 
 SceneManager::~SceneManager()
 {
-	for (int i = 0; i < Objects.size(); ++i)
-	{
-		if (nullptr != Objects[i])
-		{
-			delete Objects[i];
-		}
-	}
 	Objects.clear();
+	CurrentPlayer = nullptr;
 }
 
 void SceneManager::Tick(float DeltaTime)
 {
 	for (int i = 0; i < Objects.size(); ++i)
 	{
-		Objects[i]->Tick(DeltaTime);
+		if (Objects[i] != nullptr && !Objects[i]->IsDestroy())
+		{
+			Objects[i]->Tick(DeltaTime);
+		}
 	}
 }
 
 void SceneManager::Destroy()
 {
-	for (int i = 0; i < Objects.size(); ++i)
+	for (int i = 0; i < Objects.size();)
 	{
-		if (Objects[i]->IsDestroy())
+		if (Objects[i] == nullptr || Objects[i]->IsDestroy())
 		{
 			RemoveObject(Objects[i]);
+			continue;
 		}
+
+		++i;
 	}
 }
 
 void SceneManager::BeginPlay()
 {
-	CurrentPlayer = SpawnObject<Player>("name", 10, 10);
-	SpawnObject<Monster>();
-	SpawnObject<Monster>();
-	SpawnObject<Monster>();
-	SpawnObject<Monster>();
-	SpawnObject<Monster>();
-	SpawnObject<Monster>();
+	ObjectPoolManager::GetInstance()->Preload<Monster>(10);
+	CurrentPlayer = SpawnObject<Player>("player", 100, 100);
+	for (int i = 0; i < 6; ++i)
+	{
+		SpawnObject<Monster>();
+	}
 }
 
 void SceneManager::AddObject(AObject* object)
 {
+	if (object == nullptr)
+	{
+		return;
+	}
+
+	if (find(Objects.begin(), Objects.end(), object) != Objects.end())
+	{
+		return;
+	}
+
 	Objects.push_back(object);
 }
 
@@ -67,7 +78,8 @@ void SceneManager::RemoveObject(AObject* object)
 				CurrentPlayer = nullptr;
 			}
 
-			delete (*it);
+			ObjectPoolManager::GetInstance()->Return(*it);
+
 			it = Objects.erase(it);
 			break;
 		}

@@ -1,5 +1,6 @@
 ﻿// Item.cpp
-#include "Item.h"
+#include "Struct/Item.h"
+#include "Enum/ItemTypeEnum.h"
 #include "Player.h"
 
 void UItem::printInfo() const

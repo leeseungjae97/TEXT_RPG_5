@@ -5,7 +5,7 @@
 #include "SceneManager.h"
 #include "../Component/InventoryComponent.h"
 #include "../Define.h"
-#include "../Item.h"
+#include "../Struct/Item.h"
 #include "../Player.h"
 #include "../Monster.h"
 #include "../Component/MoveComponent.h"
@@ -298,6 +298,39 @@ void RenderManager::AddRender(int Y, int X, vector<vector<int>>& Map)
 	}
 }
 
+void RenderManager::DrawLine(int StartY, int StartX, int EndY, int EndX, wchar_t Character, int Color, int BgColor)
+{
+	int deltaX = abs(EndX - StartX);
+	int deltaY = abs(EndY - StartY);
+	int stepX = StartX < EndX ? 1 : -1;
+	int stepY = StartY < EndY ? 1 : -1;
+	int error = deltaX - deltaY;
+	WORD attribute = MakeAttribute(Color, BgColor);
+
+	while (true)
+	{
+		PutCell(StartY, StartX, Character, attribute);
+
+		if (StartX == EndX && StartY == EndY)
+		{
+			break;
+		}
+
+		int doubledError = error * 2;
+		if (doubledError > -deltaY)
+		{
+			error -= deltaY;
+			StartX += stepX;
+		}
+
+		if (doubledError < deltaX)
+		{
+			error += deltaX;
+			StartY += stepY;
+		}
+	}
+}
+
 void RenderManager::DrawBox(int Y, int X, int Width, int Height)
 {
 	if (Width < 2 || Height < 2)
@@ -305,17 +338,10 @@ void RenderManager::DrawBox(int Y, int X, int Width, int Height)
 		return;
 	}
 
-	for (int x = 0; x < Width; ++x)
-	{
-		AddRender(Y, X + x, L"\x2500");
-		AddRender(Y + Height - 1, X + x, L"\x2500");
-	}
-
-	for (int y = 0; y < Height; ++y)
-	{
-		AddRender(Y + y, X, L"\x2502");
-		AddRender(Y + y, X + Width - 1, L"\x2502");
-	}
+	DrawLine(Y, X, Y, X + Width - 1, L'\x2500');
+	DrawLine(Y + Height - 1, X, Y + Height - 1, X + Width - 1, L'\x2500');
+	DrawLine(Y, X, Y + Height - 1, X, L'\x2502');
+	DrawLine(Y, X + Width - 1, Y + Height - 1, X + Width - 1, L'\x2502');
 
 	AddRender(Y, X, L"\x250c");
 	AddRender(Y, X + Width - 1, L"\x2510");
@@ -532,7 +558,7 @@ int RenderManager::GetBackgroundColor()
 
 void RenderManager::_2DTOISO(float DeltaTime)
 {
-    vector<vector<int>>& Map = MapManager::GetInstance()->GetMap();
+    vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
 
     if (Map.empty() || Map[0].empty())
     {
@@ -681,7 +707,7 @@ void RenderManager::_2DTOISO(float DeltaTime)
     {
         for (int x = startX; x <= endX; ++x)
         {
-            drawIsoTile(x, y, Map[y][x] == 0);
+            drawIsoTile(x, y, Map[y][x].Type == ObjectType::Wall);
         }
     }
 
@@ -829,7 +855,7 @@ void RenderManager::INVEN(float DeltaTime)
 
 void RenderManager::_2DTO3D(float DeltaTime)
 {
-    vector<vector<int>>& Map = MapManager::GetInstance()->GetMap();
+    vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
     Player* player = SceneManager::GetInstance()->GetPlayer();
 
     float playerX = 1.0f;
@@ -899,7 +925,7 @@ void RenderManager::_2DTO3D(float DeltaTime)
             else
             {
                 // 벽과 충돌한 경우
-                if (Map[testY][testX] == 0)
+                if (Map[testY][testX].Type == ObjectType::Wall)
                 {
                     if (testX > previousTestX)      hitFace = WallFace::Left;
                     else if (testX < previousTestX) hitFace = WallFace::Right;

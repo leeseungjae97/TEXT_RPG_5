@@ -19,7 +19,7 @@ MapManager::~MapManager()
 void MapManager::Tick(float DeltaTime)
 {
 	UpdateMap();
-	RenderManager::GetInstance()->AddRender(2,1, Map);
+	// RenderManager::GetInstance()->AddRender(2,1, Map);
 }
 
 void MapManager::UpdateMap()
@@ -34,9 +34,13 @@ void MapManager::UpdateMap()
 		Vector PrevPos = Obj->GetPrevPosition();
 		Vector Pos = Obj->GetPosition();
 		
-		Map[PrevPos.Y][PrevPos.X] = 1;
+		Map[PrevPos.Y][PrevPos.X] = {ObjectType::Path, NO_ID};
 
-		if (Pos.Y < 1 || Pos.Y >= MAP_MAX_Y - 1 || Pos.X < 1 || Pos.X >= MAP_MAX_X - 1 || Map[Pos.Y][Pos.X] == 0)
+		if (Pos.Y < 1 
+			|| Pos.Y >= MAP_MAX_Y - 1 
+			|| Pos.X < 1 
+			|| Pos.X >= MAP_MAX_X - 1 
+			|| Map[Pos.Y][Pos.X].Type == ObjectType::Wall)
 		{
 			Obj->SetPosition(PrevPos);
 			continue;
@@ -44,29 +48,28 @@ void MapManager::UpdateMap()
 
 		if (Monster* monster = dynamic_cast<Monster*>(Obj))
 		{
-			Map[Pos.Y][Pos.X] = 4;
+			Map[Pos.Y][Pos.X] = {ObjectType::Monster, monster->GetID()};
 		}
 		
 		else if (Player* player = dynamic_cast<Player*>(Obj))
 		{
-			Map[Pos.Y][Pos.X] = 3;
+			Map[Pos.Y][Pos.X] = {ObjectType::Player, player->GetID()};
 		}
 	}
 }
 
 void MapManager::BeginPlay()
 {
-	Map.resize(MAP_MAX_Y, vector<int>(MAP_MAX_X, 1));
-	//MapOrigin.resize(MAP_MAX_X, vector<int>(MAP_MAX_Y, 1));
+	Map.resize(MAP_MAX_Y, vector<Coordinate>(MAP_MAX_X, {ObjectType::Path, NO_ID}));
 	
 	for (int i = 0 ; i < MAP_MAX_Y; ++i)
 	{
 		for (int j = 0 ; j < MAP_MAX_X; ++j)
 		{
 			if (i == 0 || j == 0 || i == MAP_MAX_Y - 1 || j == MAP_MAX_X - 1)
-				Map[i][j] = 0;
+				Map[i][j] = {ObjectType::Wall, NO_ID};
 			else 
-				Map[i][j] = 1;
+				Map[i][j] = {ObjectType::Path, NO_ID};
 		}
 	}
 	
@@ -75,6 +78,6 @@ void MapManager::BeginPlay()
 		int ry = rand() % (MAP_MAX_Y - 2) + 1;
 		int rx = rand() % (MAP_MAX_X - 2) + 1;
 		
-		Map[ry][rx] = 0;
+		Map[ry][rx] = {ObjectType::Wall, NO_ID};;
 	}
 }
