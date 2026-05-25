@@ -2,8 +2,8 @@
 
 #include "ShopManager.h"
 #include "ItemManager.h"
-#include "../ItemDB.h"
-#include "../Item.h"
+#include "../Item/ItemDB.h"
+#include "../Item/Item.h"
 #include "../Component/InventoryComponent.h"
 
 /* for template

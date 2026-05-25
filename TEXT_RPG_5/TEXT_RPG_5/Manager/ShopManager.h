@@ -4,7 +4,7 @@
 
 #include "../Singleton.h"
 #include "../pch.h"
-#include "../Vector.h"
+#include "../Struct/Vector.h"
 
 
 class UInventoryComponent;

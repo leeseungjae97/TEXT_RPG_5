@@ -2,8 +2,8 @@
 #pragma once
 
 #include "../Singleton.h"
-#include "../Item.h"
-#include "../ItemIdEnum.h"
+#include "../Item/Item.h"
+#include "../Enum/ItemIdEnum.h"
 
 class ItemManager : public Singleton<ItemManager>
 {

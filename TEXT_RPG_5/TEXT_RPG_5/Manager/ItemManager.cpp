@@ -1,10 +1,10 @@
 ﻿#include "ItemManager.h"
 
-#include "../ItemDB.h"
+#include "../Item/ItemDB.h"
 
-#include "../UsableItem.h"
-#include "../EquipmentItem.h"
-#include "../MiscItem.h"
+#include "../Item/UsableItem.h"
+#include "../Item/EquipmentItem.h"
+#include "../Item/MiscItem.h"
 
 ItemManager::ItemManager()
 {

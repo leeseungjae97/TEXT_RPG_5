@@ -1,7 +1,7 @@
 ﻿// Item.cpp
-#include "Struct/Item.h"
-#include "Enum/ItemTypeEnum.h"
-#include "Player.h"
+#include "Item.h"
+#include "../Enum/ItemTypeEnum.h"
+#include "../Player.h"
 
 void UItem::printInfo() const
 {
