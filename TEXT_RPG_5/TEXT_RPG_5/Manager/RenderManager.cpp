@@ -210,6 +210,7 @@ void RenderManager::DrawItemSlot(int Y, int X, int Width, int Height, const UIte
 {
     DrawBox(Y, X, Width, Height);
 
+    
     if (item == nullptr)
     {
         return;
@@ -220,11 +221,11 @@ void RenderManager::DrawItemSlot(int Y, int X, int Width, int Height, const UIte
     {
         iconAttribute = MakeConsoleAttribute(CC_WHITE);
     }
-    else if (item->Type == ItemType::Usable)
+    else if (itemInfo.Type == ItemType::Usable)
     {
         iconAttribute = MakeConsoleAttribute(CC_GREEN);
     }
-    else if (item->Type == ItemType::Misc)
+    else if (itemInfo.Type == ItemType::Misc)
     {
         iconAttribute = MakeConsoleAttribute(CC_YELLOW);
     }
@@ -232,7 +233,7 @@ void RenderManager::DrawItemSlot(int Y, int X, int Width, int Height, const UIte
     wchar_t icon = GetItemIcon(item);
     PutCell(Y + 2, X + Width / 2, icon, iconAttribute);
 
-    wstring itemName = ToWideString(item->Name);
+    wstring itemName = ToWideString(itemInfo.Name);
     int maxNameWidth = max(1, Width - 2);
     if (GetTextDisplayWidth(itemName) > maxNameWidth)
     {
@@ -305,7 +306,7 @@ wchar_t RenderManager::GetItemIcon(const UItem* item)
 		return L' ';
 	}
 
-	switch (item->Type)
+	switch (item->GetItemInfo().Type)
 	{
 	case ItemType::Equipment:
 		return L'@';
