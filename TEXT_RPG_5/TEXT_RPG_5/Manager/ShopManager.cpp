@@ -107,16 +107,16 @@ UItem* ShopManager::GetRandomItem()
 
 bool ShopManager::ToggleMode()
 {
-    SellMode = !SellMode;
+    bSellMode = !bSellMode;
     PlayerInventory->ResetCursor();
-    return SellMode;
+    return bSellMode;
 }
 
 
 
 void ShopManager::SelectCursor()
 {
-    if (SellMode == true)
+    if (bSellMode == true)
     {
         TrySellItem();
     }
@@ -136,9 +136,10 @@ void ShopManager::TryBuyItem()
     
     if (PlayerInventory->GetGold() >= Item->GetItemInfo().Price)
     {
-        if (PlayerInventory->IsFull() == false)
+        if (PlayerInventory->BuyItem(Item) == true )
         {
-            PlayerInventory->BuyItem(Item);
+            Vector Cursor = PlayerInventory->GetCursor();
+            Container[Cursor.Y][Cursor.X] = nullptr;
         }
         else
         {

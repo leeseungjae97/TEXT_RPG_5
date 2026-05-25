@@ -25,7 +25,7 @@ private:
     UInventoryComponent* PlayerInventory = nullptr;
     Vector CurrentCursor = {0,0};
     
-    bool SellMode = false;
+    bool bSellMode = false;
 
 
 public:
@@ -33,6 +33,8 @@ public:
     void SetPlayerInventory(UInventoryComponent* Inventory);
     void RestoreShop();
 
+    vector<vector<UItem*>> GetContainer() {return Container;}
+    bool GetSellMode() {return bSellMode;}
     UItem* GetItem(Vector Index);
     UItem* GetRandomItem();
     bool ToggleMode();

@@ -35,7 +35,7 @@ UInventoryComponent::~UInventoryComponent()
 
 void UInventoryComponent::OpenInventory()
 {
-    int currentCount = 0;
+    /*int currentCount = 0;
     for (vector<UItem*> Cont : Container)
     {
         for (UItem* Item : Cont)
@@ -44,7 +44,10 @@ void UInventoryComponent::OpenInventory()
             if (Item != nullptr)
                 Item->printInfo();
         }
-    }
+    }*/
+    
+    bOpenedInventory = true;
+    
 }
 
 
@@ -251,16 +254,18 @@ void UInventoryComponent::ClearQuickSlot(UItem* Item)
 
 
 
-void UInventoryComponent::BuyItem(UItem* Item)
+bool UInventoryComponent::BuyItem(UItem* Item)
 {
     if (Gold >= Item->GetItemInfo().Price)
     {
         if (AddItem(Item))
         {
             AddGold(-(Item->GetItemInfo().Price));
+            return true;
         }
     }
     
+    return false;
 //돈부족 및 가방 가득 찼다는 피드백은 상점의 TryButItem이 처리 중.
 }
 

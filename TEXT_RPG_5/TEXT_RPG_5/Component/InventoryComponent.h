@@ -35,6 +35,7 @@ protected:
 	int Gold = 0;
 	int SelectedIndex;
 	bool bOnShop = false;
+	bool bOpenedInventory = false;
 
 public:
 	~UInventoryComponent();
@@ -42,6 +43,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void OpenInventory();
+	void CloseInventory() { bOpenedInventory = false;}
+	bool GetOpenedInventory(){return bOpenedInventory;}
 
 	int GetGold(){return Gold;}
 	void AddGold(int Amount) {Gold += Amount;} 
@@ -74,7 +77,8 @@ public:
 	void ClearQuickSlot(UItem* Item);
 	
 	void SetOnShop(bool OnShop){bOnShop = OnShop;}
-	void BuyItem(UItem* Item);
+	bool GetOnShop(){return bOnShop;}
+	bool BuyItem(UItem* Item);
 	void SellItem(UItem* Item);
 	
 	
