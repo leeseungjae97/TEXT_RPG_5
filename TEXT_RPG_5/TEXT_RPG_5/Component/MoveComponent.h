@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.h"
-#include "../ComponentTypeEnum.h"
+#include "../Enum/ComponentTypeEnum.h"
 
 enum class EDirection : int
 {

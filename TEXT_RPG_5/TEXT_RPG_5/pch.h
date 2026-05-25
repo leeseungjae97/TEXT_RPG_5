@@ -49,7 +49,11 @@
 #include <stdexcept>
 #include <streambuf>
 #include <string>
+#include <typeindex>
 #include <typeinfo>
+#include <type_traits>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <valarray>
 #include <vector>
@@ -72,8 +76,6 @@
 #include <tuple>
 #include <typeindex>
 #include <type_traits>
-#include <unordered_map>
-#include <unordered_set>
 #endif
 
 using namespace std;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pch.h"
-#include "Vector.h"
+#include "Struct/Vector.h"
 #include "Object.h"
 
 class Player;

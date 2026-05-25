@@ -5,6 +5,7 @@
 #include "Manager/TimeManager.h"
 #include "Manager/SceneManager.h"
 #include "Manager/InputManager.h"
+#include "Manager/ObjectPoolManager.h"
 
 void GameInstance::BeginPlay()
 {

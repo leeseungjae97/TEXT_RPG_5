@@ -892,6 +892,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Manager\ObjectPoolManager.cpp" />
     <ClCompile Include="Manager\RenderManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1165,7 +1166,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllItems.h" />
-    <ClInclude Include="ComponentTypeEnum.h" />
     <ClInclude Include="Component\CombatComponent.h" />
     <ClInclude Include="Component\Component.h" />
     <ClInclude Include="Component\InventoryComponent.h" />
@@ -1173,9 +1173,12 @@
     <ClInclude Include="Component\MoveComponent.h" />
     <ClInclude Include="Component\SubActionComponent.h" />
     <ClInclude Include="Define.h" />
+    <ClInclude Include="Enum\ComponentTypeEnum.h" />
+    <ClInclude Include="Enum\ItemTypeEnum.h" />
     <ClInclude Include="Manager\BattleManager.h" />
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\MapManager.h" />
+    <ClInclude Include="Manager\ObjectPoolManager.h" />
     <ClInclude Include="Manager\RenderManager.h" />
     <ClInclude Include="Manager\SceneManager.h" />
     <ClInclude Include="Manager\TimeManager.h" />
@@ -1185,10 +1188,7 @@
     <ClInclude Include="GameInstance.h" />
     <ClInclude Include="Goblin.h" />
     <ClInclude Include="HP_Potion.h" />
-    <ClInclude Include="Item.h" />
-    <ClInclude Include="ItemData.h" />
     <ClInclude Include="ItemDB.h" />
-    <ClInclude Include="ItemTypeEnum.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Orc.h" />
@@ -1197,8 +1197,10 @@
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
     <ClInclude Include="Strength_Potion.h" />
+    <ClInclude Include="Struct\Item.h" />
+    <ClInclude Include="Struct\ItemData.h" />
+    <ClInclude Include="Struct\Vector.h" />
     <ClInclude Include="Troll.h" />
-    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,7 +3,8 @@
 #pragma once
 
 
-#include "Item.h"
+#include "Struct/Item.h"
+#include "Enum/ItemTypeEnum.h"
 
 struct Misc : public UItem
 {

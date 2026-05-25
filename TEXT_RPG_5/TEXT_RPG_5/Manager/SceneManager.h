@@ -1,6 +1,8 @@
 #pragma once
 #include "../Singleton.h"
 #include "../pch.h"
+#include "../Object.h"
+#include "ObjectPoolManager.h"
 
 class AObject;
 class Player;
@@ -25,9 +27,9 @@ public:
 	template<typename T, typename... Args>
 	T* SpawnObject(Args&&... args)
 	{
-		static_assert(is_base_of<AObject, T>::value);
+		static_assert(is_base_of<AObject, T>::value, "T must derive from AObject");
 
-		T* Object = new T(std::forward<Args>(args)...);
+		T* Object = ObjectPoolManager::GetInstance()->Get<T>(std::forward<Args>(args)...);
 		AddObject(Object);
 		Object->BeginPlay();
 
