@@ -25,8 +25,25 @@ void ObjectPoolManager::Return(AObject* object)
 	iter->second->ReturnObject(object);
 }
 
+void ObjectPoolManager::Return(int ObjectID)
+{
+	Return(GetObjectByID(ObjectID));
+}
+
+AObject* ObjectPoolManager::GetObjectByID(int ObjectID)
+{
+	auto iter = ObjectByID.find(ObjectID);
+	if (iter == ObjectByID.end())
+	{
+		return nullptr;
+	}
+
+	return iter->second;
+}
+
 void ObjectPoolManager::ClearAll()
 {
+	ObjectByID.clear();
 	PoolByObject.clear();
 	Pools.clear();
 }
