@@ -4,7 +4,7 @@
 #include "../Manager/RenderManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Player.h"
-#include "../Struct/Item.h"
+#include "../Item/Item.h"
 
 void InventoryUI::Render()
 {
@@ -20,24 +20,29 @@ void InventoryUI::Render()
 		return;
 	}
 
-	vector<UItem*>& container = InventoryComponent->GetContainer();
+	vector<vector<UItem*>>& container = InventoryComponent->GetContainer();
 	vector<UItem*> inventoryItems;
 	vector<UItem*> equipmentItems;
 
-	for (UItem* item : container)
+	for (int i = 0 ; i < container.size() ; i++)
 	{
-		if (item == nullptr)
+		for (int j = 0 ; j < container[i].size() ; j++)
 		{
-			continue;
-		}
+			UItem* item = container[i][j];
+			FItemInfo ItemInfo = item->GetItemInfo();
+			if (item == nullptr)
+			{
+				continue;
+			}
 
-		if (item->Type == ItemType::Equipment)
-		{
-			equipmentItems.push_back(item);
-		}
-		else
-		{
-			inventoryItems.push_back(item);
+			if (ItemInfo.Type == ItemType::Equipment)
+			{
+				equipmentItems.push_back(item);
+			}
+			else
+			{
+				inventoryItems.push_back(item);
+			}		
 		}
 	}
 
