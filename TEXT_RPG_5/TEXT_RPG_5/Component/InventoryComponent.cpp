@@ -1,7 +1,7 @@
 ﻿//Inventory.cpp
 
 #include "InventoryComponent.h"
-#include "../Item.h"
+#include "../Struct/Item.h"
 #include "../Manager/RenderManager.h"
 #include "../Player.h"
 #include "../Manager/InputManager.h"

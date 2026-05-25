@@ -19,7 +19,7 @@ MapManager::~MapManager()
 void MapManager::Tick(float DeltaTime)
 {
 	UpdateMap();
-	RenderManager::GetInstance()->AddRender(2,1, Map);
+	// RenderManager::GetInstance()->AddRender(2,1, Map);
 }
 
 void MapManager::UpdateMap()
@@ -44,12 +44,12 @@ void MapManager::UpdateMap()
 
 		if (Monster* monster = dynamic_cast<Monster*>(Obj))
 		{
-			Map[Pos.Y][Pos.X] = 4;
+			Map[Pos.Y][Pos.X] = 3;
 		}
 		
 		else if (Player* player = dynamic_cast<Player*>(Obj))
 		{
-			Map[Pos.Y][Pos.X] = 3;
+			Map[Pos.Y][Pos.X] = 2;
 		}
 	}
 }

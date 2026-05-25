@@ -75,7 +75,7 @@ void UCombatComponent::Tick(float DeltaTime)
 		else
 		{
 			TotalTime += DeltaTime;
-			RenderManager::GetInstance()->AddRender(2, 2, "타이머 : " + to_string(DeltaTime));
+			// RenderManager::GetInstance()->AddRender(2, 2, "타이머 : " + to_string(DeltaTime));
 		}
 		
 	}

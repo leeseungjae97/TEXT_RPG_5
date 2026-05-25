@@ -1,7 +1,7 @@
 ﻿//Strength_Potion.h
 #pragma once
 
-#include "Item.h"
+#include "Struct/Item.h"
 
 struct Strength_Potion : public UItem
 {

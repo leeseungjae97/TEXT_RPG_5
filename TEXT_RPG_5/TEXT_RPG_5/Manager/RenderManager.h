@@ -51,6 +51,7 @@ public:
 	bool bInven = false;
 	bool bPrevInvenKey = false;
 public:
+	void DrawLine(int StartY, int StartX, int EndY, int EndX, wchar_t Character = L'*', int Color = CC_GRAY, int BgColor = CC_BLACK);
 	void DrawBox(int Y, int X, int Width, int Height);
 	void DrawItemSlot(int Y, int X, int Width, int Height, const UItem* item);
 	void DrawInventoryPanel(int Y, int X, const vector<UItem*>& Items, int Capacity, int Columns, int Rows);

@@ -4,16 +4,12 @@
 
 void SubActionComponent::Tick(float DeltaTime)
 {
-	InputManager* Input = InputManager::GetInstance();
-
 	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::_1))
-
 	{
 		//UseSlotItem(0);
 	} 
 
 	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::_2))
-
 	{
 		//UseSlotItem(2);
 	}
