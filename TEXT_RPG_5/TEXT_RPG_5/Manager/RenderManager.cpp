@@ -215,26 +215,26 @@ void RenderManager::BeginPlay()
 
 void RenderManager::Tick(float DeltaTime)
 {
-    // bool bCurrentInvenKey = InputManager::GetInstance()->IsKeyDown(eKeyCode::_3);
-    // if (bCurrentInvenKey && !bPrevInvenKey)
-    // {
-    //     bInven = !bInven;
-    // }
-    // bPrevInvenKey = bCurrentInvenKey;
-    //
-    // if (InputManager::GetInstance()->IsKeyDown(eKeyCode::_1))
-    //     bIso = true;
-    //
-    // if (InputManager::GetInstance()->IsKeyDown(eKeyCode::_2))
-    //     bIso = false;
-    //
-    // if (bIso)
-    //     _2DTOISO(DeltaTime);
-    // else
-    //     _2DTO3D(DeltaTime);
-    //
-    // if (bInven)
-    //     INVEN(DeltaTime);
+    bool bCurrentInvenKey = InputManager::GetInstance()->IsKeyDown(eKeyCode::_3);
+    if (bCurrentInvenKey && !bPrevInvenKey)
+    {
+        bInven = !bInven;
+    }
+    bPrevInvenKey = bCurrentInvenKey;
+    
+    if (InputManager::GetInstance()->IsKeyDown(eKeyCode::_1))
+        bIso = true;
+    
+    if (InputManager::GetInstance()->IsKeyDown(eKeyCode::_2))
+        bIso = false;
+    
+    if (bIso)
+        _2DTOISO(DeltaTime);
+    else
+        _2DTO3D(DeltaTime);
+    
+    if (bInven)
+        INVEN(DeltaTime);
 }
 
 void RenderManager::Render(float DeltaTime)
@@ -558,7 +558,7 @@ int RenderManager::GetBackgroundColor()
 
 void RenderManager::_2DTOISO(float DeltaTime)
 {
-    vector<vector<int>>& Map = MapManager::GetInstance()->GetMap();
+    vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
 
     if (Map.empty() || Map[0].empty())
     {
@@ -707,7 +707,7 @@ void RenderManager::_2DTOISO(float DeltaTime)
     {
         for (int x = startX; x <= endX; ++x)
         {
-            drawIsoTile(x, y, Map[y][x] == 0);
+            drawIsoTile(x, y, Map[y][x].Type == ObjectType::Wall);
         }
     }
 
@@ -855,7 +855,7 @@ void RenderManager::INVEN(float DeltaTime)
 
 void RenderManager::_2DTO3D(float DeltaTime)
 {
-    vector<vector<int>>& Map = MapManager::GetInstance()->GetMap();
+    vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
     Player* player = SceneManager::GetInstance()->GetPlayer();
 
     float playerX = 1.0f;
@@ -925,7 +925,7 @@ void RenderManager::_2DTO3D(float DeltaTime)
             else
             {
                 // 벽과 충돌한 경우
-                if (Map[testY][testX] == 0)
+                if (Map[testY][testX].Type == ObjectType::Wall)
                 {
                     if (testX > previousTestX)      hitFace = WallFace::Left;
                     else if (testX < previousTestX) hitFace = WallFace::Right;

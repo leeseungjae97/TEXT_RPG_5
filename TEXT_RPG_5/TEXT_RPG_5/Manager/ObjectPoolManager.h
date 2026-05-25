@@ -123,6 +123,7 @@ public:
 			T* object = pool->Available.back();
 			pool->Available.pop_back();
 			pool->AvailableSet.erase(object);
+			ObjectByID[object->GetID()] = object;
 			object->OnSpawnFromPool();
 			return object;
 		}
@@ -131,6 +132,7 @@ public:
 		T* rawObject = newObject.get();
 		pool->Objects.push_back(move(newObject));
 		PoolByObject[rawObject] = pool;
+		ObjectByID[rawObject->GetID()] = rawObject;
 		rawObject->OnSpawnFromPool();
 
 		return rawObject;
@@ -175,6 +177,7 @@ public:
 			for (AObject* object : objects)
 			{
 				PoolByObject.erase(object);
+				ObjectByID.erase(object->GetID());
 			}
 
 			Pools.erase(iter);
@@ -182,6 +185,8 @@ public:
 	}
 
 	void Return(AObject* object);
+	void Return(int ObjectID);
+	AObject* GetObjectByID(int ObjectID);
 	void ClearAll();
 	size_t GetTypeCount() const { return Pools.size(); }
 
@@ -204,6 +209,12 @@ public:
 		return PoolByObject.find(object) != PoolByObject.end();
 	}
 
+	bool Contains(int ObjectID) const
+	{
+		return ObjectByID.find(ObjectID) != ObjectByID.end();
+	}
+
 private:
 	unordered_map<AObject*, ITypePool*> PoolByObject;
+	unordered_map<int, AObject*> ObjectByID;
 };

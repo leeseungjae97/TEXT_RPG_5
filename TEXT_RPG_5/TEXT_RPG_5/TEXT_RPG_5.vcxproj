@@ -1175,6 +1175,7 @@
     <ClInclude Include="Define.h" />
     <ClInclude Include="Enum\ComponentTypeEnum.h" />
     <ClInclude Include="Enum\ItemTypeEnum.h" />
+    <ClInclude Include="Enum\ObjectTypeEnum.h" />
     <ClInclude Include="Manager\BattleManager.h" />
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\MapManager.h" />
@@ -1197,6 +1198,7 @@
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
     <ClInclude Include="Strength_Potion.h" />
+    <ClInclude Include="Struct\Coordinate.h" />
     <ClInclude Include="Struct\Item.h" />
     <ClInclude Include="Struct\ItemData.h" />
     <ClInclude Include="Struct\Vector.h" />
