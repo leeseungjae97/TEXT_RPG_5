@@ -1,15 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "../Enum/ComponentTypeEnum.h"
-
-enum class EDirection : int
-{
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	NONE
-};
+#include "../Enum/Direction.h"
 
 class Player;
 

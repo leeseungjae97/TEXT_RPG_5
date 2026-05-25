@@ -9,16 +9,16 @@ public:
 	~TimeManager();
 
 private:
-	static double DeltaTime;
-	static double StoreSecond;
-	static UINT FrameCount;
+	double DeltaTime;
+	double StoreSecond;
+	UINT FrameCount;
+	UINT LastFPS;
 	
-	static LARGE_INTEGER CpuFrequency;
-	static LARGE_INTEGER PrevFrequency;
-	static LARGE_INTEGER CurFrequency;
+	LARGE_INTEGER CpuFrequency;
+	LARGE_INTEGER PrevFrequency;
+	LARGE_INTEGER CurFrequency;
 public:
 	double GetDeltaTime() { return DeltaTime; }
-	static UINT LastFPS;
 
 public:
 	void Tick();
