@@ -1,7 +1,7 @@
 ﻿#include "RenderManager.h"
 
 #include "../Define.h"
-#include "../Struct/Item.h"
+#include "../Item/Item.h"
 
 namespace
 {
@@ -208,40 +208,40 @@ void RenderManager::DrawBox(int Y, int X, int Width, int Height)
 
 void RenderManager::DrawItemSlot(int Y, int X, int Width, int Height, const UItem* item)
 {
-    DrawBox(Y, X, Width, Height);
+    // DrawBox(Y, X, Width, Height);
+    //
+    //
+    // if (item == nullptr)
+    // {
+    //     return;
+    // }
 
-    
-    if (item == nullptr)
-    {
-        return;
-    }
-
-    WORD iconAttribute = MakeConsoleAttribute(CC_CYAN);
-    if (item->Type == ItemType::Equipment)
-    {
-        iconAttribute = MakeConsoleAttribute(CC_WHITE);
-    }
-    else if (itemInfo.Type == ItemType::Usable)
-    {
-        iconAttribute = MakeConsoleAttribute(CC_GREEN);
-    }
-    else if (itemInfo.Type == ItemType::Misc)
-    {
-        iconAttribute = MakeConsoleAttribute(CC_YELLOW);
-    }
-
-    wchar_t icon = GetItemIcon(item);
-    PutCell(Y + 2, X + Width / 2, icon, iconAttribute);
-
-    wstring itemName = ToWideString(itemInfo.Name);
-    int maxNameWidth = max(1, Width - 2);
-    if (GetTextDisplayWidth(itemName) > maxNameWidth)
-    {
-        itemName = TrimTextToDisplayWidth(itemName, maxNameWidth);
-    }
-
-    int nameX = X + 1 + max(0, (maxNameWidth - GetTextDisplayWidth(itemName)) / 2);
-    AddRender(Y + Height - 2, nameX, itemName);
+    // WORD iconAttribute = MakeConsoleAttribute(CC_CYAN);
+    // if (item->Type == ItemType::Equipment)
+    // {
+    //     iconAttribute = MakeConsoleAttribute(CC_WHITE);
+    // }
+    // else if (itemInfo.Type == ItemType::Usable)
+    // {
+    //     iconAttribute = MakeConsoleAttribute(CC_GREEN);
+    // }
+    // else if (itemInfo.Type == ItemType::Misc)
+    // {
+    //     iconAttribute = MakeConsoleAttribute(CC_YELLOW);
+    // }
+    //
+    // wchar_t icon = GetItemIcon(item);
+    // PutCell(Y + 2, X + Width / 2, icon, iconAttribute);
+    //
+    // wstring itemName = ToWideString(itemInfo.Name);
+    // int maxNameWidth = max(1, Width - 2);
+    // if (GetTextDisplayWidth(itemName) > maxNameWidth)
+    // {
+    //     itemName = TrimTextToDisplayWidth(itemName, maxNameWidth);
+    // }
+    //
+    // int nameX = X + 1 + max(0, (maxNameWidth - GetTextDisplayWidth(itemName)) / 2);
+    // AddRender(Y + Height - 2, nameX, itemName);
 }
 
 void RenderManager::DrawInventoryPanel(int Y, int X, const vector<UItem*>& Items, int Capacity, int Columns, int Rows)
