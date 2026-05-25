@@ -893,6 +893,9 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Manager\ObjectPoolManager.cpp" />
+    <ClCompile Include="Manager\ViewportManager.cpp" />
+    <ClCompile Include="UI\InventoryUI.cpp" />
+    <ClCompile Include="UI\PlayerStatusUI.cpp" />
     <ClCompile Include="Manager\RenderManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1174,12 +1177,14 @@
     <ClInclude Include="Component\SubActionComponent.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Enum\ComponentTypeEnum.h" />
+    <ClInclude Include="Enum\Direction.h" />
     <ClInclude Include="Enum\ItemTypeEnum.h" />
     <ClInclude Include="Enum\ObjectTypeEnum.h" />
     <ClInclude Include="Manager\BattleManager.h" />
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\MapManager.h" />
     <ClInclude Include="Manager\ObjectPoolManager.h" />
+    <ClInclude Include="Manager\ViewportManager.h" />
     <ClInclude Include="Manager\RenderManager.h" />
     <ClInclude Include="Manager\SceneManager.h" />
     <ClInclude Include="Manager\TimeManager.h" />
@@ -1203,6 +1208,8 @@
     <ClInclude Include="Struct\ItemData.h" />
     <ClInclude Include="Struct\Vector.h" />
     <ClInclude Include="Troll.h" />
+    <ClInclude Include="UI\InventoryUI.h" />
+    <ClInclude Include="UI\PlayerStatusUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

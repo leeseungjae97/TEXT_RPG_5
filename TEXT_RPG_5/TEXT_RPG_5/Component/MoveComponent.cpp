@@ -78,28 +78,28 @@ void UMoveComponent::Tick(float DeltaTime)
 		return;
 	}
 	
-	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::UP))
+	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::UP))
 	{
 		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
 		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, max(PlayerPtr->GetPosition().Y - 1, 0) });
 		SetFacingDirection(EDirection::UP);
 		MoveElapsedTime = 0.0f;
 	}
-	else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::DOWN))
+	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::DOWN))
 	{
 		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
 		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y + 1 });
 		SetFacingDirection(EDirection::DOWN);
 		MoveElapsedTime = 0.0f;
 	}
-	else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::LEFT))
+	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::LEFT))
 	{
 		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
 		PlayerPtr->SetPosition({ max(PlayerPtr->GetPosition().X - 1, 0 ), PlayerPtr->GetPosition().Y});
 		SetFacingDirection(EDirection::LEFT);
 		MoveElapsedTime = 0.0f;
 	}
-	else if (InputManager::GetInstance()->IsKeyDown(eKeyCode::RIGHT))
+	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::RIGHT))
 	{
 		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
 		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y});
