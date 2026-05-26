@@ -3,69 +3,6 @@
 #include "../Define.h"
 #include "../Item/Item.h"
 
-namespace
-{
-    WORD MakeConsoleAttribute(int Color, int BackgroundColor = CC_BLACK)
-    {
-        return static_cast<WORD>(((BackgroundColor & 0xf) << 4) | (Color & 0xf));
-    }
-
-    bool IsWideCharacter(wchar_t Character)
-    {
-        return
-            (Character >= 0x1100 && Character <= 0x11FF) ||
-            (Character >= 0x2E80 && Character <= 0xA4CF) ||
-            (Character >= 0xAC00 && Character <= 0xD7A3) ||
-            (Character >= 0xF900 && Character <= 0xFAFF) ||
-            (Character >= 0xFE10 && Character <= 0xFE6F) ||
-            (Character >= 0xFF00 && Character <= 0xFF60) ||
-            (Character >= 0xFFE0 && Character <= 0xFFE6);
-    }
-
-    int GetCharacterDisplayWidth(wchar_t Character)
-    {
-        if (Character == L'\0')
-        {
-            return 0;
-        }
-
-        return IsWideCharacter(Character) ? 2 : 1;
-    }
-
-    int GetTextDisplayWidth(const wstring& Text)
-    {
-        int width = 0;
-        for (wchar_t character : Text)
-        {
-            width += GetCharacterDisplayWidth(character);
-        }
-
-        return width;
-    }
-
-    wstring TrimTextToDisplayWidth(const wstring& Text, int MaxWidth)
-    {
-        wstring result;
-        int width = 0;
-
-        for (wchar_t character : Text)
-        {
-            int characterWidth = GetCharacterDisplayWidth(character);
-            if (width + characterWidth > MaxWidth)
-            {
-                break;
-            }
-
-            result.push_back(character);
-            width += characterWidth;
-        }
-
-        return result;
-    }
-
-}
-
-
 RenderManager::~RenderManager()
 {
     delete[] screen;
@@ -206,80 +143,6 @@ void RenderManager::DrawBox(int Y, int X, int Width, int Height)
 	AddRender(Y + Height - 1, X + Width - 1, L"\x2518");
 }
 
-void RenderManager::DrawItemSlot(int Y, int X, int Width, int Height, const UItem* item)
-{
-    // DrawBox(Y, X, Width, Height);
-    //
-    //
-    // if (item == nullptr)
-    // {
-    //     return;
-    // }
-
-    // WORD iconAttribute = MakeConsoleAttribute(CC_CYAN);
-    // if (item->Type == ItemType::Equipment)
-    // {
-    //     iconAttribute = MakeConsoleAttribute(CC_WHITE);
-    // }
-    // else if (itemInfo.Type == ItemType::Usable)
-    // {
-    //     iconAttribute = MakeConsoleAttribute(CC_GREEN);
-    // }
-    // else if (itemInfo.Type == ItemType::Misc)
-    // {
-    //     iconAttribute = MakeConsoleAttribute(CC_YELLOW);
-    // }
-    //
-    // wchar_t icon = GetItemIcon(item);
-    // PutCell(Y + 2, X + Width / 2, icon, iconAttribute);
-    //
-    // wstring itemName = ToWideString(itemInfo.Name);
-    // int maxNameWidth = max(1, Width - 2);
-    // if (GetTextDisplayWidth(itemName) > maxNameWidth)
-    // {
-    //     itemName = TrimTextToDisplayWidth(itemName, maxNameWidth);
-    // }
-    //
-    // int nameX = X + 1 + max(0, (maxNameWidth - GetTextDisplayWidth(itemName)) / 2);
-    // AddRender(Y + Height - 2, nameX, itemName);
-}
-
-void RenderManager::DrawInventoryPanel(int Y, int X, const vector<UItem*>& Items, int Capacity, int Columns, int Rows)
-{
-	const int slotWidth = 16;
-	const int slotHeight = 7;
-
-	AddRender(Y, X, L"인벤토리 (" + to_wstring(Items.size()) + L"/" + to_wstring(Capacity) + L")");
-
-	for (int row = 0; row < Rows; ++row)
-	{
-		for (int col = 0; col < Columns; ++col)
-		{
-			int index = row * Columns + col;
-			const UItem* item = index < Items.size() ? Items[index] : nullptr;
-			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, item);
-		}
-	}
-}
-
-void RenderManager::DrawEquipmentPanel(int Y, int X, const vector<UItem*>& Items, int Columns, int Rows)
-{
-	const int slotWidth = 16;
-	const int slotHeight = 7;
-
-	AddRender(Y, X, L"장비");
-
-	for (int row = 0; row < Rows; ++row)
-	{
-		for (int col = 0; col < Columns; ++col)
-		{
-			int index = row * Columns + col;
-			const UItem* item = index < Items.size() ? Items[index] : nullptr;
-			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, item);
-		}
-	}
-}
-
 wstring RenderManager::ToWideString(const string& Text)
 {
 	if (Text.empty())
@@ -299,26 +162,7 @@ wstring RenderManager::ToWideString(const string& Text)
 	return result;
 }
 
-wchar_t RenderManager::GetItemIcon(const UItem* item)
-{
-	if (item == nullptr)
-	{
-		return L' ';
-	}
 
-	switch (item->GetItemInfo().Type)
-	{
-	case ItemType::Equipment:
-		return L'@';
-	case ItemType::Usable:
-		return L'^';
-	case ItemType::Misc:
-		return L'■';
-	default:
-		return L'?';
-	}
-    return L' ';
-}
 
 void RenderManager::PutCell(int Y, int X, wchar_t Character, WORD Attribute)
 {
@@ -414,3 +258,60 @@ int RenderManager::GetBackgroundColor()
     return (buff.wAttributes & 0xf0) >> 4;
 }
 
+WORD RenderManager::MakeConsoleAttribute(int Color, int BackgroundColor)
+{
+	return static_cast<WORD>(((BackgroundColor & 0xf) << 4) | (Color & 0xf));
+}
+
+bool RenderManager::IsWideCharacter(wchar_t Character)
+{
+	return
+		(Character >= 0x1100 && Character <= 0x11FF) ||
+		(Character >= 0x2E80 && Character <= 0xA4CF) ||
+		(Character >= 0xAC00 && Character <= 0xD7A3) ||
+		(Character >= 0xF900 && Character <= 0xFAFF) ||
+		(Character >= 0xFE10 && Character <= 0xFE6F) ||
+		(Character >= 0xFF00 && Character <= 0xFF60) ||
+		(Character >= 0xFFE0 && Character <= 0xFFE6);
+}
+
+int RenderManager::GetCharacterDisplayWidth(wchar_t Character)
+{
+	if (Character == L'\0')
+	{
+		return 0;
+	}
+
+	return IsWideCharacter(Character) ? 2 : 1;
+}
+
+int RenderManager::GetTextDisplayWidth(const wstring& Text)
+{
+	int width = 0;
+	for (wchar_t character : Text)
+	{
+		width += GetCharacterDisplayWidth(character);
+	}
+
+	return width;
+}
+
+wstring RenderManager::TrimTextToDisplayWidth(const wstring& Text, int MaxWidth)
+{
+	wstring result;
+	int width = 0;
+
+	for (wchar_t character : Text)
+	{
+		int characterWidth = GetCharacterDisplayWidth(character);
+		if (width + characterWidth > MaxWidth)
+		{
+			break;
+		}
+
+		result.push_back(character);
+		width += characterWidth;
+	}
+
+	return result;
+}

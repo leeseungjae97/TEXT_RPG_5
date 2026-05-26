@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h";
+#include "Component.h"
 #include "../Enum/ComponentTypeEnum.h"
 class AObject;
 
@@ -18,7 +18,18 @@ public:
     const int MaxLevel = 10;    
     void AddExp(int InExp);
     void StatsUpdate(int LevelUpCount);
-    virtual void Tick(float DeltaTime) override {}
-
+    bool ShouldShowLevelUpText() const { return LevelUpDisplayTime > 0.0f; }
+    const wstring& GetLevelUpStateText() const { return LevelUpStateText; }
+    float GetLevelUpEffectAlpha() const;
+    void NotifyLevelUp(const wstring& StateText, float DisplayDuration = 2.0f);
+    virtual void Tick(float DeltaTime) override;
+    
 private:
+    int LevelUpCount = 0;
+    const int HPIncreasePerLevel = 20;
+    const int PowerIncreasePerLevel = 5;
+    const int LevelIncreaseAmount = 1;
+    float LevelUpDisplayTime = 0.0f;
+    float LevelUpDisplayDuration = 0.0f;
+    wstring LevelUpStateText;
 };

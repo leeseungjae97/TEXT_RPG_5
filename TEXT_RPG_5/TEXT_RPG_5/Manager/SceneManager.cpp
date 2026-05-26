@@ -4,6 +4,9 @@
 #include "../Object.h"
 #include "../Player.h"
 #include "../Monster.h"
+#include "../Goblin.h"
+#include "../Orc.h"
+#include "../Slime.h"
 
 SceneManager::SceneManager()
 {
@@ -43,11 +46,15 @@ void SceneManager::Destroy()
 
 void SceneManager::BeginPlay()
 {
-	ObjectPoolManager::GetInstance()->Preload<Monster>(10);
-	CurrentPlayer = SpawnObject<Player>("player", 100, 100);
-	for (int i = 0; i < 6; ++i)
+	ObjectPoolManager::GetInstance()->Preload<Goblin>(10, 1);
+	ObjectPoolManager::GetInstance()->Preload<Orc>(10, 1);
+	ObjectPoolManager::GetInstance()->Preload<Slime>(10, 1);
+	CurrentPlayer = SpawnObject<Player>("player", 100, 60);
+	for (int i = 0; i < 3; ++i)
 	{
-		SpawnObject<Monster>();
+		SpawnObject<Goblin>(1);
+		SpawnObject<Orc>(1);
+		SpawnObject<Slime>(1);
 	}
 }
 

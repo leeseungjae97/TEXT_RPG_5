@@ -19,7 +19,6 @@ MapManager::~MapManager()
 void MapManager::Tick(float DeltaTime)
 {
 	UpdateMap();
-	// RenderManager::GetInstance()->AddRender(2,1, Map);
 }
 
 void MapManager::UpdateMap()

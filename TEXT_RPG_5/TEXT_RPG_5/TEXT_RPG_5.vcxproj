@@ -794,7 +794,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
@@ -878,7 +878,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
@@ -962,7 +962,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
@@ -1214,7 +1214,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
@@ -1313,7 +1313,7 @@
     <ClCompile Include="Manager\ObjectPoolManager.cpp" />
     <ClCompile Include="Manager\ViewportManager.cpp" />
     <ClCompile Include="UI\InventoryUI.cpp" />
-    <ClCompile Include="UI\PlayerStatusUI.cpp" />
+    <ClCompile Include="UI\HUDUI.cpp" />
     <ClCompile Include="Manager\RenderManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1554,7 +1554,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
@@ -1680,6 +1680,7 @@
     <ClInclude Include="Enum\Direction.h" />
     <ClInclude Include="Enum\ItemTypeEnum.h" />
     <ClInclude Include="Enum\ObjectTypeEnum.h" />
+    <ClInclude Include="Enum\WeaponType.h" />
     <ClInclude Include="Item\AllItems.h" />
     <ClInclude Include="Item\EquipmentItem.h" />
     <ClInclude Include="Item\Item.h" />
@@ -1714,7 +1715,7 @@
     <ClInclude Include="Struct\Vector.h" />
     <ClInclude Include="Troll.h" />
     <ClInclude Include="UI\InventoryUI.h" />
-    <ClInclude Include="UI\PlayerStatusUI.h" />
+    <ClInclude Include="UI\HUDUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
