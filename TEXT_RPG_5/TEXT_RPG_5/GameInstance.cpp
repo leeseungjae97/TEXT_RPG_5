@@ -1,6 +1,7 @@
 #include "GameInstance.h"
 #include "Manager/RenderManager.h"
 #include "Manager/BattleManager.h"
+#include "Manager/ViewportManager.h"
 #include "Manager/MapManager.h"
 #include "Manager/TimeManager.h"
 #include "Manager/SceneManager.h"
@@ -20,34 +21,26 @@ void GameInstance::BeginPlay()
 
 void GameInstance::Tick()
 {
-	RenderManager::GetInstance()->ClearScreen();
-	
 	TimeManager::GetInstance()->Tick();
 	double DeltaTime = TimeManager::GetInstance()->GetDeltaTime();
+	
 	InputManager::GetInstance()->Tick(DeltaTime);
 
 	BattleManager::GetInstance()->Tick(DeltaTime);
 	SceneManager::GetInstance()->Tick(DeltaTime);
 
 	MapManager::GetInstance()->Tick(DeltaTime);
-	RenderManager::GetInstance()->Tick(DeltaTime);
+	ViewportManager::GetInstance()->Tick(DeltaTime);
 }
 void GameInstance::Render()
 {
-	// FPS 계산
-	TimeManager::GetInstance()->CalcFPS();
-	UINT FPS = TimeManager::GetInstance()->LastFPS;
-	RenderManager::GetInstance()->AddRender(1, 1, "FPS : " + to_string(FPS));
-	RenderManager::GetInstance()->DrawScreen();
+	ViewportManager::GetInstance()->Render();
+	RenderManager::GetInstance()->Render();
 }
 
 void GameInstance::Destroy()
 {
-	//TimeManager::GetInstance()->Destroy();
 	SceneManager::GetInstance()->Destroy();
-	//MapManager::GetInstance()->Destroy();
-	//BattleManager::GetInstance()->Destroy();
-	//RenderManager::GetInstance()->Destroy();
 }
 
 void GameInstance::Run()

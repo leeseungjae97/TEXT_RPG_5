@@ -38,29 +38,22 @@ public:
 	void DrawScreen();
 
 public:
-	void Tick(float DeltaTime);
+	void Tick(float DeltaTime) {}
 	void BeginPlay();
-	void Render(float DeltaTime);
+	void Render();
 	void Destroy();
 
 	void AddRender(int Y, int X, string Content);
 	void AddRender(int Y, int X, vector<vector<int>>& Map);
 	void AddRender(int Y, int X, wstring Content);
 
-	bool bIso = false;
-	bool bInven = false;
-	bool bPrevInvenKey = false;
 public:
 	void DrawLine(int StartY, int StartX, int EndY, int EndX, wchar_t Character = L'*', int Color = CC_GRAY, int BgColor = CC_BLACK);
 	void DrawBox(int Y, int X, int Width, int Height);
 	void DrawItemSlot(int Y, int X, int Width, int Height, const UItem* item);
 	void DrawInventoryPanel(int Y, int X, const vector<UItem*>& Items, int Capacity, int Columns, int Rows);
 	void DrawEquipmentPanel(int Y, int X, const vector<UItem*>& Items, int Columns, int Rows);
-
-public:
-	void _2DTO3D(float DeltaTime);
-	void _2DTOISO(float DeltaTime);
-	void INVEN(float DeltaTime);
+	void PutCell(int Y, int X, wchar_t Character, WORD Attribute);
 
 public:
 	void SetColor(int Color, int Bgcolor);
@@ -70,12 +63,8 @@ public:
 	int GetBackgroundColor();
 
 private:
-	float ElapsedTime = 0.0f;
-
-private:
 	wstring ToWideString(const string& Text);
 	wchar_t GetItemIcon(const UItem* item);
-	void PutCell(int Y, int X, wchar_t Character, WORD Attribute);
 
 	wchar_t* screen = nullptr;
 	WORD* attributes = nullptr;

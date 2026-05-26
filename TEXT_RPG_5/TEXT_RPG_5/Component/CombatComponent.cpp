@@ -30,7 +30,7 @@ void UCombatComponent::Tick(float DeltaTime)
 
 	if (PlayerPtr != nullptr)
 	{
-		if (InputManager::GetInstance()->IsKeyDown(eKeyCode::Z) && (TotalTime >= DelayTime))
+		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::Z) && (TotalTime >= DelayTime))
 		{
 			if (!(PlayerPtr->GetIsAttack()))
 			{

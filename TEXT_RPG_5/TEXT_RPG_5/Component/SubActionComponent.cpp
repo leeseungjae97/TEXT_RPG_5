@@ -18,7 +18,7 @@ void SubActionComponent::Tick(float DeltaTime)
 		UseSlotItem(0);
 	} 
 
-	if (InputManager::GetInstance()->IsKeyDown(eKeyCode::_2))
+	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::_2))
 	{
 		UseSlotItem(1);
 	}
