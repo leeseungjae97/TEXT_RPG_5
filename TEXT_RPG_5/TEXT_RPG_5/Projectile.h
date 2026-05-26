@@ -16,9 +16,11 @@ public:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
     virtual void Destroy() override;
+    virtual void OnSpawnFromPool() override;
 
     void BeginPlay(AObject* InOwner, EDirection InDirection, ProjectileInfo InInfo);
     void Fire();
+    EDirection GetDirection() const { return Direction; }
 
 private:
     ProjectileInfo Info;

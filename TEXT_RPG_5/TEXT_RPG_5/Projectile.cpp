@@ -120,3 +120,9 @@ void Projectile::Tick(float DeltaTime)
 {
     AObject::Tick(DeltaTime);
 }
+
+void Projectile::OnSpawnFromPool()
+{
+    AObject::OnSpawnFromPool();
+    Owner = nullptr;
+}

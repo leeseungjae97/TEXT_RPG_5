@@ -7,6 +7,7 @@
 #include "../Goblin.h"
 #include "../Orc.h"
 #include "../Slime.h"
+#include "../Projectile.h"
 
 SceneManager::SceneManager()
 {
@@ -49,6 +50,7 @@ void SceneManager::BeginPlay()
 	ObjectPoolManager::GetInstance()->Preload<Goblin>(10, 1);
 	ObjectPoolManager::GetInstance()->Preload<Orc>(10, 1);
 	ObjectPoolManager::GetInstance()->Preload<Slime>(10, 1);
+	ObjectPoolManager::GetInstance()->Preload<Projectile>(10);
 	CurrentPlayer = SpawnObject<Player>("player", 100, 60);
 	for (int i = 0; i < 3; ++i)
 	{

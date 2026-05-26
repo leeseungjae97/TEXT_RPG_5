@@ -21,6 +21,8 @@ UCombatComponent::UCombatComponent(AObject* InOwner)
 	AttackVisibleTime = 0.0f;
 	AttackVisibleDuration = 0.18f;
 	bAttackRequested = false;
+	ProjectileTotalTime = 0.0f;
+	ProjectileDelayTime = 0.0f;
 }
 
 UCombatComponent::~UCombatComponent()
@@ -106,9 +108,71 @@ void UCombatComponent::HandleAttack()
 	bAttackRequested = false;
 }
 
-void UCombatComponent::HandleAttackInput(float DeltaTime)
+void UCombatComponent::LaunchProjectile()
 {
-	AttackElapsedTime += DeltaTime;
+	ProjectileInfo Info;
+	Info.Range = 10;
+	Info.Damage = 40;
+	Info.Speed = 0.1f;
+
+	EDirection Direction = MoveComponentPtr->GetFacingDirection();
+
+		Projectile* ProjectileAttack = ObjectPoolManager::GetInstance()->Get<Projectile>();
+
+		if (ProjectileAttack != nullptr)
+		{
+			SceneManager::GetInstance()->AddObject(ProjectileAttack);
+			ProjectileAttack->BeginPlay(PlayerPtr, Direction, Info);
+			ProjectileAttack->Fire();
+		}
+			
+	ProjectileTotalTime = 0.0f;
+	ProjectileDelayTime = 0.5f;
+}
+
+void UCombatComponent::MakeSwordRange()
+{
+	AttackValue.clear();
+	PlayerPtr->SetIsAttack(true);
+	Vector Pos = PlayerPtr->GetPosition();
+
+	if (MoveComponentPtr->GetFacingDirection() == EDirection::UP)
+	{
+		AttackValue.push_back({ Pos.X, Pos.Y - 1 });
+		AttackValue.push_back({ Pos.X - 1, Pos.Y - 1 });
+		AttackValue.push_back({ Pos.X + 1, Pos.Y - 1 });
+	}
+	if (MoveComponentPtr->GetFacingDirection() == EDirection::DOWN)
+	{
+		AttackValue.push_back({ Pos.X, Pos.Y + 1 });
+		AttackValue.push_back({ Pos.X - 1, Pos.Y + 1 });
+		AttackValue.push_back({ Pos.X + 1, Pos.Y + 1 });
+	}
+	if (MoveComponentPtr->GetFacingDirection() == EDirection::RIGHT)
+	{
+		AttackValue.push_back({ Pos.X + 1, Pos.Y - 1 });
+		AttackValue.push_back({ Pos.X + 1, Pos.Y });
+		AttackValue.push_back({ Pos.X + 1, Pos.Y + 1 });
+	}
+	if (MoveComponentPtr->GetFacingDirection() == EDirection::LEFT)
+	{
+		AttackValue.push_back({ Pos.X - 1, Pos.Y - 1 });
+		AttackValue.push_back({ Pos.X - 1, Pos.Y });
+		AttackValue.push_back({ Pos.X - 1, Pos.Y + 1 });
+	}
+	if (MoveComponentPtr->GetFacingDirection() == EDirection::NONE)
+	{
+		AttackValue.push_back({ Pos.X, Pos.Y - 1 });
+		AttackValue.push_back({ Pos.X - 1, Pos.Y });
+		AttackValue.push_back({ Pos.X + 1, Pos.Y });
+		AttackValue.push_back({ Pos.X, Pos.Y + 1 });
+	}
+	bAttackRequested = true;
+	AttackVisibleTime = AttackVisibleDuration;
+}
+
+void UCombatComponent::AttackEffectTimeAcc(float DeltaTime)
+{
 	if (AttackVisibleTime > 0.0f)
 	{
 		AttackVisibleTime -= DeltaTime;
@@ -122,6 +186,14 @@ void UCombatComponent::HandleAttackInput(float DeltaTime)
 			}
 		}
 	}
+}
+
+void UCombatComponent::HandleAttackInput(float DeltaTime)
+{
+	AttackElapsedTime += DeltaTime;
+	ProjectileTotalTime += DeltaTime;
+	
+	AttackEffectTimeAcc(DeltaTime);
 
 	if (!PlayerPtr)
 	{
@@ -139,45 +211,13 @@ void UCombatComponent::HandleAttackInput(float DeltaTime)
 	{
 		if (!PlayerPtr->GetIsAttack())
 		{
-			AttackValue.clear();
-			PlayerPtr->SetIsAttack(true);
-			Vector Pos = PlayerPtr->GetPosition();
-
-			if (MoveComponentPtr->GetFacingDirection() == EDirection::UP)
-			{
-				AttackValue.push_back({ Pos.X, Pos.Y - 1 });
-				AttackValue.push_back({ Pos.X - 1, Pos.Y - 1 });
-				AttackValue.push_back({ Pos.X + 1, Pos.Y - 1 });
-			}
-			if (MoveComponentPtr->GetFacingDirection() == EDirection::DOWN)
-			{
-				AttackValue.push_back({ Pos.X, Pos.Y + 1 });
-				AttackValue.push_back({ Pos.X - 1, Pos.Y + 1 });
-				AttackValue.push_back({ Pos.X + 1, Pos.Y + 1 });
-			}
-			if (MoveComponentPtr->GetFacingDirection() == EDirection::RIGHT)
-			{
-				AttackValue.push_back({ Pos.X + 1, Pos.Y - 1 });
-				AttackValue.push_back({ Pos.X + 1, Pos.Y });
-				AttackValue.push_back({ Pos.X + 1, Pos.Y + 1 });
-			}
-			if (MoveComponentPtr->GetFacingDirection() == EDirection::LEFT)
-			{
-				AttackValue.push_back({ Pos.X - 1, Pos.Y - 1 });
-				AttackValue.push_back({ Pos.X - 1, Pos.Y });
-				AttackValue.push_back({ Pos.X - 1, Pos.Y + 1 });
-			}
-			if (MoveComponentPtr->GetFacingDirection() == EDirection::NONE)
-			{
-				AttackValue.push_back({ Pos.X, Pos.Y - 1 });
-				AttackValue.push_back({ Pos.X - 1, Pos.Y });
-				AttackValue.push_back({ Pos.X + 1, Pos.Y });
-				AttackValue.push_back({ Pos.X, Pos.Y + 1 });
-			}
-			bAttackRequested = true;
-			AttackVisibleTime = AttackVisibleDuration;
+			MakeSwordRange();
 		}
 		AttackElapsedTime = 0.0f;
+	}
+	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::X) && (ProjectileTotalTime >= ProjectileDelayTime))
+	{
+		LaunchProjectile();
 	}
 }
 
