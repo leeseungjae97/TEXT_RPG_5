@@ -31,6 +31,8 @@ private:
 	vector<Vector> AttackValue;
 	Player* PlayerPtr;
 	UMoveComponent* MoveComponentPtr;
-	float TotalTime;
-	float DelayTime;
+	float AttackTotalTime;
+	float AttackDelayTime;
+	float ProjectileTotalTime;
+	float ProjectileDelayTime;
 };

@@ -1156,6 +1156,7 @@
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Orc.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Slime.cpp" />
     <ClCompile Include="Strength_Potion.cpp" />
     <ClCompile Include="test_main.cpp">
@@ -1195,12 +1196,14 @@
     <ClInclude Include="Orc.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
     <ClInclude Include="Strength_Potion.h" />
     <ClInclude Include="Struct\Coordinate.h" />
     <ClInclude Include="Struct\Item.h" />
     <ClInclude Include="Struct\ItemData.h" />
+    <ClInclude Include="Struct\ProjectileInfo.h" />
     <ClInclude Include="Struct\Vector.h" />
     <ClInclude Include="Troll.h" />
   </ItemGroup>

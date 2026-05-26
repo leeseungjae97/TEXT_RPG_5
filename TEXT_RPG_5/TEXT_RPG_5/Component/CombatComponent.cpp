@@ -3,14 +3,19 @@
 #include "../Manager/InputManager.h"
 #include "../Manager/RenderManager.h"
 #include "../Player.h"
+#include "../Projectile.h"
+#include "../Struct/ProjectileInfo.h"
+#include "../Manager/ObjectPoolManager.h"
 
 UCombatComponent::UCombatComponent(AObject* InOwner)
 	: UComponent(InOwner)
 {
 	PlayerPtr = dynamic_cast<Player*>(InOwner);
 	MoveComponentPtr = PlayerPtr->GetComponent<UMoveComponent>();
-	this->TotalTime = 0.0f;
-	this->DelayTime = 2.0f;
+	this->AttackTotalTime = 0.0f;
+	this->AttackDelayTime = 0.0f;
+	this->ProjectileTotalTime = 0.0f;
+	this->ProjectileDelayTime = 0.0f;
 }
 
 UCombatComponent::~UCombatComponent()
@@ -27,10 +32,13 @@ void UCombatComponent::Tick(float DeltaTime)
 {
 	if (nullptr == MoveComponentPtr)
 		return;
-
+	
 	if (PlayerPtr != nullptr)
 	{
-		if (InputManager::GetInstance()->IsKeyDown(eKeyCode::Z) && (TotalTime >= DelayTime))
+		AttackTotalTime += DeltaTime;
+		ProjectileTotalTime += DeltaTime;
+		
+		if (InputManager::GetInstance()->IsKeyDown(eKeyCode::Z) && (AttackTotalTime >= AttackDelayTime))
 		{
 			if (!(PlayerPtr->GetIsAttack()))
 			{
@@ -69,14 +77,32 @@ void UCombatComponent::Tick(float DeltaTime)
 					this->AttackValue.push_back({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y + 1 });
 				}
 			}
-			TotalTime = 0.0f;
-			
+			AttackTotalTime = 0.0f;
+			AttackDelayTime = 2.0f;
 		}
-		else
+		if (InputManager::GetInstance()->IsKeyDown(eKeyCode::X) && (ProjectileTotalTime >= ProjectileDelayTime))
 		{
-			TotalTime += DeltaTime;
-			// RenderManager::GetInstance()->AddRender(2, 2, "타이머 : " + to_string(DeltaTime));
+			ProjectileInfo Info;
+			Info.Range = 10;
+			Info.Damage = 40;
+			Info.Speed = 0.5f;
+
+			EDirection Direction = MoveComponentPtr->GetFacingDirection();
+
+			Projectile* ProjectileAttack = ObjectPoolManager::GetInstance()->Get<Projectile>();
+
+			if (ProjectileAttack != nullptr)
+			{
+				ProjectileAttack->BeginPlay(PlayerPtr, Direction, Info);
+				ProjectileAttack->Fire();
+				ObjectPoolManager::GetInstance()->Return(ProjectileAttack);
+			}
+			
+			ProjectileTotalTime = 0.0f;
+			ProjectileDelayTime = 0.5f;
 		}
-		
+
+		//RenderManager::GetInstance()->AddRender(2, 2, "타이머 : " + to_string(DeltaTime));
+		//RenderManager::GetInstance()->AddRender(0, 0, "타이머 : " + to_string(ProjectileTotalTime));
 	}
 }
