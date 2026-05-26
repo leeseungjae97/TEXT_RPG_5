@@ -3,7 +3,7 @@
 #include "Component/MoveComponent.h"
 #include "Component/CombatComponent.h"
 #include "Component/InventoryComponent.h"
-#include "Component/SubActionComponent.h"
+#include "Component/LevelComponent.h"
 
 Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 {
@@ -17,7 +17,8 @@ Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 	this->MoveComponent = CreateDefaultComponent<UMoveComponent>();
 	this->CombatComponent = CreateDefaultComponent<UCombatComponent>();
 	this->InventoryComponent = CreateDefaultComponent<UInventoryComponent>();
-	this->SubActionComponent = CreateDefaultComponent<USubActionComponent>();
+	this->LevelComponentPtr = CreateDefaultComponent<LevelComponent>();
+
 	this->Position.Y = 2;
 	this->Position.X = 2;
 	this->PrevPosition = this->Position;

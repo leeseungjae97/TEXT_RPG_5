@@ -1,12 +1,17 @@
 #pragma once
 #include "../Singleton.h"
 #include "../UI/InventoryUI.h"
-#include "../UI/PlayerStatusUI.h"
+#include "../UI/HUDUI.h"
+
+class UCombatComponent;
+class UMoveComponent;
 
 class ViewportManager : public Singleton<ViewportManager>
 {
 public:
-	ViewportManager() {}
+	ViewportManager() : PlayerPtr(nullptr), moveComponent(nullptr), combatComponent(nullptr)
+	{
+	}
 	~ViewportManager() {}
 
 public:
@@ -25,6 +30,9 @@ private:
 	bool bIso = false;
 	bool bInven = false;
 	bool bPrevInvenKey = false;
-	PlayerStatusUI PlayerStatus;
+	HUDUI PlayerStatus;
 	InventoryUI Inventory;
+	Player* PlayerPtr;
+	UMoveComponent* moveComponent;
+	UCombatComponent* combatComponent;
 };

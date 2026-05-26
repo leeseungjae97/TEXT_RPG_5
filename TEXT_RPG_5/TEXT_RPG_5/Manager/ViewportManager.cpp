@@ -4,6 +4,8 @@
 #include "MapManager.h"
 #include "RenderManager.h"
 #include "SceneManager.h"
+#include "../Component/CombatComponent.h"
+#include "../Component/LevelComponent.h"
 #include "../Component/MoveComponent.h"
 #include "../Define.h"
 #include "../Monster.h"
@@ -127,6 +129,34 @@ namespace
 			OriginY + static_cast<int>(roundf((WorldX + WorldY) * TileHalfHeight))
 		};
 	}
+
+	wchar_t GetMonsterIcon(Monster* MonsterPtr)
+	{
+		if (MonsterPtr == nullptr)
+		{
+			return L'M';
+		}
+
+		string name = MonsterPtr->GetName();
+		if (name == "Goblin") return L'G';
+		if (name == "Slime")  return L'S';
+		if (name == "Orc")    return L'O';
+		return L'M';
+	}
+
+	int GetMonsterColor(Monster* MonsterPtr)
+	{
+		if (MonsterPtr == nullptr)
+		{
+			return CC_MAGENTA;
+		}
+
+		string name = MonsterPtr->GetName();
+		if (name == "Goblin") return CC_GREEN;
+		if (name == "Slime")  return CC_CYAN;
+		if (name == "Orc")    return CC_DARKYELLOW;
+		return CC_MAGENTA;
+	}
 }
 
 void ViewportManager::Render2DtoISO()
@@ -225,6 +255,91 @@ void ViewportManager::Render2DtoISO()
 			renderManager->PutCell(iso.Y - 1, iso.X + 1, L'\\', attribute);
 		};
 
+	auto drawIsoMonsterActor = [&](IsoScreenPosition iso, Monster* monster, WORD attribute)
+		{
+			if (monster == nullptr)
+			{
+				return;
+			}
+
+			WORD shadowAttribute = MakeAttribute(CC_DARKGRAY);
+			renderManager->PutCell(iso.Y, iso.X - 2, L'(', shadowAttribute);
+			renderManager->PutCell(iso.Y, iso.X - 1, L'_', shadowAttribute);
+			renderManager->PutCell(iso.Y, iso.X, L'_', shadowAttribute);
+			renderManager->PutCell(iso.Y, iso.X + 1, L')', shadowAttribute);
+
+			string name = monster->GetName();
+			if (name == "Goblin")
+			{
+				renderManager->PutCell(iso.Y - 4, iso.X - 2, L'<', attribute);
+				renderManager->PutCell(iso.Y - 4, iso.X, L'G', attribute);
+				renderManager->PutCell(iso.Y - 4, iso.X + 2, L'>', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X - 1, L'/', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X, L'|', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X + 1, L'\\', attribute);
+				renderManager->PutCell(iso.Y - 2, iso.X - 2, L'/', attribute);
+				renderManager->PutCell(iso.Y - 2, iso.X + 2, L'|', MakeAttribute(CC_DARKGRAY));
+				renderManager->PutCell(iso.Y - 1, iso.X - 1, L'/', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 1, L'\\', attribute);
+				return;
+			}
+
+			if (name == "Slime")
+			{
+				renderManager->PutCell(iso.Y - 3, iso.X - 2, L'_', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X - 1, L'_', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X, L'S', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X + 1, L'_', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X + 2, L'_', attribute);
+				renderManager->PutCell(iso.Y - 2, iso.X - 3, L'/', attribute);
+				renderManager->PutCell(iso.Y - 2, iso.X - 1, L'o', attribute);
+				renderManager->PutCell(iso.Y - 2, iso.X + 1, L'o', attribute);
+				renderManager->PutCell(iso.Y - 2, iso.X + 3, L'\\', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X - 2, L'\\', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X - 1, L'_', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X, L'_', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 1, L'_', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 2, L'/', attribute);
+				return;
+			}
+
+			if (name == "Orc")
+			{
+				renderManager->PutCell(iso.Y - 5, iso.X, L'O', attribute);
+				renderManager->PutCell(iso.Y - 4, iso.X - 2, L'T', MakeAttribute(CC_DARKGRAY));
+				renderManager->PutCell(iso.Y - 4, iso.X - 1, L'/', attribute);
+				renderManager->PutCell(iso.Y - 4, iso.X, L'|', attribute);
+				renderManager->PutCell(iso.Y - 4, iso.X + 1, L'\\', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X - 1, L'/', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X, L'|', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X + 1, L'\\', attribute);
+				renderManager->PutCell(iso.Y - 2, iso.X - 1, L'|', attribute);
+				renderManager->PutCell(iso.Y - 2, iso.X + 1, L'|', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X - 1, L'/', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 1, L'\\', attribute);
+				return;
+			}
+
+			drawIsoActor(iso, L'M', attribute, false);
+		};
+
+	auto drawStatusBar = [&](int y, int centerX, float ratio, int filledColor)
+		{
+			constexpr int barWidth = 8;
+			ratio = min(max(ratio, 0.0f), 1.0f);
+			int filledWidth = static_cast<int>(roundf(ratio * barWidth));
+
+			int startX = centerX - barWidth / 2 - 1;
+
+			renderManager->PutCell(y, startX, L'[', MakeAttribute(CC_GRAY));
+			for (int i = 0; i < barWidth; ++i)
+			{
+				bool filled = i < filledWidth;
+				renderManager->PutCell(y, startX + 1 + i, filled ? L'=' : L'-', MakeAttribute(filled ? filledColor : CC_DARKGRAY));
+			}
+			renderManager->PutCell(y, startX + barWidth + 1, L']', MakeAttribute(CC_GRAY));
+		};
+
 	auto drawMonsterHpBar = [&](IsoScreenPosition iso, Monster* monster)
 		{
 			if (monster == nullptr)
@@ -232,21 +347,61 @@ void ViewportManager::Render2DtoISO()
 				return;
 			}
 
-			constexpr int barWidth = 8;
 			int maxHealth = max(1, monster->GetMaxHealth());
 			int currentHealth = min(max(monster->GetHealth(), 0), maxHealth);
-			int filledWidth = static_cast<int>(roundf(static_cast<float>(currentHealth) / static_cast<float>(maxHealth) * barWidth));
+			drawStatusBar(iso.Y - 6, iso.X, static_cast<float>(currentHealth) / static_cast<float>(maxHealth), CC_RED);
+		};
 
-			int startX = iso.X - barWidth / 2 - 1;
-			int y = iso.Y - 6;
-
-			renderManager->PutCell(y, startX, L'[', MakeAttribute(CC_GRAY));
-			for (int i = 0; i < barWidth; ++i)
+	auto drawPlayerBars = [&](IsoScreenPosition iso, Player* player)
+		{
+			if (player == nullptr)
 			{
-				bool filled = i < filledWidth;
-				renderManager->PutCell(y, startX + 1 + i, filled ? L'=' : L'-', MakeAttribute(filled ? CC_RED : CC_DARKGRAY));
+				return;
 			}
-			renderManager->PutCell(y, startX + barWidth + 1, L']', MakeAttribute(CC_GRAY));
+
+			int maxHealth = max(1, player->GetMax_HP());
+			int currentHealth = min(max(player->GetHP(), 0), maxHealth);
+			int maxExp = max(1, player->GetMax_Exp());
+			int currentExp = min(max(player->GetExp(), 0), maxExp);
+
+			drawStatusBar(iso.Y - 8, iso.X, static_cast<float>(currentExp) / static_cast<float>(maxExp), CC_GREEN);
+			drawStatusBar(iso.Y - 7, iso.X, static_cast<float>(currentHealth) / static_cast<float>(maxHealth), CC_RED);
+
+			UCombatComponent* combatComponent = player->GetComponent<UCombatComponent>();
+			if (combatComponent != nullptr && combatComponent->IsAttackCoolingDown())
+			{
+				drawStatusBar(iso.Y - 6, iso.X, combatComponent->GetAttackCooldownAlpha(), CC_CYAN);
+			}
+		};
+
+	auto drawLevelUpEffect = [&](IsoScreenPosition iso, Player* player)
+		{
+			if (player == nullptr)
+			{
+				return;
+			}
+
+			LevelComponent* levelComponent = player->GetComponent<LevelComponent>();
+			if (levelComponent == nullptr || !levelComponent->ShouldShowLevelUpText())
+			{
+				return;
+			}
+
+			renderManager->AddRender(iso.Y - 11, iso.X - 4, L"LEVEL UP!");
+			renderManager->AddRender(iso.Y - 10, iso.X - static_cast<int>(levelComponent->GetLevelUpStateText().length()) / 2, levelComponent->GetLevelUpStateText());
+
+			float effectAlpha = levelComponent->GetLevelUpEffectAlpha();
+			int radiusX = 5 + static_cast<int>(roundf(effectAlpha * 5.0f));
+			int radiusY = max(2, radiusX / 3);
+			WORD effectAttribute = MakeAttribute(effectAlpha < 0.5f ? CC_YELLOW : CC_CYAN);
+
+			for (int i = 0; i < 16; ++i)
+			{
+				float angle = 2.0f * PI * static_cast<float>(i) / 16.0f + effectAlpha * 2.0f * PI;
+				int x = iso.X + static_cast<int>(roundf(cosf(angle) * radiusX));
+				int y = iso.Y - 2 + static_cast<int>(roundf(sinf(angle) * radiusY));
+				renderManager->PutCell(y, x, L'o', effectAttribute);
+			}
 		};
 
 	auto drawIsoTile = [&](int mapX, int mapY, bool wall)
@@ -272,6 +427,42 @@ void ViewportManager::Render2DtoISO()
 			drawIsoDiamond(iso, floorAttribute);
 		};
 
+	auto drawAttackPositions = [&]()
+		{
+			Player* player = SceneManager::GetInstance()->GetPlayer();
+			if (player == nullptr)
+			{
+				return;
+			}
+
+			UCombatComponent* combatComponent = player->GetComponent<UCombatComponent>();
+			if (combatComponent == nullptr || !combatComponent->IsAttackVisible())
+			{
+				return;
+			}
+
+			for (const Vector& attackPosition : combatComponent->GetAttackValue())
+			{
+				if (fabsf(static_cast<float>(attackPosition.X) - cameraPosition.X) > viewRadiusX ||
+					fabsf(static_cast<float>(attackPosition.Y) - cameraPosition.Y) > viewRadiusY)
+				{
+					continue;
+				}
+
+				IsoScreenPosition iso = WorldToIso(
+					static_cast<float>(attackPosition.X) - cameraPosition.X,
+					static_cast<float>(attackPosition.Y) - cameraPosition.Y,
+					originX,
+					originY
+				);
+
+				renderManager->PutCell(iso.Y - 1, iso.X, L'*', MakeAttribute(CC_RED));
+				renderManager->PutCell(iso.Y, iso.X - 1, L'<', MakeAttribute(CC_RED));
+				renderManager->PutCell(iso.Y, iso.X, L'X', MakeAttribute(CC_RED));
+				renderManager->PutCell(iso.Y, iso.X + 1, L'>', MakeAttribute(CC_RED));
+			}
+		};
+
 	const int startY = max(0, static_cast<int>(cameraPosition.Y) - viewRadiusY);
 	const int endY = min(static_cast<int>(Map.size()) - 1, static_cast<int>(cameraPosition.Y) + viewRadiusY);
 	const int startX = max(0, static_cast<int>(cameraPosition.X) - viewRadiusX);
@@ -284,6 +475,8 @@ void ViewportManager::Render2DtoISO()
 			drawIsoTile(x, y, Map[y][x].Type == ObjectType::Wall);
 		}
 	}
+
+	drawAttackPositions();
 
 	vector<AObject*>& objects = SceneManager::GetInstance()->GetObjects();
 	vector<AObject*> sortedObjects;
@@ -312,9 +505,11 @@ void ViewportManager::Render2DtoISO()
 		wchar_t objectIcon = L'?';
 		WORD objectAttribute = MakeAttribute(CC_WHITE);
 		Monster* monsterForHpBar = nullptr;
+		Player* playerForBars = nullptr;
 
 		if (Player* player = dynamic_cast<Player*>(object))
 		{
+			playerForBars = player;
 			float moveAlpha = 1.0f;
 			UMoveComponent* moveComponent = player->GetComponent<UMoveComponent>();
 			if (moveComponent != nullptr)
@@ -347,13 +542,13 @@ void ViewportManager::Render2DtoISO()
 			}
 
 			renderPosition = InterpolatePosition(player->GetPrevPosition(), player->GetPosition(), moveAlpha);
-			objectAttribute = MakeAttribute(CC_YELLOW);
+			objectAttribute = MakeAttribute(player->IsHitFlashActive() ? CC_WHITE : CC_YELLOW);
 		}
 		else if (Monster* monster = dynamic_cast<Monster*>(object))
 		{
 			renderPosition = InterpolatePosition(monster->GetPrevPosition(), monster->GetPosition(), monster->GetMoveAlpha());
-			objectIcon = L'M';
-			objectAttribute = MakeAttribute(CC_MAGENTA);
+			objectIcon = GetMonsterIcon(monster);
+			objectAttribute = MakeAttribute(monster->IsHitFlashActive() ? CC_WHITE : GetMonsterColor(monster));
 			monsterForHpBar = monster;
 		}
 		else
@@ -373,8 +568,21 @@ void ViewportManager::Render2DtoISO()
 			originX,
 			originY
 		);
-		drawIsoActor(iso, objectIcon, objectAttribute, dynamic_cast<Player*>(object) != nullptr);
+		if (monsterForHpBar != nullptr)
+		{
+			drawIsoMonsterActor(iso, monsterForHpBar, objectAttribute);
+		}
+		else
+		{
+			drawIsoActor(iso, objectIcon, objectAttribute, dynamic_cast<Player*>(object) != nullptr);
+		}
+		drawPlayerBars(iso, playerForBars);
+		drawLevelUpEffect(iso, playerForBars);
 		drawMonsterHpBar(iso, monsterForHpBar);
+		if (object->ShouldShowDamageText())
+		{
+			renderManager->AddRender(iso.Y - 8, iso.X - 1, L"-" + to_wstring(object->GetLastDamage()));
+		}
 	}
 
 	renderManager->AddRender(1, 1, L"ISO");
@@ -423,23 +631,27 @@ void ViewportManager::Render2Dto3D()
 {
 	RenderManager* renderManager = RenderManager::GetInstance();
 	vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
-	Player* player = SceneManager::GetInstance()->GetPlayer();
+	if (!PlayerPtr)
+	{
+		PlayerPtr = SceneManager::GetInstance()->GetPlayer();
+	}
 
 	float playerX = 1.0f;
 	float playerY = 1.0f;
 	float playerA = PI;
 
-	if (player != nullptr)
+	if (PlayerPtr != nullptr)
 	{
 		float moveAlpha = 1.0f;
-		UMoveComponent* moveComponent = player->GetComponent<UMoveComponent>();
+		if (!moveComponent)
+			moveComponent = PlayerPtr->GetComponent<UMoveComponent>();
 
 		if (moveComponent != nullptr)
 		{
 			moveAlpha = moveComponent->GetMoveAlpha();
 		}
 
-		RenderPosition playerPosition = InterpolatePosition(player->GetPrevPosition(), player->GetPosition(), moveAlpha);
+		RenderPosition playerPosition = InterpolatePosition(PlayerPtr->GetPrevPosition(), PlayerPtr->GetPosition(), moveAlpha);
 		playerX = playerPosition.X;
 		playerY = playerPosition.Y;
 
@@ -450,7 +662,7 @@ void ViewportManager::Render2Dto3D()
 			playerA = InterpolateAngle(previousAngle, currentAngle, moveComponent->GetTurnAlpha());
 		}
 	}
-
+	
 	float fov = PI / 8.0f;
 	float depth = 36.0f;
 
@@ -539,7 +751,7 @@ void ViewportManager::Render2Dto3D()
 	vector<AObject*>& objects = SceneManager::GetInstance()->GetObjects();
 	for (AObject* object : objects)
 	{
-		if (object == nullptr || object == player || object->IsDestroy())
+		if (object == nullptr || object == PlayerPtr || object->IsDestroy())
 		{
 			continue;
 		}
@@ -588,10 +800,32 @@ void ViewportManager::Render2Dto3D()
 
 			wallDepths[x] = distanceFromPlayer;
 
+			wchar_t monsterCharacter = GetMonsterIcon(monster);
+			WORD monsterAttribute = MakeAttribute(monster->IsHitFlashActive() ? CC_WHITE : GetMonsterColor(monster));
+
 			for (int y = enemyTop; y <= enemyBottom; ++y)
 			{
-				renderManager->PutCell(y, x, L'M', MakeAttribute(CC_MAGENTA));
+				renderManager->PutCell(y, x, monsterCharacter, monsterAttribute);
 			}
 		}
+
+		if (monster->ShouldShowDamageText())
+		{
+			renderManager->AddRender(max(0, enemyTop - 1), max(0, enemyScreenX - 2), L"-" + to_wstring(monster->GetLastDamage()));
+		}
+	}
+
+	if (!combatComponent)
+		combatComponent = PlayerPtr->GetComponent<UCombatComponent>();
+	
+	if (combatComponent != nullptr && combatComponent->IsAttackVisible())
+	{
+		const int centerX = SCREEN_WIDTH / 2;
+		const int centerY = SCREEN_HEIGHT / 2;
+		renderManager->PutCell(centerY - 1, centerX, L'|', MakeAttribute(CC_RED));
+		renderManager->PutCell(centerY, centerX - 1, L'-', MakeAttribute(CC_RED));
+		renderManager->PutCell(centerY, centerX, L'X', MakeAttribute(CC_RED));
+		renderManager->PutCell(centerY, centerX + 1, L'-', MakeAttribute(CC_RED));
+		renderManager->PutCell(centerY + 1, centerX, L'|', MakeAttribute(CC_RED));
 	}
 }

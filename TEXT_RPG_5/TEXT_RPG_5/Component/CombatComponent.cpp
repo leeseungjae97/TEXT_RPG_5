@@ -3,24 +3,29 @@
 #include "../Manager/InputManager.h"
 #include "../Manager/RenderManager.h"
 #include "../Player.h"
+#include "../Monster.h"
+#include "../Manager/SceneManager.h"
+#include "../Manager/MapManager.h"
+#include "../Manager/ObjectPoolManager.h"
+#include "../Define.h"
 #include "../Projectile.h"
 #include "../Struct/ProjectileInfo.h"
-#include "../Manager/ObjectPoolManager.h"
 
 UCombatComponent::UCombatComponent(AObject* InOwner)
-	: UComponent(InOwner)
+	: UComponent(InOwner), Weapon(WeaponType::Melee)
 {
 	PlayerPtr = dynamic_cast<Player*>(InOwner);
-	MoveComponentPtr = PlayerPtr->GetComponent<UMoveComponent>();
-	this->AttackTotalTime = 0.0f;
-	this->AttackDelayTime = 0.0f;
-	this->ProjectileTotalTime = 0.0f;
-	this->ProjectileDelayTime = 0.0f;
+	MoveComponentPtr = PlayerPtr != nullptr ? PlayerPtr->GetComponent<UMoveComponent>() : nullptr;
+	AttackElapsedTime = 999.0f;
+	AttackInterval = 2.0f;
+	AttackVisibleTime = 0.0f;
+	AttackVisibleDuration = 0.18f;
+	bAttackRequested = false;
 }
 
 UCombatComponent::~UCombatComponent()
 {
-
+	
 }
 
 vector<Vector> UCombatComponent::GetAttackValue()
@@ -28,81 +33,156 @@ vector<Vector> UCombatComponent::GetAttackValue()
 	return AttackValue;
 }
 
-void UCombatComponent::Tick(float DeltaTime)
+bool UCombatComponent::IsAttackCoolingDown() const
 {
-	if (nullptr == MoveComponentPtr)
+	return AttackElapsedTime < AttackInterval;
+}
+
+float UCombatComponent::GetAttackCooldownAlpha() const
+{
+	if (AttackInterval <= 0.0f)
+	{
+		return 1.0f;
+	}
+
+	return min(max(AttackElapsedTime / AttackInterval, 0.0f), 1.0f);
+}
+
+void UCombatComponent::SwordAttack()
+{
+	if (AttackValue.empty())
 		return;
 	
-	if (PlayerPtr != nullptr)
+	if (!PlayerPtr)
 	{
-		AttackTotalTime += DeltaTime;
-		ProjectileTotalTime += DeltaTime;
-		
-		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::Z) && (AttackTotalTime >= AttackDelayTime))
-		{
-			if (!(PlayerPtr->GetIsAttack()))
-			{
-				AttackValue.clear();
-				PlayerPtr->SetIsAttack(true);
-
-				if (MoveComponentPtr->GetFacingDirection() == EDirection::UP)
-				{
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y - 1 });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y - 1 });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y - 1 });
-				}
-				if (MoveComponentPtr->GetFacingDirection() == EDirection::DOWN)
-				{
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y + 1 });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y + 1 });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y + 1 });
-				}
-				if (MoveComponentPtr->GetFacingDirection() == EDirection::RIGHT)
-				{
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y - 1 });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y + 1 });
-				}
-				if (MoveComponentPtr->GetFacingDirection() == EDirection::LEFT)
-				{
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y - 1 });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y + 1 });
-				}
-				if (MoveComponentPtr->GetFacingDirection() == EDirection::NONE)
-				{
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y - 1 });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X - 1, PlayerPtr->GetPosition().Y });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y });
-					this->AttackValue.push_back({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y + 1 });
-				}
-			}
-			AttackTotalTime = 0.0f;
-			AttackDelayTime = 2.0f;
-		}
-		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::X) && (ProjectileTotalTime >= ProjectileDelayTime))
-		{
-			ProjectileInfo Info;
-			Info.Range = 10;
-			Info.Damage = 40;
-			Info.Speed = 0.5f;
-
-			EDirection Direction = MoveComponentPtr->GetFacingDirection();
-
-			Projectile* ProjectileAttack = ObjectPoolManager::GetInstance()->Get<Projectile>();
-
-			if (ProjectileAttack != nullptr)
-			{
-				ProjectileAttack->BeginPlay(PlayerPtr, Direction, Info);
-				ProjectileAttack->Fire();
-				ObjectPoolManager::GetInstance()->Return(ProjectileAttack);
-			}
-			
-			ProjectileTotalTime = 0.0f;
-			ProjectileDelayTime = 0.5f;
-		}
-
-		//RenderManager::GetInstance()->AddRender(2, 2, "타이머 : " + to_string(DeltaTime));
-		//RenderManager::GetInstance()->AddRender(0, 0, "타이머 : " + to_string(ProjectileTotalTime));
+		PlayerPtr = dynamic_cast<Player*>(GetOwner());
+		return;
 	}
+	
+	const vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
+	if (Map.empty() || Map[0].empty())
+	{
+		return;
+	}
+
+	for (const auto AttackPos : AttackValue)
+	{
+		if (AttackPos.Y < 0 || AttackPos.Y >= MAP_MAX_Y || AttackPos.X < 0 || AttackPos.X >= MAP_MAX_X)
+		{
+			continue;
+		}
+
+		if (Map[AttackPos.Y][AttackPos.X].Type == ObjectType::Monster)
+		{
+			const int ID = Map[AttackPos.Y][AttackPos.X].ID;
+			if (Monster* const Mon = dynamic_cast<Monster*>(ObjectPoolManager::GetInstance()->GetObjectByID(ID)))
+			{
+				Mon->TakeDamage(PlayerPtr->GetPower());
+			}
+		}
+	}
+}
+
+void UCombatComponent::HandleAttack()
+{
+	if (!bAttackRequested)
+	{
+		return;
+	}
+
+	switch (Weapon)
+	{
+		case WeaponType::Melee:
+		{
+			SwordAttack();
+		}
+		break;
+		default : 
+		{
+			
+		}
+	}
+
+	bAttackRequested = false;
+}
+
+void UCombatComponent::HandleAttackInput(float DeltaTime)
+{
+	AttackElapsedTime += DeltaTime;
+	if (AttackVisibleTime > 0.0f)
+	{
+		AttackVisibleTime -= DeltaTime;
+		if (AttackVisibleTime <= 0.0f)
+		{
+			AttackVisibleTime = 0.0f;
+			AttackValue.clear();
+			if (PlayerPtr != nullptr)
+			{
+				PlayerPtr->SetIsAttack(false);
+			}
+		}
+	}
+
+	if (!PlayerPtr)
+	{
+		PlayerPtr = dynamic_cast<Player*>(GetOwner());
+		return;
+	}
+	
+	if (!MoveComponentPtr)
+	{
+		MoveComponentPtr = PlayerPtr->GetComponent<UMoveComponent>();
+		return;
+	}
+	
+	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::Z) && (AttackElapsedTime >= AttackInterval))
+	{
+		if (!PlayerPtr->GetIsAttack())
+		{
+			AttackValue.clear();
+			PlayerPtr->SetIsAttack(true);
+			Vector Pos = PlayerPtr->GetPosition();
+
+			if (MoveComponentPtr->GetFacingDirection() == EDirection::UP)
+			{
+				AttackValue.push_back({ Pos.X, Pos.Y - 1 });
+				AttackValue.push_back({ Pos.X - 1, Pos.Y - 1 });
+				AttackValue.push_back({ Pos.X + 1, Pos.Y - 1 });
+			}
+			if (MoveComponentPtr->GetFacingDirection() == EDirection::DOWN)
+			{
+				AttackValue.push_back({ Pos.X, Pos.Y + 1 });
+				AttackValue.push_back({ Pos.X - 1, Pos.Y + 1 });
+				AttackValue.push_back({ Pos.X + 1, Pos.Y + 1 });
+			}
+			if (MoveComponentPtr->GetFacingDirection() == EDirection::RIGHT)
+			{
+				AttackValue.push_back({ Pos.X + 1, Pos.Y - 1 });
+				AttackValue.push_back({ Pos.X + 1, Pos.Y });
+				AttackValue.push_back({ Pos.X + 1, Pos.Y + 1 });
+			}
+			if (MoveComponentPtr->GetFacingDirection() == EDirection::LEFT)
+			{
+				AttackValue.push_back({ Pos.X - 1, Pos.Y - 1 });
+				AttackValue.push_back({ Pos.X - 1, Pos.Y });
+				AttackValue.push_back({ Pos.X - 1, Pos.Y + 1 });
+			}
+			if (MoveComponentPtr->GetFacingDirection() == EDirection::NONE)
+			{
+				AttackValue.push_back({ Pos.X, Pos.Y - 1 });
+				AttackValue.push_back({ Pos.X - 1, Pos.Y });
+				AttackValue.push_back({ Pos.X + 1, Pos.Y });
+				AttackValue.push_back({ Pos.X, Pos.Y + 1 });
+			}
+			bAttackRequested = true;
+			AttackVisibleTime = AttackVisibleDuration;
+		}
+		AttackElapsedTime = 0.0f;
+	}
+}
+
+void UCombatComponent::Tick(float DeltaTime)
+{
+	HandleAttackInput(DeltaTime);
+	HandleAttack();
 }

@@ -5,5 +5,5 @@
 
 #define NO_ID -1
 
-#define SCREEN_WIDTH 240 * 2
-#define SCREEN_HEIGHT 80 * 2
+#define SCREEN_WIDTH 240
+#define SCREEN_HEIGHT 80

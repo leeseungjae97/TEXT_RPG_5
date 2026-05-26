@@ -6,6 +6,10 @@
 #include <cstdlib>
 #include <cmath>
 
+#include "Define.h"
+#include "Component/LevelComponent.h"
+#include "Manager/MapManager.h"
+
 Monster::Monster()
 {
 	Name = "Monster";
@@ -63,6 +67,7 @@ float Monster::GetMoveAlpha() const
 void Monster::TakeDamage(int Damage)
 {
 	Health -= Damage;
+	NotifyDamage(Damage);
 
 	if (Health < 0)
 	{
@@ -78,13 +83,24 @@ bool Monster::IsDead()
 void Monster::Tick(float DeltaTime)
 {
 	AObject::Tick(DeltaTime);
+
 	if (IsDead())
 	{
+		if (Player* PlayerPtr = SceneManager::GetInstance()->GetPlayer())
+		{
+			if (LevelComponent* LevelComp = PlayerPtr->GetComponent<LevelComponent>())
+			{
+				LevelComp->AddExp(50);
+			}
+		}
+		MapManager::GetInstance()->GetMap()[Position.Y][Position.X].Type = ObjectType::Path;
+		MapManager::GetInstance()->GetMap()[Position.Y][Position.X].ID = NO_ID;
+		
 		Destroy();
 		return;
 	}
 
-	MoveElapsedtime += DeltaTime;
+	MoveElapsedtime += DeltaTime * GetSlowRatio();
 
 
 	if (MoveElapsedtime < MoveInterval)
@@ -126,6 +142,17 @@ void Monster::Tick(float DeltaTime)
 void Monster::Destroy()
 {
 	bIsDestroy = true;
+}
+
+void Monster::OnSpawnFromPool()
+{
+	AObject::OnSpawnFromPool();
+	Health = MaxHealth;
+}
+
+void Monster::OnReturnToPool()
+{
+	AObject::OnReturnToPool();
 }
 
 Player* Monster::FindPlayer()

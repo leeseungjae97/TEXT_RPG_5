@@ -46,6 +46,8 @@ public:
 	virtual void BeginPlay()	override{}
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroy() override;
+	virtual void OnSpawnFromPool() override;
+	virtual void OnReturnToPool() override;
 
 protected:
 	Player* FindPlayer();
