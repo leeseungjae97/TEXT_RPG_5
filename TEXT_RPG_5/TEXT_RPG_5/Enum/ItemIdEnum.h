@@ -8,6 +8,7 @@ enum class ItemId
 	HP_POTION,
 	STRENGTH_POTION,
 	GOBLIN_LEATHER,
+	LONGSWORD,
 
 	MAX
 };

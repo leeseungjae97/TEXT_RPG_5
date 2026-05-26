@@ -27,6 +27,9 @@ UItem* ItemManager::CreateItem(ItemId Id)
     case ItemId::GOBLIN_LEATHER:
         return new MiscItem(ItemDB::GOBLIN_LEATHER);
 
+    case ItemId::LONGSWORD:
+        return new EquipmentItem(ItemDB::LONGSWORD);
+
     default:
         return nullptr;
     }

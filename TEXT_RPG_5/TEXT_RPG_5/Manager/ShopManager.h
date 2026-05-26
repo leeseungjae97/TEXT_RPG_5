@@ -37,7 +37,9 @@ public:
     bool GetSellMode() {return bSellMode;}
     UItem* GetItem(Vector Index);
     UItem* GetRandomItem();
-    bool ToggleMode();
+    
+    bool SetSellMode(bool EnableSellMode);
+    bool ToggleSellMode();
     
     void SelectCursor();
     void TryBuyItem();

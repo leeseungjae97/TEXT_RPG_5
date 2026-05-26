@@ -27,6 +27,10 @@ Monster::Monster()
 	DetectionRange = 4;
 	
 	bUseBfs = true;
+	
+	AttackRange = 1;
+	AttackElapsedtime = 0.0f;
+	AttackInterval = 1.5f;
 }
 
 Monster::~Monster()
@@ -86,40 +90,39 @@ void Monster::Tick(float DeltaTime)
 
 	if (IsDead())
 	{
-		if (Player* PlayerPtr = SceneManager::GetInstance()->GetPlayer())
-		{
-			if (LevelComponent* LevelComp = PlayerPtr->GetComponent<LevelComponent>())
-			{
-				LevelComp->AddExp(50);
-			}
-		}
-		MapManager::GetInstance()->GetMap()[Position.Y][Position.X].Type = ObjectType::Path;
-		MapManager::GetInstance()->GetMap()[Position.Y][Position.X].ID = NO_ID;
-		
 		Destroy();
 		return;
 	}
 
 	MoveElapsedtime += DeltaTime * GetSlowRatio();
-
-
+	AttackElapsedtime += DeltaTime * GetSlowRatio();
+	
+	Player* player = SceneManager::GetInstance()->GetPlayer();
+	//Player* player = FindPlayer();
+	
+	if (player == nullptr)
+	{
+		return;
+	}
+	
+	if (player->IsDead())
+	{
+		return;
+	}
+	
+	if (CanAttackplayer(player))
+	{
+		Attackplayer(player);
+		return;
+	}
+	
 	if (MoveElapsedtime < MoveInterval)
 	{
 		return;
 	}
 
 	MoveElapsedtime = 0.0f;
-
-
-	Player* player = FindPlayer();
-
-
-	if (player == nullptr)
-	{
-		MoveRandom();
-		return;
-	}
-
+	
 	int Distance = GetDistanceToPlayer(player);
 
 	if (Distance <= DetectionRange)
@@ -141,6 +144,15 @@ void Monster::Tick(float DeltaTime)
 
 void Monster::Destroy()
 {
+	if (Player* PlayerPtr = SceneManager::GetInstance()->GetPlayer())
+	{
+		if (LevelComponent* LevelComp = PlayerPtr->GetComponent<LevelComponent>())
+		{
+			LevelComp->AddExp(50);
+		}
+	}
+	MapManager::GetInstance()->GetMap()[Position.Y][Position.X].Type = ObjectType::Path;
+	MapManager::GetInstance()->GetMap()[Position.Y][Position.X].ID = NO_ID;
 	bIsDestroy = true;
 }
 
@@ -157,34 +169,7 @@ void Monster::OnReturnToPool()
 
 Player* Monster::FindPlayer()
 {
-	
 	return SceneManager::GetInstance()->GetPlayer();
-	
-	//vector<AObject*>& objects = SceneManager::GetInstance()->GetObjects();
-
-	//for (int i = 0; i < objects.size(); ++i)
-	//{
-		//AObject* obj = objects[i];
-
-		//if (obj == nullptr)
-		//{
-			//continue;
-		//}
-	
-	// 	if (obj->IsDestroy())
-	// 	{
-	// 		continue;
-	// 	}
-	// 	
-	// 	Player* player = dynamic_cast<Player*>(obj);
-	//
-	// 	if (player != nullptr)
-	// 	{
-	// 		return player;
-	// 	}
-	// }
-	//
-	// return nullptr;
 }
 
 int Monster::GetDistanceToPlayer(Player* player)
@@ -384,11 +369,56 @@ void Monster::MoveTowardPlayerBfs()
 	}
 	
 	Vector NextPosition = Moving[1];
+	
+	if (NextPosition.X == Target.X && NextPosition.Y == Target.Y)
+	{
+		return;
+	}
 
 	PrevPosition = Position;
 	
 	Position = NextPosition;
 }
+
+bool Monster::CanAttackplayer(Player* player)
+{
+	if (player == nullptr)
+	{
+		return false;
+	}
+	
+	if (player->IsDead())
+	{
+		return false;
+	}
+	
+	int Distance = GetDistanceToPlayer(player);
+	
+	if (Distance > AttackRange)
+	{
+		return false;
+	}
+	
+	if (AttackElapsedtime < AttackInterval)
+	{
+		return false;
+	}
+	
+	return true;
+}
+
+void Monster::Attackplayer(Player* player)
+{
+	if (player == nullptr)
+	{
+		return;
+	}
+	
+	player -> TakeDamage(Attack);
+	
+	AttackElapsedtime = 0.0f;
+}
+
 		
 
 

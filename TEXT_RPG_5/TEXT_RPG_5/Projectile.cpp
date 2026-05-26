@@ -288,3 +288,9 @@ bool Projectile::HandleCurrentTile()
 
     return false;
 }
+
+void Projectile::OnSpawnFromPool()
+{
+    AObject::OnSpawnFromPool();
+    Owner = nullptr;
+}

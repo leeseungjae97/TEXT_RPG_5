@@ -3,6 +3,8 @@
 #include "Component/MoveComponent.h"
 #include "Component/CombatComponent.h"
 #include "Component/InventoryComponent.h"
+#include "Component/EffectComponent.h"
+#include "Component/EquipmentComponent.h"
 #include "Component/LevelComponent.h"
 
 Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
@@ -17,6 +19,8 @@ Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 	this->MoveComponent = CreateDefaultComponent<UMoveComponent>();
 	this->CombatComponent = CreateDefaultComponent<UCombatComponent>();
 	this->InventoryComponent = CreateDefaultComponent<UInventoryComponent>();
+	this->EffectComponent = CreateDefaultComponent<UEffectComponent>();
+	this->EquipmentComponent = CreateDefaultComponent<UEquipmentComponent>();
 	this->LevelComponentPtr = CreateDefaultComponent<LevelComponent>();
 
 	this->Position.Y = 2;
@@ -110,4 +114,20 @@ void Player::SetGold(int Gold)
 void Player::SetIsAttack(bool Value)
 {
 	this->TotalStat.IsAttack = Value;
+}
+
+void Player::TakeDamage(int Damage)
+{
+	TotalStat.HP -= Damage;
+	NotifyDamage(Damage);
+	
+	if (TotalStat.HP < 0)
+	{
+		TotalStat.HP = 0;
+	}
+}
+
+bool Player::IsDead()
+{
+	return TotalStat.HP <= 0;
 }

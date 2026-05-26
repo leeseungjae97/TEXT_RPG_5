@@ -4,6 +4,7 @@
 #include "../Component/InventoryComponent.h"
 #include "../Component/LevelComponent.h"
 #include "../Define.h"
+#include "../Enum/Direction.h"
 #include "../Item/Item.h"
 #include "../Manager/MapManager.h"
 #include "../Manager/ObjectPoolManager.h"
@@ -11,6 +12,7 @@
 #include "../Manager/SceneManager.h"
 #include "../Monster.h"
 #include "../Player.h"
+#include "../Projectile.h"
 
 void HUDUI::Render()
 {
@@ -126,17 +128,15 @@ void HUDUI::QuickSlotRender()
 
 	Renderer->AddRender(y - 2, x, "Quick Slot");
 
-	map<int, UItem*> quickSlots = inventoryComponent->GetQuickSlot();
+	vector<UItem*> quickSlots = inventoryComponent->GetQuickSlot();
 	for (int i = 0; i < slotCount; ++i)
 	{
 		int slotNumber = i + 1;
 		int slotX = x + i * (slotWidth - 1);
+		
 		UItem* item = nullptr;
-		auto iter = quickSlots.find(slotNumber);
-		if (iter != quickSlots.end())
-		{
-			item = iter->second;
-		}
+		if (i < (int)quickSlots.size())
+			item = quickSlots[i];
 
 		Renderer->DrawBox(y, slotX, slotWidth, slotHeight);
 
@@ -188,6 +188,25 @@ wchar_t HUDUI::GetMapIcon(int MapY, int MapX)
 			if (name == "Orc")    return L'O';
 		}
 		return L'M';
+	case ObjectType::Projectile:
+		if (Projectile* projectile = dynamic_cast<Projectile*>(ObjectPoolManager::GetInstance()->GetObjectByID(map[MapY][MapX].ID)))
+		{
+			switch (projectile->GetDirection())
+			{
+			case EDirection::UP:
+				return L'^';
+			case EDirection::DOWN:
+				return L'v';
+			case EDirection::LEFT:
+				return L'<';
+			case EDirection::RIGHT:
+				return L'>';
+			case EDirection::NONE:
+			default:
+				return L'*';
+			}
+		}
+		return L'*';
 	case ObjectType::Path:
 	default:
 		return L'.';
@@ -217,6 +236,8 @@ int HUDUI::GetMapIconColor(int MapY, int MapX)
 			if (name == "Orc")    return CC_DARKYELLOW;
 		}
 		return CC_MAGENTA;
+	case ObjectType::Projectile:
+		return CC_CYAN;
 	case ObjectType::Path:
 	default:
 		return CC_DARKGRAY;
