@@ -36,6 +36,7 @@ public:
     void BeginPlay();
 
     vector<vector<UItem*>> GetContainer() {return Container;}
+    const vector<vector<UItem*>>& GetContainerRef() const { return Container; }
     bool GetSellMode() {return bSellMode;}
     UItem* GetItem(Vector Index);
     UItem* GetRandomItem();

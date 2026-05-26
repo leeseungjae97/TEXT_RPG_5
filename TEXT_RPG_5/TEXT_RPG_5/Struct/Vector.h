@@ -14,3 +14,18 @@ public:
 		return X != vector.X || Y != vector.Y;
 	}
 };
+
+struct FVector
+{
+public:
+	FVector() : X(0.f), Y(0.f) {}
+	FVector(float _X, float _Y) : X(_X), Y(_Y) {}
+	FVector(const FVector& Other) : X(Other.X), Y(Other.Y) {}
+
+public:
+	float X, Y;
+	bool operator!=(const FVector& vector) const
+	{
+		return X != vector.X || Y != vector.Y;
+	}
+};

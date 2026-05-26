@@ -1,12 +1,13 @@
 #include "MoveComponent.h"
-#include "../Manager/RenderManager.h"
+
+#include "InventoryComponent.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/MapManager.h"
-#include "../Manager/SceneManager.h"
+#include "../Manager/ShopManager.h"
 #include "../Object.h"
 #include "../Player.h"
-#include  "../Monster.h"
 #include "../Struct/Coordinate.h"
+#include "../Define.h"
 
 UMoveComponent::UMoveComponent(AObject* InOwner)
 	: UComponent(InOwner)
@@ -64,24 +65,51 @@ float UMoveComponent::GetTurnAlpha() const
 	return Alpha * Alpha * (3.0f - 2.0f * Alpha);
 }
 
-void UMoveComponent::Tick(float DeltaTime)
+void UMoveComponent::OpenShop()
 {
-	if(nullptr == PlayerPtr)
-		PlayerPtr = dynamic_cast<Player*>(GetOwner());
+	Vector Vec = PlayerPtr->GetPosition();
+	const Vector checkPositions[] = {
+		{ Vec.X, Vec.Y - 1 },
+		{ Vec.X, Vec.Y + 1 },
+		{ Vec.X - 1, Vec.Y },
+		{ Vec.X + 1, Vec.Y }
+	};
 
-	if (PlayerPtr == nullptr)
+	bool bNearShop = false;
+	for (const Vector& checkPosition : checkPositions)
 	{
+		if (checkPosition.X < 0 || checkPosition.X >= MAP_MAX_X || checkPosition.Y < 0 || checkPosition.Y >= MAP_MAX_Y)
+		{
+			continue;
+		}
+
+		if (MapManager::GetInstance()->GetType(checkPosition) == MapObjectType::Shop)
+		{
+			bNearShop = true;
+			break;
+		}
+	}
+
+	if (!bNearShop)
+	{
+		bWasOnShop = false;
 		return;
 	}
 
-	MoveElapsedTime += DeltaTime;
-	TurnElapsedTime += DeltaTime;
-
-	if (MoveElapsedTime < MoveInterval)
+	if (!bWasOnShop)
 	{
-		return;
+		if (UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>())
+		{
+			ShopManager::GetInstance()->SetPlayerInventory(InventoryComponent);
+			InventoryComponent->OpenShop();
+		}
 	}
-	
+
+	bWasOnShop = true;
+}
+
+void UMoveComponent::HandleMoveInput()
+{
 	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::UP))
 	{
 		int NextX = PlayerPtr->GetPosition().X;
@@ -150,6 +178,35 @@ void UMoveComponent::Tick(float DeltaTime)
 		SetFacingDirection(EDirection::RIGHT);
 		MoveElapsedTime = 0.0f;
 	}
+}
+
+void UMoveComponent::Tick(float DeltaTime)
+{
+	if(nullptr == PlayerPtr)
+		PlayerPtr = dynamic_cast<Player*>(GetOwner());
+
+	if (PlayerPtr == nullptr)
+	{
+		return;
+	}
+
+	MoveElapsedTime += DeltaTime;
+	TurnElapsedTime += DeltaTime;
+
+	if (MoveElapsedTime < MoveInterval)
+	{
+		return;
+	}
+	
+	OpenShop();
+	if (UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>())
+	{
+		if (InventoryComponent->GetOpenedInventory())
+		{
+			return;
+		}
+	}
+	HandleMoveInput();
 }
 
 /*void UMoveComponent::Tick(float DeltaTime)

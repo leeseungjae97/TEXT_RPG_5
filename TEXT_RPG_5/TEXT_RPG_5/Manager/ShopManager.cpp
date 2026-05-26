@@ -121,15 +121,23 @@ bool ShopManager::SetSellMode(bool EnableSellMode)
     if (EnableSellMode != bSellMode)
     {
         bSellMode = EnableSellMode;
-        PlayerInventory->ResetCursor();
+        if (PlayerInventory != nullptr)
+        {
+            PlayerInventory->ResetCursor();
+        }
         return bSellMode;
     }
+
+    return bSellMode;
 }
 
 bool ShopManager::ToggleSellMode()
 {
     bSellMode = !bSellMode;
-    PlayerInventory->ResetCursor();
+    if (PlayerInventory != nullptr)
+    {
+        PlayerInventory->ResetCursor();
+    }
     return bSellMode;
 }
 
