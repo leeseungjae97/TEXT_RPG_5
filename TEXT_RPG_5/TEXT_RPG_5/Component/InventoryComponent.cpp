@@ -41,6 +41,7 @@ void UInventoryComponent::OpenInventory()
 
 void UInventoryComponent::OpenShop()
 {
+    OpenInventory();
     SetOnShop(true);
 }
 
