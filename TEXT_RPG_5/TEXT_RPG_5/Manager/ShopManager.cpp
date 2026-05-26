@@ -105,7 +105,17 @@ UItem* ShopManager::GetRandomItem()
 }
 
 
-bool ShopManager::ToggleMode()
+bool ShopManager::SetSellMode(bool EnableSellMode)
+{
+    if (EnableSellMode != bSellMode)
+    {
+        bSellMode = EnableSellMode;
+        PlayerInventory->ResetCursor();
+        return bSellMode;
+    }
+}
+
+bool ShopManager::ToggleSellMode()
 {
     bSellMode = !bSellMode;
     PlayerInventory->ResetCursor();

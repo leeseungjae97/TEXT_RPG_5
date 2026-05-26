@@ -7,6 +7,8 @@ enum class ComponentType
 	MovementComponent,
 	SubActionComponent,
 	InventoryComponent,
+	EffectComponent,
+	EquipmentComponent,
 
 	MAX
 };

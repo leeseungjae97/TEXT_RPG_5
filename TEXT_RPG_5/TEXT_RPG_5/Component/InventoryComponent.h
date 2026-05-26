@@ -6,6 +6,7 @@
 #include "../pch.h"
 #include "component.h"
 #include "../Enum/ComponentTypeEnum.h"
+#include "../Enum/ItemIdEnum.h"
 
 class Player;
 class UItem;
@@ -31,10 +32,11 @@ protected:
 	vector<vector<UItem*>> Container;
 	int MaxColumn = 4;
 	int MaxRow = 4;
-	map<int, UItem*> QuickSlot;
+	vector<UItem*> QuickSlot;
 	int Gold = 0;
 	int SelectedIndex;
 	bool bOnShop = false;
+	bool bOnEquipment = false;
 	bool bOpenedInventory = false;
 
 public:
@@ -43,7 +45,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void OpenInventory();
-	void CloseInventory() { bOpenedInventory = false;}
+	void OpenShop();
+	void CloseInventory();
 	bool GetOpenedInventory(){return bOpenedInventory;}
 
 	int GetGold(){return Gold;}
@@ -57,6 +60,7 @@ public:
 	bool RemoveItem(UItem* Item);
 	bool UseRandomItem();
 	bool UseItem(UItem* Item);
+	UItem* FindItemById(ItemId Id);
 	
 	void SelectCursor();
 	void ExpandRow(int Amount){MaxRow += Amount;}
@@ -70,16 +74,22 @@ public:
 	bool UseCursorItem(){return UseItem(GetItemFromCursor());}
 
 	
-	map<int, UItem*> GetQuickSlot(){return QuickSlot;}
+	vector<UItem*> GetQuickSlot(){return QuickSlot;}
 	void RegisterOnQuickSlot(int Number);
 	UItem* GetItemFromQuickSlot(int Number){return QuickSlot[Number];}
 	void UseQuickSlot(int Number){UseItem(QuickSlot[Number]);}
 	void ClearQuickSlot(UItem* Item);
 	
-	void SetOnShop(bool OnShop){bOnShop = OnShop;}
+	bool SetOnShop(bool OnShop);
+	bool ToggleOnShop();
 	bool GetOnShop(){return bOnShop;}
 	bool BuyItem(UItem* Item);
 	void SellItem(UItem* Item);
+
+	bool GetOnEquipment() { return bOnEquipment; }
+	void OpenEquipmentPanel() { bOnEquipment = true; ResetCursor(); }
+	void CloseEquipmentPanel() { bOnEquipment = false; ResetCursor(); }
+	UItem* DetachItem(UItem* Item);
 	
 	
 	

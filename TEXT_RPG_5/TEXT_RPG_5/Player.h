@@ -7,6 +7,8 @@
 class UMoveComponent;
 class UCombatComponent;
 class UInventoryComponent;
+class UEffectComponent;
+class UEquipmentComponent;
 class LevelComponent;
 
 class Player : public AObject
@@ -55,5 +57,7 @@ private:
 	UMoveComponent* MoveComponent = nullptr;
 	UCombatComponent* CombatComponent = nullptr;
 	UInventoryComponent* InventoryComponent = nullptr;
+	UEffectComponent* EffectComponent = nullptr;
+	UEquipmentComponent* EquipmentComponent = nullptr;
 	LevelComponent* LevelComponentPtr = nullptr;
 };
