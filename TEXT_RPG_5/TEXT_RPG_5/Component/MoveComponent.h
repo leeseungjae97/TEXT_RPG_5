@@ -25,8 +25,6 @@ public:
 	float GetMoveAlpha() const;
 	float GetTurnAlpha() const;
 	
-	bool IsMonsterAtPosition(int X, int Y);
-	
 public:
 	virtual void Tick(float DeltaTime) override;
 

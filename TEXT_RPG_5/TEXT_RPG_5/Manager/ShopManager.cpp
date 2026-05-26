@@ -70,6 +70,17 @@ void ShopManager::RestoreShop()
     }
 }
 
+void ShopManager::BeginPlay()
+{
+    ShopPoses.resize(3);
+    
+    for (int i = 0 ; i < ShopPoses.size(); ++i)
+    {
+        ShopPoses[i].X = 5 + i * 2;
+        ShopPoses[i].Y = 5 + i * 2;
+    }
+}
+
 
 UItem* ShopManager::GetItem(Vector Index)
 {

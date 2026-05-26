@@ -81,43 +81,13 @@ void UMoveComponent::Tick(float DeltaTime)
 	{
 		return;
 	}
-
-	// 다음 위치에 몬스터가 있는지 확인하는 함수
-	auto IsMonsterAtPosition = [](int X, int Y) -> bool
-	{
-		vector<AObject*>& Objects = SceneManager::GetInstance()->GetObjects();
-
-		for (AObject* Obj : Objects)
-		{
-			if (Obj == nullptr || Obj->IsDestroy())
-			{
-				continue;
-			}
-
-			Monster* Mon = dynamic_cast<Monster*>(Obj);
-
-			if (Mon == nullptr)
-			{
-				continue;
-			}
-
-			Vector MonPosition = Mon->GetPosition();
-
-			if (MonPosition.X == X && MonPosition.Y == Y)
-			{
-				return true;
-			}
-		}
-
-		return false;
-	};
 	
 	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::UP))
 	{
 		int NextX = PlayerPtr->GetPosition().X;
 		int NextY = max(PlayerPtr->GetPosition().Y - 1, 0);
 
-		if (IsMonsterAtPosition(NextX, NextY))
+		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
 		{
 			SetFacingDirection(EDirection::UP);
 			MoveElapsedTime = 0.0f;
@@ -134,7 +104,7 @@ void UMoveComponent::Tick(float DeltaTime)
 		int NextX = PlayerPtr->GetPosition().X;
 		int NextY = PlayerPtr->GetPosition().Y + 1;
 
-		if (IsMonsterAtPosition(NextX, NextY))
+		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
 		{
 			SetFacingDirection(EDirection::DOWN);
 			MoveElapsedTime = 0.0f;
@@ -151,7 +121,7 @@ void UMoveComponent::Tick(float DeltaTime)
 		int NextX = max(PlayerPtr->GetPosition().X - 1, 0);
 		int NextY = PlayerPtr->GetPosition().Y;
 
-		if (IsMonsterAtPosition(NextX, NextY))
+		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
 		{
 			SetFacingDirection(EDirection::LEFT);
 			MoveElapsedTime = 0.0f;
@@ -168,7 +138,7 @@ void UMoveComponent::Tick(float DeltaTime)
 		int NextX = PlayerPtr->GetPosition().X + 1;
 		int NextY = PlayerPtr->GetPosition().Y;
 
-		if (IsMonsterAtPosition(NextX, NextY))
+		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
 		{
 			SetFacingDirection(EDirection::RIGHT);
 			MoveElapsedTime = 0.0f;
@@ -180,31 +150,6 @@ void UMoveComponent::Tick(float DeltaTime)
 		SetFacingDirection(EDirection::RIGHT);
 		MoveElapsedTime = 0.0f;
 	}
-}
-
-bool UMoveComponent::IsMonsterAtPosition(int X, int Y)
-{
-	vector<AObject*>& Objects = SceneManager::GetInstance()->GetObjects();
-
-	for (AObject* Obj : Objects)
-	{
-		if (Obj == nullptr || Obj->IsDestroy())
-		{
-			continue;
-		}
-
-		if (Monster* Mon = dynamic_cast<Monster*>(Obj))
-		{
-			Vector MonPos = Mon->GetPosition();
-
-			if (MonPos.X == X && MonPos.Y == Y)
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
 }
 
 /*void UMoveComponent::Tick(float DeltaTime)

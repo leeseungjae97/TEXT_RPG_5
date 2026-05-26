@@ -73,13 +73,13 @@ Projectile::~Projectile()
         //RenderManager::GetInstance()->AddRender(0, 0, "Tile Type : " + to_string(static_cast<int>(CurrentTile.Type)));
         
         // 벽 -> 공격 x
-        if (CurrentTile.Type == ObjectType::Wall)
+        if (CurrentTile.Type == MapObjectType::Wall)
         {
             break;
         }
 
         // 플레이어는 Monster만 공격
-        if (CurrentTile.Type == ObjectType::Monster)
+        if (CurrentTile.Type == MapObjectType::Monster)
         {
             int ObjectID = CurrentTile.ID;
 
@@ -180,10 +180,8 @@ bool Projectile::CanTickProjectile()
         Destroy();
         return false;
     }
-
-    vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
-
-    if (Map.empty() || Map[0].empty())
+    
+    if (MapManager::GetInstance()->IsMapInitSize())
     {
         Destroy();
         return false;
@@ -258,34 +256,22 @@ bool Projectile::IsOutOfMap() const
 
 bool Projectile::HandleCurrentTile()
 {
-    vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
-
-    Coordinate& CurrentTile = Map[Position.Y][Position.X];
-
-    if (CurrentTile.Type == ObjectType::Wall)
+    if (MapManager::GetInstance()->IsTypeExist(Position, MapObjectType::Wall))
     {
         Destroy();
         return true;
     }
 
-    if (CurrentTile.Type == ObjectType::Monster)
+    if (AObject* Obj = MapManager::GetInstance()->GetMapObject(Position, MapObjectType::Monster))
     {
-        int ObjectID = CurrentTile.ID;
-
-        AObject* HitObject = ObjectPoolManager::GetInstance()->GetObjectByID(ObjectID);
-
-        if (HitObject != Owner)
+        if (Monster* Mons = dynamic_cast<Monster*>(Obj))
         {
-            if (Monster* Mons = dynamic_cast<Monster*>(HitObject))
-            {
-                Mons->TakeDamage(Info.Damage);
-            }
+            Mons->TakeDamage(Info.Damage);
         }
-
         Destroy();
         return true;
     }
-
+    
     return false;
 }
 

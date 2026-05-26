@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include "../Enum/ObjectTypeEnum.h"
+#include "../Enum/MapObjectTypeEnum.h"
 
 struct Coordinate
 {
-	ObjectType Type;
+	MapObjectType Type;
 	int ID;
 };

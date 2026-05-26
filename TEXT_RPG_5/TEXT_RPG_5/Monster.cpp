@@ -151,8 +151,7 @@ void Monster::Destroy()
 			LevelComp->AddExp(50);
 		}
 	}
-	MapManager::GetInstance()->GetMap()[Position.Y][Position.X].Type = ObjectType::Path;
-	MapManager::GetInstance()->GetMap()[Position.Y][Position.X].ID = NO_ID;
+	MapManager::GetInstance()->SetMapObjectCoordinate(Position.Y, Position.X, {MapObjectType::Path, NO_ID});
 	bIsDestroy = true;
 }
 
@@ -274,8 +273,6 @@ void Monster::MoveTowardPlayerBfs()
 	Vector Start = Position;
 	Vector Target = player->GetPosition();
 	
-	vector<vector<Coordinate>>& WorldMap = MapManager::GetInstance()->GetMap();
-	
 	queue<Vector> Q;
 	bool visited[MAP_MAX_Y][MAP_MAX_X] = {};
 	Vector Parent[MAP_MAX_Y][MAP_MAX_X];
@@ -321,11 +318,11 @@ void Monster::MoveTowardPlayerBfs()
 				continue;
 			}
 			
-			if (WorldMap[Go.Y][Go.X].Type == ObjectType::Wall)
+			if (MapManager::GetInstance()->IsTypeExist(Go, MapObjectType::Wall))
 			{
 				continue;
 			}
-			if (WorldMap[Go.Y][Go.X].Type == ObjectType::Monster)
+			if (MapManager::GetInstance()->IsTypeExist(Go, MapObjectType::Monster))
 			{
 				continue;
 			}
