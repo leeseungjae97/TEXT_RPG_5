@@ -9,17 +9,21 @@ Slime::Slime(int playerLevel)
 	}
 
 	Name = "Slime";
-	Health = playerLevel * 20 + rand() % (playerLevel * 10 + 1);
+	Health = playerLevel * 25 + rand() % (playerLevel * 10 + 1);
 	MaxHealth = Health;
-	Attack = playerLevel * 5 + rand() % (playerLevel * 5 + 1);
+	Attack = playerLevel * 3 + rand() % (playerLevel * 3 + 1);
 	
 	MoveInterval = 1.1f;
 
 	
 	DetectionRange = 3;
 
-	Position = Vector(4, 4);
+	Position = Vector(3, 3);
 	PrevPosition = Position;
 	
-	bUseBfs = false;
+	bUseBfs = true;
+	
+	AttackRange = 1;
+	AttackInterval = 2.0f;
+	AttackElapsedtime = 0.0f;
 }
