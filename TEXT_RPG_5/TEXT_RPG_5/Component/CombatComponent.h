@@ -34,6 +34,8 @@ public:
 	void AttackEffectTimeAcc(float DeltaTime);
 	void HandleAttackInput(float DeltaTime);
 	
+	void ProjectileAttack();
+	
 	WeaponType GetWeaponType() { return Weapon;}
 	void SetWeaponType(WeaponType InWeaponType) { Weapon = InWeaponType;}
 	

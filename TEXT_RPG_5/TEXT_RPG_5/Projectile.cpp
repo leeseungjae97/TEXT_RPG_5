@@ -4,6 +4,8 @@
 #include "Manager/MapManager.h"
 #include "Manager/ObjectPoolManager.h"
 #include "Monster.h"
+#include "Define.h"
+
 
 Projectile::Projectile()
     : Owner(nullptr)
@@ -29,7 +31,8 @@ Projectile::~Projectile()
     
 }
 
-void Projectile::Fire()
+// 기존의 라인 트레이서 느낌
+/*void Projectile::Fire()
 {
     if (Owner == nullptr)
     {
@@ -97,6 +100,24 @@ void Projectile::Fire()
             break;
         }
     }
+}*/
+
+void Projectile::Fire()
+{
+    if (Owner == nullptr)
+    {
+        return;
+    }
+
+    Position = Owner->GetPosition();
+    PrevPosition = Position;
+
+    MoveCount = 0;
+    
+    AccTime = Info.Speed;
+
+    bActive = true;
+    bIsDestroy = false;
 }
 
 void Projectile::BeginPlay(AObject* InOwner, EDirection InDirection, ProjectileInfo InInfo)
@@ -104,6 +125,15 @@ void Projectile::BeginPlay(AObject* InOwner, EDirection InDirection, ProjectileI
     Owner = InOwner;
     Direction = InDirection;
     Info = InInfo;
+    
+    Position = Owner->GetPosition();
+    PrevPosition = Position;
+
+    MoveCount = 0;
+    AccTime = 0.0f;
+    bActive = true;
+    
+    bHasPreviousTile = false;
 }
 
 void Projectile::BeginPlay()
@@ -111,14 +141,152 @@ void Projectile::BeginPlay()
 
 }
 
-void Projectile::Destroy()
-{
-
-}
-
 void Projectile::Tick(float DeltaTime)
 {
     AObject::Tick(DeltaTime);
+
+    if (!CanTickProjectile())
+    {
+        return;
+    }
+
+    AccTime += DeltaTime;
+
+    if (!CanMove())
+    {
+        return;
+    }
+
+    AccTime = 0.0f;
+
+    MoveProjectile();
+}
+
+void Projectile::Destroy()
+{
+    bActive = false;
+    bIsDestroy = true;
+}
+
+bool Projectile::CanTickProjectile()
+{
+    if (!bActive)
+    {
+        return false;
+    }
+
+    if (Owner == nullptr)
+    {
+        Destroy();
+        return false;
+    }
+
+    vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
+
+    if (Map.empty() || Map[0].empty())
+    {
+        Destroy();
+        return false;
+    }
+
+    return true;
+}
+
+bool Projectile::CanMove() const
+{
+    return AccTime >= Info.Speed;
+}
+
+void Projectile::MoveProjectile()
+{
+    PrevPosition = Position;
+
+    MoveByDirection();
+
+    MoveCount++;
+
+    if (IsOutOfMap())
+    {
+        Destroy();
+        return;
+    }
+
+    if (HandleCurrentTile())
+    {
+        return;
+    }
+
+    if (MoveCount >= Info.Range)
+    {
+        Destroy();
+        return;
+    }
+}
+
+void Projectile::MoveByDirection()
+{
+    switch (Direction)
+    {
+    case EDirection::UP:
+        Position.Y -= 1;
+        break;
+
+    case EDirection::DOWN:
+        Position.Y += 1;
+        break;
+
+    case EDirection::LEFT:
+        Position.X -= 1;
+        break;
+
+    case EDirection::RIGHT:
+        Position.X += 1;
+        break;
+
+    case EDirection::NONE:
+    default:
+        Destroy();
+        break;
+    }
+}
+
+bool Projectile::IsOutOfMap() const
+{
+    return Position.Y < 0 || Position.Y >= MAP_MAX_Y ||
+           Position.X < 0 || Position.X >= MAP_MAX_X;
+}
+
+bool Projectile::HandleCurrentTile()
+{
+    vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
+
+    Coordinate& CurrentTile = Map[Position.Y][Position.X];
+
+    if (CurrentTile.Type == ObjectType::Wall)
+    {
+        Destroy();
+        return true;
+    }
+
+    if (CurrentTile.Type == ObjectType::Monster)
+    {
+        int ObjectID = CurrentTile.ID;
+
+        AObject* HitObject = ObjectPoolManager::GetInstance()->GetObjectByID(ObjectID);
+
+        if (HitObject != Owner)
+        {
+            if (Monster* Mons = dynamic_cast<Monster*>(HitObject))
+            {
+                Mons->TakeDamage(Info.Damage);
+            }
+        }
+
+        Destroy();
+        return true;
+    }
+
+    return false;
 }
 
 void Projectile::OnSpawnFromPool()
