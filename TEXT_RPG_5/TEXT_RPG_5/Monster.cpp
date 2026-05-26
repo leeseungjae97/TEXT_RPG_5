@@ -86,16 +86,6 @@ void Monster::Tick(float DeltaTime)
 
 	if (IsDead())
 	{
-		if (Player* PlayerPtr = SceneManager::GetInstance()->GetPlayer())
-		{
-			if (LevelComponent* LevelComp = PlayerPtr->GetComponent<LevelComponent>())
-			{
-				LevelComp->AddExp(50);
-			}
-		}
-		MapManager::GetInstance()->GetMap()[Position.Y][Position.X].Type = ObjectType::Path;
-		MapManager::GetInstance()->GetMap()[Position.Y][Position.X].ID = NO_ID;
-		
 		Destroy();
 		return;
 	}
@@ -141,6 +131,15 @@ void Monster::Tick(float DeltaTime)
 
 void Monster::Destroy()
 {
+	if (Player* PlayerPtr = SceneManager::GetInstance()->GetPlayer())
+	{
+		if (LevelComponent* LevelComp = PlayerPtr->GetComponent<LevelComponent>())
+		{
+			LevelComp->AddExp(50);
+		}
+	}
+	MapManager::GetInstance()->GetMap()[Position.Y][Position.X].Type = ObjectType::Path;
+	MapManager::GetInstance()->GetMap()[Position.Y][Position.X].ID = NO_ID;
 	bIsDestroy = true;
 }
 
