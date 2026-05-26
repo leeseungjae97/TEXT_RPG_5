@@ -16,6 +16,6 @@ public:
     virtual void Tick(float DeltaTime) override;
     void UseSlotItem(int NumKey);
 private:
-    float CoolTime= 3.0f;
+    float const CoolTime= 3.0f;
     float TimeCheck = 3.0f;
 };
