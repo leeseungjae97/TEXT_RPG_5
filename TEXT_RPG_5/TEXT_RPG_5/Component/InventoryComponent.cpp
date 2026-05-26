@@ -54,6 +54,12 @@ void UInventoryComponent::OpenInventory()
 
 Vector UInventoryComponent::GetItemIndex(UItem* Item)
 {
+    if (nullptr == Item)
+    {
+        return { -1, -1 };
+    }
+    
+    
     for (int y = 0; y < Container.size(); ++y)
     {
         for (int x = 0; x < MaxColumn; ++x)
@@ -249,7 +255,10 @@ void UInventoryComponent::ClearQuickSlot(UItem* Item)
     for (auto& slot : QuickSlot)
     {
         if (slot.second == Item)
+        {
             slot.second = nullptr;
+            break;
+        }
     }
 }
 
