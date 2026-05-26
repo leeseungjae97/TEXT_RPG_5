@@ -5,6 +5,7 @@
 #include "RenderManager.h"
 #include "SceneManager.h"
 #include "../Component/CombatComponent.h"
+#include "../Component/InventoryComponent.h"
 #include "../Component/LevelComponent.h"
 #include "../Component/MoveComponent.h"
 #include "../Define.h"
@@ -618,18 +619,28 @@ void ViewportManager::Render2DtoISO()
 	renderManager->AddRender(1, 1, L"ISO");
 }
 
+void ViewportManager::OpenInventory()
+{
+	if (!inventoryComponent) return;
+	if (InputManager::GetInstance()->IsKeyTap(KeyCode::_3))
+	{
+		if (!bIsInvenOpen)	inventoryComponent->OpenInventory();
+		else				inventoryComponent->CloseInventory();
+		
+		bIsInvenOpen = !bIsInvenOpen;
+	}
+}
+
 void ViewportManager::Tick(float DeltaTime)
 {
-	bool bCurrentInvenKey = InputManager::GetInstance()->IsKeyPressed(KeyCode::_3);
-	if (bCurrentInvenKey && !bPrevInvenKey)
+	if (!PlayerPtr)
 	{
-		bInven = !bInven;
+		PlayerPtr = SceneManager::GetInstance()->GetPlayer();
 	}
-
-	bPrevInvenKey = bCurrentInvenKey;
-
-	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::_1)) bIso = true;
-	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::_2)) bIso = false;
+	if (!inventoryComponent)
+		inventoryComponent = PlayerPtr != nullptr ? PlayerPtr->GetComponent<UInventoryComponent>() : nullptr;
+	
+	OpenInventory();
 }
 
 void ViewportManager::BeginPlay()
@@ -644,14 +655,15 @@ void ViewportManager::Render()
 
 void ViewportManager::RenderObject()
 {
-	if (bIso) Render2DtoISO();
-	else      Render2Dto3D();
+	Render2DtoISO();
+	// if (bIso) Render2DtoISO();
+	// else      Render2Dto3D();
 }
 
 void ViewportManager::RenderUI()
 {
 	PlayerStatus.Render();
-	if (bInven)
+	if (bIsInvenOpen)
 	{
 		Inventory.Render();
 	}

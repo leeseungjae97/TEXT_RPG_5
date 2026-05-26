@@ -9,9 +9,11 @@ class UMoveComponent;
 class ViewportManager : public Singleton<ViewportManager>
 {
 public:
-	ViewportManager() : PlayerPtr(nullptr), moveComponent(nullptr), combatComponent(nullptr)
+	ViewportManager() : PlayerPtr(nullptr), moveComponent(nullptr), combatComponent(nullptr),
+	                    inventoryComponent(nullptr)
 	{
 	}
+
 	~ViewportManager() {}
 
 public:
@@ -21,18 +23,18 @@ public:
 	
 	void Render2Dto3D();
 	void Render2DtoISO();
-	
+	void OpenInventory();
+
 private:
 	void RenderObject();
 	void RenderUI();
 
 private:
-	bool bIso = false;
-	bool bInven = false;
-	bool bPrevInvenKey = false;
+	bool bIsInvenOpen = false;
 	HUDUI PlayerStatus;
 	InventoryUI Inventory;
 	Player* PlayerPtr;
 	UMoveComponent* moveComponent;
 	UCombatComponent* combatComponent;
+	UInventoryComponent* inventoryComponent;
 };
