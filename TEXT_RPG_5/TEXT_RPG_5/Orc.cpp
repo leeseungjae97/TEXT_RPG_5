@@ -9,19 +9,22 @@ Orc::Orc(int playerLevel)
 	}
 
 	Name = "Orc";
-	Health = playerLevel * 20 + rand() % (playerLevel * 10 + 1);
+	Health = playerLevel * 35 + rand() % (playerLevel * 15 + 1);
 	MaxHealth = Health;
-	Attack = playerLevel * 5 + rand() % (playerLevel * 5 + 1);
+	Attack = playerLevel * 6 + rand() % (playerLevel * 5 + 1);
 	
 	MoveInterval = 0.9f;
 	
 	
 	DetectionRange = 9;
 
-	Position = Vector(4, 4);
+	Position = Vector(3, 5);
 	PrevPosition = Position;
 	
 	bUseBfs = true;
 	
+	AttackRange = 1;
+	AttackInterval = 1.6f;
+	AttackElapsedtime = 0.0f;
 	
 }
