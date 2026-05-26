@@ -5,7 +5,7 @@
 enum class KeyCode
 {
 	_1, _2, _3, _4,
-	Z, X, C, V, B, N, M,
+	Z, X, C, V, B, N, M, I,
 	UP, DOWN, LEFT, RIGHT, ESCAPE, END
 };
 
