@@ -45,6 +45,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void OpenInventory();
+	void OpenShop();
 	void CloseInventory();
 	bool GetOpenedInventory(){return bOpenedInventory;}
 

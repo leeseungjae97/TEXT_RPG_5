@@ -39,6 +39,11 @@ void UInventoryComponent::OpenInventory()
     bOpenedInventory = true;
 }
 
+void UInventoryComponent::OpenShop()
+{
+    SetOnShop(true);
+}
+
 void UInventoryComponent::CloseInventory()
 {
     bOpenedInventory = false;
