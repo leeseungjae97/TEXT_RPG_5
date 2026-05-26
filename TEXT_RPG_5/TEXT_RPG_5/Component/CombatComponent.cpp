@@ -83,6 +83,43 @@ void UCombatComponent::SwordAttack()
 	}
 }
 
+void UCombatComponent::ProjectileAttack()
+{
+	if (!PlayerPtr)
+	{
+		PlayerPtr = dynamic_cast<Player*>(GetOwner());
+		return;
+	}
+
+	if (!MoveComponentPtr)
+	{
+		MoveComponentPtr = PlayerPtr->GetComponent<UMoveComponent>();
+		return;
+	}
+
+	EDirection ShootDirection = MoveComponentPtr->GetFacingDirection();
+
+	if (ShootDirection == EDirection::NONE)
+	{
+		return;
+	}
+
+	ProjectileInfo Info;
+	Info.Damage = PlayerPtr->GetPower();
+	Info.Range = 7;
+	Info.Speed = 0.1f;
+
+	Projectile* NewProjectile = SceneManager::GetInstance()->SpawnObject<Projectile>();
+
+	if (NewProjectile == nullptr)
+	{
+		return;
+	}
+
+	NewProjectile->BeginPlay(PlayerPtr, ShootDirection, Info);
+	NewProjectile->Fire();
+}
+
 void UCombatComponent::HandleAttack()
 {
 	if (!bAttackRequested)
@@ -95,6 +132,12 @@ void UCombatComponent::HandleAttack()
 		case WeaponType::Melee:
 		{
 			SwordAttack();
+		}
+		break;
+		// 프로젝타일 추가
+		case WeaponType::Projectile:
+		{
+			ProjectileAttack();
 		}
 		break;
 		default : 
@@ -177,6 +220,12 @@ void UCombatComponent::HandleAttackInput(float DeltaTime)
 			bAttackRequested = true;
 			AttackVisibleTime = AttackVisibleDuration;
 		}
+		AttackElapsedTime = 0.0f;
+	}
+	// 프로젝타일 input 관련
+	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::X) && AttackElapsedTime >= AttackInterval)
+	{
+		ProjectileAttack();
 		AttackElapsedTime = 0.0f;
 	}
 }

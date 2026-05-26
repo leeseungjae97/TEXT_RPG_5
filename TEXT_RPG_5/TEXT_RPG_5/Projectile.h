@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "Object.h"
 #include "Struct/ProjectileInfo.h"
+#include "Struct/Coordinate.h"
 
 enum class EDirection : int;
 
@@ -21,11 +22,29 @@ public:
     void Fire();
 
 private:
+    // Tick 흐름 제어
+    bool CanTickProjectile();
+    bool CanMove() const;
+
+    // 이동 처리
+    void MoveProjectile();
+    void MoveByDirection();
+
+    // 맵 범위 확인
+    bool IsOutOfMap() const;
+
+    // 충돌 처리
+    bool HandleCurrentTile();
+
+private:
     ProjectileInfo Info;
     EDirection Direction;
 
     AObject* Owner;
-    int MoveCount;
-    float AccTime;
     
+    int MoveCount = 0;
+    float AccTime = 0.0f;
+    bool bActive = false;
+    Coordinate PreviousTile;
+    bool bHasPreviousTile = false;
 };
