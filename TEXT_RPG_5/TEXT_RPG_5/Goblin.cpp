@@ -11,7 +11,7 @@ Goblin::Goblin(int playerLevel)
 	Name = "Goblin";
 	Health = playerLevel * 20 + rand() % (playerLevel * 10 + 1);
 	MaxHealth = Health;
-	Attack = playerLevel * 5 + rand() % (playerLevel * 5 + 1);
+	Attack = playerLevel * 4 + rand() % (playerLevel * 4 + 1);
 
 
 	
@@ -20,9 +20,13 @@ Goblin::Goblin(int playerLevel)
 	
 	DetectionRange = 7;
 
-	Position = Vector(4, 4);
+	Position = Vector(4, 5);
 	PrevPosition = Position;
 	
 	bUseBfs = true;
+	
+	AttackRange = 1;
+	AttackInterval = 1.1f;
+	AttackElapsedtime = 0.0f;
 	
 }

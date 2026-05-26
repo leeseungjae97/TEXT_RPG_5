@@ -17,14 +17,16 @@ protected:
 protected:
 	
 	float MoveElapsedtime;
-
 	
 	float MoveInterval;
-
 	
 	int DetectionRange;
 	
 	bool bUseBfs;
+	
+	int AttackRange;
+	float AttackElapsedtime;
+	float AttackInterval;
 
 	
 public:
@@ -54,13 +56,14 @@ protected:
 
 	
 	int GetDistanceToPlayer(Player* player);
-
-
+	
+	bool CanAttackplayer(Player* player);
+	
+	void Attackplayer(Player* player);
+	
 	void MoveTowardPlayer(Player* player);
 	
-	
 	void MoveTowardPlayerBfs();
-
-
+	
 	void MoveRandom();
 };

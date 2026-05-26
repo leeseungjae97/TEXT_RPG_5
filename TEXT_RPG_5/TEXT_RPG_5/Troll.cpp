@@ -9,9 +9,9 @@ Troll::Troll(int playerLevel)
 	}
 
 	Name = "Troll";
-	Health = playerLevel * 20 + rand() % (playerLevel * 10 + 1);
+	Health = playerLevel * 50 + rand() % (playerLevel * 20 + 1);
 	MaxHealth = Health;
-	Attack = playerLevel * 5 + rand() % (playerLevel * 5 + 1);
+	Attack = playerLevel * 9 + rand() % (playerLevel * 6 + 1);
 	
 	MoveInterval = 1.3f;
 
@@ -22,5 +22,9 @@ Troll::Troll(int playerLevel)
 	PrevPosition = Position;
 	
 	bUseBfs = true;
+	
+	AttackRange = 1;
+	AttackInterval = 2.4f;
+	AttackElapsedtime = 0.0f;
 	
 }

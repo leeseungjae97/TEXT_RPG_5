@@ -111,3 +111,19 @@ void Player::SetIsAttack(bool Value)
 {
 	this->TotalStat.IsAttack = Value;
 }
+
+void Player::TakeDamage(int Damage)
+{
+	TotalStat.HP -= Damage;
+	NotifyDamage(Damage);
+	
+	if (TotalStat.HP < 0)
+	{
+		TotalStat.HP = 0;
+	}
+}
+
+bool Player::IsDead()
+{
+	return TotalStat.HP <= 0;
+}

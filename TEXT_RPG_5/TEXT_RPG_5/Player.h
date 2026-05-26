@@ -28,6 +28,9 @@ public:
 	int GetMax_Exp();
 	int GetGold();
 	bool GetIsAttack();
+	
+	void TakeDamage(int damage);
+	bool IsDead();
 
 	// Setter
 	void SetName(string Name);
