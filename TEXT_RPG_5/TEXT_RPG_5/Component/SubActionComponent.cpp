@@ -5,7 +5,7 @@
 #include "../Player.h"
 
 
-void SubActionComponent::Tick(float DeltaTime)
+void USubActionComponent::Tick(float DeltaTime)
 {
 	TimeCheck += DeltaTime;
 	if (TimeCheck < CoolTime)
@@ -24,7 +24,7 @@ void SubActionComponent::Tick(float DeltaTime)
 
 }
 
-void SubActionComponent::UseSlotItem(int NumKey) 
+void USubActionComponent::UseSlotItem(int NumKey) 
 {
 	Player* player = dynamic_cast<Player*>(GetOwner());
 	if (player == nullptr)

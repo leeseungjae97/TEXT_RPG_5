@@ -7,7 +7,7 @@
 class UMoveComponent;
 class UCombatComponent;
 class UInventoryComponent;
-
+class USubActionComponent;
 class Player : public AObject
 {
 public:
@@ -51,4 +51,5 @@ private:
 	UMoveComponent* MoveComponent = nullptr;
 	UCombatComponent* CombatComponent = nullptr;
 	UInventoryComponent* InventoryComponent = nullptr;
+	USubActionComponent* SubActionComponent = nullptr;
 };
