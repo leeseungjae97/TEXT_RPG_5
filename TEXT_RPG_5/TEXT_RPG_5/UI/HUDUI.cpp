@@ -128,17 +128,15 @@ void HUDUI::QuickSlotRender()
 
 	Renderer->AddRender(y - 2, x, "Quick Slot");
 
-	map<int, UItem*> quickSlots = inventoryComponent->GetQuickSlot();
+	vector<UItem*> quickSlots = inventoryComponent->GetQuickSlot();
 	for (int i = 0; i < slotCount; ++i)
 	{
 		int slotNumber = i + 1;
 		int slotX = x + i * (slotWidth - 1);
+		
 		UItem* item = nullptr;
-		auto iter = quickSlots.find(slotNumber);
-		if (iter != quickSlots.end())
-		{
-			item = iter->second;
-		}
+		if (i < (int)quickSlots.size())
+			item = quickSlots[i];
 
 		Renderer->DrawBox(y, slotX, slotWidth, slotHeight);
 
