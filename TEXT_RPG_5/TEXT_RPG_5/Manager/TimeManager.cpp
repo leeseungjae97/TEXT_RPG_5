@@ -1,14 +1,10 @@
 #include "TimeManager.h"
 
-double TimeManager::DeltaTime = 0.0l;
-double TimeManager::StoreSecond = 0.0f;
-UINT TimeManager::FrameCount = 0;
-UINT TimeManager::LastFPS = 0;
-LARGE_INTEGER TimeManager::CpuFrequency = {};
-LARGE_INTEGER TimeManager::PrevFrequency = {};
-LARGE_INTEGER TimeManager::CurFrequency = {};
+#include "RenderManager.h"
 
 TimeManager::TimeManager()
+	: DeltaTime(0.f), StoreSecond(0.0f), FrameCount(0), LastFPS(0),
+	CpuFrequency(), PrevFrequency(), CurFrequency()
 {
 }
 
@@ -28,6 +24,8 @@ void TimeManager::Tick()
 	double differnceFrequency = CurFrequency.QuadPart - PrevFrequency.QuadPart;
 	DeltaTime = differnceFrequency / static_cast<double>(CpuFrequency.QuadPart);
 	PrevFrequency.QuadPart = CurFrequency.QuadPart;
+	
+	CalcFPS();
 
 }
 void TimeManager::BeginPlay()
@@ -51,6 +49,5 @@ void TimeManager::CalcFPS()
 		StoreSecond = 0.0f;
 		FrameCount = 0;
 	}
-
-	//wcout << L"FPS : " << LastFPS << '\n';
+	RenderManager::GetInstance()->AddRender(1, 1, "FPS : " + to_string(LastFPS));
 }
