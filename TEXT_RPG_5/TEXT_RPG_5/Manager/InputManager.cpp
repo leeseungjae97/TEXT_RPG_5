@@ -4,7 +4,7 @@
 int ASCII[(UINT)KeyCode::END] =
 {
     '1', '2', '3', '4',
-    'Z', 'X', 'C', 'V', 'B', 'N', 'M',
+    'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'I',
     VK_UP, VK_DOWN, VK_LEFT ,VK_RIGHT, VK_ESCAPE
 };
 
