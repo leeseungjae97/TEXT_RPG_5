@@ -1,5 +1,6 @@
 #pragma once
 #include "../Singleton.h"
+#include "../pch.h"
 
 class BattleManager : public Singleton<BattleManager>
 {
@@ -11,4 +12,9 @@ public:
 public:
 	void Tick(float DeltaTime);
 	void BeginPlay();
+	void RegisterKilledMonster(const string& MonsterName);
+	const vector<pair<string, int>>& GetKilledMonsters() const { return KilledMonsters; }
+
+private:
+	vector<pair<string, int>> KilledMonsters;
 };

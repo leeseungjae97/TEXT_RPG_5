@@ -21,6 +21,14 @@ void USubActionComponent::Tick(float DeltaTime)
 	{
 		UseSlotItem(1);
 	}
+	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::_3))
+	{
+		UseSlotItem(2);
+	}
+	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::_4))
+	{
+		UseSlotItem(3);
+	}
 
 }
 

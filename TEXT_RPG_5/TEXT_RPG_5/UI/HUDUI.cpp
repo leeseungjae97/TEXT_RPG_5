@@ -10,6 +10,8 @@
 #include "../Manager/ObjectPoolManager.h"
 #include "../Manager/RenderManager.h"
 #include "../Manager/SceneManager.h"
+#include "../Manager/TimeManager.h"
+#include "../Manager/ViewportManager.h"
 #include "../Monster.h"
 #include "../Player.h"
 #include "../Projectile.h"
@@ -44,6 +46,11 @@ void HUDUI::StatusRender()
 	int currentHealth = min(max(PlayerPtr->GetHP(), 0), maxHealth);
 	int maxExp = max(1, PlayerPtr->GetMax_Exp());
 	int currentExp = min(max(PlayerPtr->GetExp(), 0), maxExp);
+	if (PlayerPtr->ShouldShowLogText())
+	{
+		Vector isoPosition = ViewportManager::GetInstance()->GetISOPosition();
+		Renderer->AddRender(isoPosition.Y - 10, isoPosition.X, PlayerPtr->GetLogText());
+	}
 
 	Renderer->AddRender(hudY, hudX, "LV : " + to_string(PlayerPtr->GetLevel()));
 	Renderer->AddRender(hudY + 2, hudX, "HP : " + to_string(PlayerPtr->GetHP()) + "/" + to_string(PlayerPtr->GetMax_HP()));
@@ -172,6 +179,8 @@ wchar_t HUDUI::GetMapIcon(int MapY, int MapX)
 		return L'#';
 	case MapObjectType::Player:
 		return L'P';
+	case MapObjectType::Shop:
+		return L'S';
 	case MapObjectType::Monster:
 		if (Monster* monster = dynamic_cast<Monster*>(MapManager::GetInstance()->GetMapObject(MapY, MapX, MapObjectType::Monster)))
 		{
@@ -212,11 +221,19 @@ int HUDUI::GetMapIconColor(int MapY, int MapX)
 	{
 		return CC_BLACK;
 	}
-
+	ColorChangeDuration += TimeManager::GetInstance()->GetDeltaTime();
+	if (ColorChangeDuration >= ColorChangeInterval)
+	{
+		++ShopColorIndex;
+		ColorChangeDuration = 0.0f;
+	}
+	
 	switch (MapManager::GetInstance()->GetType(MapY, MapX))
 	{
 	case MapObjectType::Wall:
 		return CC_LIGHTGRAY;
+	case MapObjectType::Shop:
+		return (ShopColorIndex %= CC_WHITE);
 	case MapObjectType::Player:
 		return CC_YELLOW;
 	case MapObjectType::Monster:

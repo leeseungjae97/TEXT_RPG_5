@@ -1,6 +1,8 @@
 #include "InventoryUI.h"
 
+#include "../Component/EquipmentComponent.h"
 #include "../Component/InventoryComponent.h"
+#include "../Define.h"
 #include "../Manager/RenderManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Player.h"
@@ -36,36 +38,47 @@ void InventoryUI::InventoryRender()
 		return;
 	}
 
-	vector<vector<UItem*>>& container = InventoryComponent->GetContainer();
-	vector<UItem*> equipmentItems;
-
-	for (int i = 0; i < container.size(); i++)
+	if (InventoryComponent->GetOnShop())
 	{
-		for (int j = 0; j < container[i].size(); j++)
-		{
-			UItem* item = container[i][j];
-			if (item == nullptr) { continue; }
-			FItemInfo ItemInfo = item->GetItemInfo();
-
-			if (ItemInfo.Type == ItemType::Equipment) { equipmentItems.push_back(item); }
-		}
+		return;
 	}
 
-	int equipmentColumns = 2;
-	int equipmentRows = 3;
+	vector<vector<UItem*>>& container = InventoryComponent->GetContainer();
 	
 	const int inventoryX = 3;
 	const int inventoryY = 3;
 	const int equipmentX = inventoryX + static_cast<int>(container[0].size()) * 15 + 8;
 	const int equipmentY = inventoryY;
 
-	DrawInventoryPanel(inventoryY, inventoryX, container);
-	DrawEquipmentPanel(equipmentY, equipmentX, equipmentItems, equipmentColumns, equipmentRows);
+	DrawBackground(1, 1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	Renderer->AddRender(2, 3, L"(Z)적용/착용  (I)닫기");
+	DrawInventoryPanel(inventoryY, inventoryX, container, L"인벤토리");
+	DrawEquipmentPanel(equipmentY, equipmentX);
 }
 
 void InventoryUI::QuickSlotRender()
 {
 	
+}
+
+void InventoryUI::DrawBackground(int Y, int X, int Width, int Height)
+{
+	if (!Renderer)
+	{
+		Renderer = RenderManager::GetInstance();
+		return;
+	}
+
+	WORD attribute = Renderer->MakeConsoleAttribute(CC_BLACK, CC_BLACK);
+	for (int row = 0; row < Height; ++row)
+	{
+		for (int col = 0; col < Width; ++col)
+		{
+			Renderer->PutCell(Y + row, X + col, L' ', attribute);
+		}
+	}
+
+	Renderer->DrawBox(Y, X, Width, Height);
 }
 
 void InventoryUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem* item, bool bSelected)
@@ -127,7 +140,7 @@ void InventoryUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem*
 	Renderer->AddRender(Y + Height - 2, nameX, itemName);
 }
 
-void InventoryUI::DrawInventoryPanel(int Y, int X, vector<vector<UItem*>>& Items)
+void InventoryUI::DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title)
 {
 	if (!Renderer)
 	{
@@ -154,19 +167,19 @@ void InventoryUI::DrawInventoryPanel(int Y, int X, vector<vector<UItem*>>& Items
 		}
 	}
 
-	Renderer->AddRender(Y, X, L"인벤토리 (" + to_wstring(itemCount) + L"/" + to_wstring(capacity) + L")");
+	Renderer->AddRender(Y, X, Title + L" (" + to_wstring(itemCount) + L"/" + to_wstring(capacity) + L")");
 
 	for (int row = 0; row < rows; ++row)
 	{
 		for (int col = 0; col < static_cast<int>(Items[row].size()); ++col)
 		{
-			bool bSelected = Cursor.X == col && Cursor.Y == row;
+			bool bSelected = !InventoryComponent->GetOnEquipment() && Cursor.X == col && Cursor.Y == row;
 			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, Items[row][col], bSelected);
 		}
 	}
 }
 
-void InventoryUI::DrawEquipmentPanel(int Y, int X, const vector<UItem*>& Items, int Columns, int Rows)
+void InventoryUI::DrawEquipmentPanel(int Y, int X)
 {
 	if (!Renderer)
 	{
@@ -176,16 +189,36 @@ void InventoryUI::DrawEquipmentPanel(int Y, int X, const vector<UItem*>& Items, 
 	
 	const int slotWidth = 16;
 	const int slotHeight = 7;
+	const int Rows = 4;
+	const wchar_t* defaultLabels[Rows] = { L"무기", L"머리", L"가슴", L"신발" };
 
 	Renderer->AddRender(Y, X, L"장비");
 
 	for (int row = 0; row < Rows; ++row)
 	{
-		for (int col = 0; col < Columns; ++col)
+		const UItem* item = nullptr;
+		if (PlayerPtr != nullptr)
 		{
-			int index = row * Columns + col;
-			const UItem* item = index < Items.size() ? Items[index] : nullptr;
-			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, item);
+			UEquipmentComponent* equipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>();
+			if (equipmentComponent != nullptr)
+			{
+				item = equipmentComponent->GetItem({ 0, row });
+			}
+		}
+
+		bool bSelected = InventoryComponent != nullptr &&
+			InventoryComponent->GetOnEquipment() &&
+			InventoryComponent->GetCursor().X == 0 &&
+			InventoryComponent->GetCursor().Y == row;
+
+		int slotY = Y + 2 + row * (slotHeight - 1);
+		DrawItemSlot(slotY, X, slotWidth, slotHeight, item, bSelected);
+
+		if (item == nullptr)
+		{
+			wstring label = defaultLabels[row];
+			int labelX = X + max(1, (slotWidth - Renderer->GetTextDisplayWidth(label)) / 2);
+			Renderer->AddRender(slotY + slotHeight / 2, labelX, label);
 		}
 	}
 }
