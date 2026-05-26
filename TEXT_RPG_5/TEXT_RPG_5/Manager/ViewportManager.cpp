@@ -181,12 +181,6 @@ namespace
 void ViewportManager::Render2DtoISO()
 {
 	RenderManager* renderManager = RenderManager::GetInstance();
-	vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
-
-	if (Map.empty() || Map[0].empty())
-	{
-		return;
-	}
 
 	const int originX = SCREEN_WIDTH / 2;
 	const int originY = SCREEN_HEIGHT / 3;
@@ -483,15 +477,15 @@ void ViewportManager::Render2DtoISO()
 		};
 
 	const int startY = max(0, static_cast<int>(cameraPosition.Y) - viewRadiusY);
-	const int endY = min(static_cast<int>(Map.size()) - 1, static_cast<int>(cameraPosition.Y) + viewRadiusY);
+	const int endY = min(static_cast<int>(MAP_MAX_Y) - 1, static_cast<int>(cameraPosition.Y) + viewRadiusY);
 	const int startX = max(0, static_cast<int>(cameraPosition.X) - viewRadiusX);
-	const int endX = min(static_cast<int>(Map[0].size()) - 1, static_cast<int>(cameraPosition.X) + viewRadiusX);
+	const int endX = min(static_cast<int>(MAP_MAX_X) - 1, static_cast<int>(cameraPosition.X) + viewRadiusX);
 
 	for (int y = startY; y <= endY; ++y)
 	{
 		for (int x = startX; x <= endX; ++x)
 		{
-			drawIsoTile(x, y, Map[y][x].Type == ObjectType::Wall);
+			drawIsoTile(x, y, MapManager::GetInstance()->IsTypeExist(y, x, MapObjectType::Wall));
 		}
 	}
 
@@ -654,7 +648,8 @@ void ViewportManager::Render()
 }
 
 void ViewportManager::RenderObject()
-{
+{	
+	// Render2Dto3D();
 	Render2DtoISO();
 	// if (bIso) Render2DtoISO();
 	// else      Render2Dto3D();
@@ -672,7 +667,6 @@ void ViewportManager::RenderUI()
 void ViewportManager::Render2Dto3D()
 {
 	RenderManager* renderManager = RenderManager::GetInstance();
-	vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
 	if (!PlayerPtr)
 	{
 		PlayerPtr = SceneManager::GetInstance()->GetPlayer();
@@ -739,7 +733,7 @@ void ViewportManager::Render2Dto3D()
 			}
 			else
 			{
-				if (Map[testY][testX].Type == ObjectType::Wall)
+				if (MapManager::GetInstance()->IsTypeExist(testY, testX, MapObjectType::Wall))
 				{
 					if (testX > previousTestX)      hitFace = WallFace::Left;
 					else if (testX < previousTestX) hitFace = WallFace::Right;

@@ -75,16 +75,10 @@ void HUDUI::StatusRender()
 
 void HUDUI::MapRender()
 {
-	vector<vector<Coordinate>>& map = MapManager::GetInstance()->GetMap();
-	if (map.empty() || map[0].empty())
-	{
-		return;
-	}
-
 	constexpr int miniMapWidth = 20;
 	constexpr int miniMapHeight = 20;
-	const int mapHeight = static_cast<int>(map.size());
-	const int mapWidth = static_cast<int>(map[0].size());
+	const int mapHeight = MAP_MAX_Y;
+	const int mapWidth = MAP_MAX_X;
 	const int boxWidth = miniMapWidth + 2;
 	const int boxHeight = miniMapHeight + 2;
 	const int y = 1;
@@ -167,20 +161,19 @@ void HUDUI::DrawStatusBar(int Y, int X, int Width, float Ratio, int FilledColor)
 
 wchar_t HUDUI::GetMapIcon(int MapY, int MapX)
 {
-	vector<vector<Coordinate>>& map = MapManager::GetInstance()->GetMap();
-	if (MapY < 0 || MapY >= static_cast<int>(map.size()) || MapX < 0 || MapX >= static_cast<int>(map[0].size()))
+	if (MapY < 0 || MapY >= MAP_MAX_Y || MapX < 0 || MapX >= MAP_MAX_X)
 	{
 		return L' ';
 	}
 
-	switch (map[MapY][MapX].Type)
+	switch (MapManager::GetInstance()->GetType(MapY, MapX))
 	{
-	case ObjectType::Wall:
+	case MapObjectType::Wall:
 		return L'#';
-	case ObjectType::Player:
+	case MapObjectType::Player:
 		return L'P';
-	case ObjectType::Monster:
-		if (Monster* monster = dynamic_cast<Monster*>(ObjectPoolManager::GetInstance()->GetObjectByID(map[MapY][MapX].ID)))
+	case MapObjectType::Monster:
+		if (Monster* monster = dynamic_cast<Monster*>(MapManager::GetInstance()->GetMapObject(MapY, MapX, MapObjectType::Monster)))
 		{
 			string name = monster->GetName();
 			if (name == "Goblin") return L'G';
@@ -188,8 +181,8 @@ wchar_t HUDUI::GetMapIcon(int MapY, int MapX)
 			if (name == "Orc")    return L'O';
 		}
 		return L'M';
-	case ObjectType::Projectile:
-		if (Projectile* projectile = dynamic_cast<Projectile*>(ObjectPoolManager::GetInstance()->GetObjectByID(map[MapY][MapX].ID)))
+	case MapObjectType::Projectile:
+		if (Projectile* projectile = dynamic_cast<Projectile*>(MapManager::GetInstance()->GetMapObject(MapY, MapX, MapObjectType::Projectile)))
 		{
 			switch (projectile->GetDirection())
 			{
@@ -207,7 +200,7 @@ wchar_t HUDUI::GetMapIcon(int MapY, int MapX)
 			}
 		}
 		return L'*';
-	case ObjectType::Path:
+	case MapObjectType::Path:
 	default:
 		return L'.';
 	}
@@ -215,20 +208,19 @@ wchar_t HUDUI::GetMapIcon(int MapY, int MapX)
 
 int HUDUI::GetMapIconColor(int MapY, int MapX)
 {
-	vector<vector<Coordinate>>& map = MapManager::GetInstance()->GetMap();
-	if (MapY < 0 || MapY >= static_cast<int>(map.size()) || MapX < 0 || MapX >= static_cast<int>(map[0].size()))
+	if (MapY < 0 || MapY >= MAP_MAX_Y || MapX < 0 || MapX >= MAP_MAX_X)
 	{
 		return CC_BLACK;
 	}
 
-	switch (map[MapY][MapX].Type)
+	switch (MapManager::GetInstance()->GetType(MapY, MapX))
 	{
-	case ObjectType::Wall:
+	case MapObjectType::Wall:
 		return CC_LIGHTGRAY;
-	case ObjectType::Player:
+	case MapObjectType::Player:
 		return CC_YELLOW;
-	case ObjectType::Monster:
-		if (Monster* monster = dynamic_cast<Monster*>(ObjectPoolManager::GetInstance()->GetObjectByID(map[MapY][MapX].ID)))
+	case MapObjectType::Monster:
+		if (Monster* monster = dynamic_cast<Monster*>(MapManager::GetInstance()->GetMapObject(MapY, MapX, MapObjectType::Monster)))
 		{
 			string name = monster->GetName();
 			if (name == "Goblin") return CC_GREEN;
@@ -236,9 +228,9 @@ int HUDUI::GetMapIconColor(int MapY, int MapX)
 			if (name == "Orc")    return CC_DARKYELLOW;
 		}
 		return CC_MAGENTA;
-	case ObjectType::Projectile:
+	case MapObjectType::Projectile:
 		return CC_CYAN;
-	case ObjectType::Path:
+	case MapObjectType::Path:
 	default:
 		return CC_DARKGRAY;
 	}

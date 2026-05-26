@@ -26,12 +26,14 @@ private:
     Vector CurrentCursor = {0,0};
     
     bool bSellMode = false;
-
+    
+    vector<Vector> ShopPoses;
 
 public:
-    
+    vector<Vector>& GetShopPoses() { return ShopPoses; }
     void SetPlayerInventory(UInventoryComponent* Inventory);
     void RestoreShop();
+    void BeginPlay();
 
     vector<vector<UItem*>> GetContainer() {return Container;}
     bool GetSellMode() {return bSellMode;}

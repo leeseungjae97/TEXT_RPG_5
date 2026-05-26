@@ -3,7 +3,10 @@
 #include "../pch.h"
 #include "../Struct/Coordinate.h"
 
+struct Vector;
 class Player;
+class AObject;
+
 class MapManager : public Singleton<MapManager>
 {
 public:
@@ -14,10 +17,23 @@ public:
 	void BeginPlay();
 	void Tick(float DeltaTime);
 
+private:
 	void UpdateMap();
-	vector<vector<Coordinate>>& GetMap() { return Map; }
+	
+public:
+	bool IsMapInitSize();
+	bool IsTypeExist(int Y, int X, MapObjectType Type);
+	bool IsTypeExist(Vector Pos, MapObjectType Type);
+	int GetID(int Y, int X);
+	int GetID(Vector Pos);
+	void SetMapObjectCoordinate(int Y, int X, Coordinate InCoordinate);
+	void SetMapObjectType(int Y, int X, MapObjectType Type);
+	void SetMapObjectID(int Y, int X, int InID);
+	MapObjectType GetType(Vector Pos);
+	MapObjectType GetType(int Y, int X);
+	AObject* GetMapObject(Vector Pos, MapObjectType Type);
+	AObject* GetMapObject(int Y, int X, MapObjectType Type);
 
 private:
 	vector<vector<Coordinate>> Map;
-	//vector<vector<int>> MapOrigin;
 };
