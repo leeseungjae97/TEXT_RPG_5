@@ -23,10 +23,10 @@ protected:
 
 	
 	int DetectionRange;
+	
+	bool bUseBfs;
 
-
-
-
+	
 public:
 	Monster();
 	virtual ~Monster();
@@ -55,6 +55,9 @@ protected:
 
 
 	void MoveTowardPlayer(Player* player);
+	
+	
+	void MoveTowardPlayerBfs();
 
 
 	void MoveRandom();
