@@ -24,6 +24,12 @@ public:
 
 public:
 	bool IsDestroy() const { return bIsDestroy; }
+	bool IsHitFlashActive() const { return HitFlashTime > 0.0f; }
+	bool ShouldShowDamageText() const { return DamageTextTime > 0.0f; }
+	int GetLastDamage() const { return LastDamage; }
+	void NotifyDamage(int Damage, float FlashDuration = 0.25f, float DamageTextDuration = 3.0f);
+	bool IsSlowed() const { return SlowTime > 0.0f; }
+	float GetSlowRatio() const { return IsSlowed() ? SlowRatio : 1.0f; }
 
 	Vector GetPosition() const { return Position; }
 	void SetPosition(Vector InPosition) { Position = InPosition; }
@@ -79,6 +85,11 @@ public:
 protected:
 	Vector Position;
 	Vector PrevPosition;
+	int LastDamage;
+	float HitFlashTime;
+	float DamageTextTime;
+	float SlowTime;
+	float SlowRatio;
 
 	static int IDGenerator;
 	int ID;

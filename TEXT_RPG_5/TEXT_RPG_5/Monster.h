@@ -23,10 +23,10 @@ protected:
 
 	
 	int DetectionRange;
+	
+	bool bUseBfs;
 
-
-
-
+	
 public:
 	Monster();
 	virtual ~Monster();
@@ -46,6 +46,8 @@ public:
 	virtual void BeginPlay()	override{}
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroy() override;
+	virtual void OnSpawnFromPool() override;
+	virtual void OnReturnToPool() override;
 
 protected:
 	Player* FindPlayer();
@@ -55,6 +57,9 @@ protected:
 
 
 	void MoveTowardPlayer(Player* player);
+	
+	
+	void MoveTowardPlayerBfs();
 
 
 	void MoveRandom();

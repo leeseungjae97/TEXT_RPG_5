@@ -25,7 +25,7 @@ enum ConsoleColor {
 	CC_ORIGINALBG = 0
 };
 
-struct UItem;
+class UItem;
 
 class RenderManager : public Singleton<RenderManager>
 {
@@ -33,7 +33,7 @@ public:
 	RenderManager() {}
 	~RenderManager();
 
-public:
+private:
 	void ClearScreen();
 	void DrawScreen();
 
@@ -50,9 +50,6 @@ public:
 public:
 	void DrawLine(int StartY, int StartX, int EndY, int EndX, wchar_t Character = L'*', int Color = CC_GRAY, int BgColor = CC_BLACK);
 	void DrawBox(int Y, int X, int Width, int Height);
-	void DrawItemSlot(int Y, int X, int Width, int Height, const UItem* item);
-	void DrawInventoryPanel(int Y, int X, const vector<UItem*>& Items, int Capacity, int Columns, int Rows);
-	void DrawEquipmentPanel(int Y, int X, const vector<UItem*>& Items, int Columns, int Rows);
 	void PutCell(int Y, int X, wchar_t Character, WORD Attribute);
 
 public:
@@ -61,11 +58,16 @@ public:
 	void SetBackgroundColor(int Bgcolor);
 	int GetFontColor();
 	int GetBackgroundColor();
+	
+	WORD MakeConsoleAttribute(int Color, int BackgroundColor = CC_BLACK);
+	bool IsWideCharacter(wchar_t Character);
+
+	int GetCharacterDisplayWidth(wchar_t Character);
+	int GetTextDisplayWidth(const wstring& Text);
+	wstring TrimTextToDisplayWidth(const wstring& Text, int MaxWidth);
+	wstring ToWideString(const string& Text);
 
 private:
-	wstring ToWideString(const string& Text);
-	wchar_t GetItemIcon(const UItem* item);
-
 	wchar_t* screen = nullptr;
 	WORD* attributes = nullptr;
 	HANDLE hConsole = INVALID_HANDLE_VALUE;

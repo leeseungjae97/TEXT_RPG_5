@@ -1315,7 +1315,7 @@
     <ClCompile Include="Manager\ObjectPoolManager.cpp" />
     <ClCompile Include="Manager\ViewportManager.cpp" />
     <ClCompile Include="UI\InventoryUI.cpp" />
-    <ClCompile Include="UI\PlayerStatusUI.cpp" />
+    <ClCompile Include="UI\HUDUI.cpp" />
     <ClCompile Include="Manager\RenderManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1662,6 +1662,7 @@
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Orc.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Slime.cpp" />
     <ClCompile Include="test_main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -1684,6 +1685,7 @@
     <ClInclude Include="Enum\Direction.h" />
     <ClInclude Include="Enum\ItemTypeEnum.h" />
     <ClInclude Include="Enum\ObjectTypeEnum.h" />
+    <ClInclude Include="Enum\WeaponType.h" />
     <ClInclude Include="Item\AllItems.h" />
     <ClInclude Include="Item\EquipmentItem.h" />
     <ClInclude Include="Item\Item.h" />
@@ -1709,16 +1711,18 @@
     <ClInclude Include="Orc.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
     <ClInclude Include="Struct\ItemInfo.h" />
     <ClInclude Include="Troll.h" />
     <ClInclude Include="Struct\Coordinate.h" />
     <ClInclude Include="Struct\ItemData.h" />
+    <ClInclude Include="Struct\ProjectileInfo.h" />
     <ClInclude Include="Struct\Vector.h" />
     <ClInclude Include="Troll.h" />
     <ClInclude Include="UI\InventoryUI.h" />
-    <ClInclude Include="UI\PlayerStatusUI.h" />
+    <ClInclude Include="UI\HUDUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
