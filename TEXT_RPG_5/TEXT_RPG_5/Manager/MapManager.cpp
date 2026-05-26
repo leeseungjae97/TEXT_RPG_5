@@ -5,6 +5,7 @@
 #include "../Object.h"
 #include "../Monster.h"
 #include "../Player.h"
+#include "../Projectile.h"
 
 MapManager::MapManager()
 {
@@ -53,6 +54,11 @@ void MapManager::UpdateMap()
 		else if (Player* player = dynamic_cast<Player*>(Obj))
 		{
 			Map[Pos.Y][Pos.X] = {ObjectType::Player, player->GetID()};
+		}
+
+		else if (Projectile* projectile = dynamic_cast<Projectile*>(Obj))
+		{
+			Map[Pos.Y][Pos.X] = {ObjectType::Projectile, projectile->GetID()};
 		}
 	}
 }

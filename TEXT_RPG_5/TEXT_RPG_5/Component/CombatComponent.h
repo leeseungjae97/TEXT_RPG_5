@@ -29,6 +29,9 @@ public:
 	// void SetAttackValue();
 	void SwordAttack();
 	void HandleAttack();
+	void LaunchProjectile();
+	void MakeSwordRange();
+	void AttackEffectTimeAcc(float DeltaTime);
 	void HandleAttackInput(float DeltaTime);
 	
 	WeaponType GetWeaponType() { return Weapon;}
@@ -47,5 +50,8 @@ private:
 	float AttackVisibleTime;
 	float AttackVisibleDuration;
 	bool bAttackRequested;
+	
+	float ProjectileTotalTime;
+	float ProjectileDelayTime;
 	
 };

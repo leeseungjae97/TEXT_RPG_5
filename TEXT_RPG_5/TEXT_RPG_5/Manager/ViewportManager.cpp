@@ -10,6 +10,7 @@
 #include "../Define.h"
 #include "../Monster.h"
 #include "../Player.h"
+#include "../Projectile.h"
 
 namespace
 {
@@ -156,6 +157,23 @@ namespace
 		if (name == "Slime")  return CC_CYAN;
 		if (name == "Orc")    return CC_DARKYELLOW;
 		return CC_MAGENTA;
+	}
+	wchar_t GetDirectionArrow(EDirection Direction)
+	{
+		switch (Direction)
+		{
+		case EDirection::UP:
+			return L'↗';
+		case EDirection::DOWN:
+			return L'↙';
+		case EDirection::LEFT:
+			return L'↖';
+		case EDirection::RIGHT:
+			return L'↘';
+		case EDirection::NONE:
+		default:
+			return L'*';
+		}
 	}
 }
 
@@ -506,6 +524,7 @@ void ViewportManager::Render2DtoISO()
 		WORD objectAttribute = MakeAttribute(CC_WHITE);
 		Monster* monsterForHpBar = nullptr;
 		Player* playerForBars = nullptr;
+		Projectile* projectileForRender = nullptr;
 
 		if (Player* player = dynamic_cast<Player*>(object))
 		{
@@ -519,16 +538,16 @@ void ViewportManager::Render2DtoISO()
 				switch (moveComponent->GetFacingDirection())
 				{
 				case EDirection::UP:
-					objectIcon = L'^';
+					objectIcon = L'↗';
 					break;
 				case EDirection::DOWN:
-					objectIcon = L'v';
+					objectIcon = L'↙';
 					break;
 				case EDirection::LEFT:
-					objectIcon = L'<';
+					objectIcon = L'↖';
 					break;
 				case EDirection::RIGHT:
-					objectIcon = L'>';
+					objectIcon = L'↘';
 					break;
 				case EDirection::NONE:
 				default:
@@ -551,6 +570,13 @@ void ViewportManager::Render2DtoISO()
 			objectAttribute = MakeAttribute(monster->IsHitFlashActive() ? CC_WHITE : GetMonsterColor(monster));
 			monsterForHpBar = monster;
 		}
+		else if (Projectile* projectile = dynamic_cast<Projectile*>(object))
+		{
+			renderPosition = InterpolatePosition(projectile->GetPrevPosition(), projectile->GetPosition(), 1.0f);
+			objectIcon = GetDirectionArrow(projectile->GetDirection());
+			objectAttribute = MakeAttribute(CC_CYAN);
+			projectileForRender = projectile;
+		}
 		else
 		{
 			renderPosition = InterpolatePosition(object->GetPrevPosition(), object->GetPosition(), 1.0f);
@@ -571,6 +597,10 @@ void ViewportManager::Render2DtoISO()
 		if (monsterForHpBar != nullptr)
 		{
 			drawIsoMonsterActor(iso, monsterForHpBar, objectAttribute);
+		}
+		else if (projectileForRender != nullptr)
+		{
+			renderManager->PutCell(iso.Y - 3, iso.X, objectIcon, objectAttribute);
 		}
 		else
 		{
@@ -757,12 +787,15 @@ void ViewportManager::Render2Dto3D()
 		}
 
 		Monster* monster = dynamic_cast<Monster*>(object);
-		if (monster == nullptr)
+		Projectile* projectile = dynamic_cast<Projectile*>(object);
+		if (monster == nullptr && projectile == nullptr)
 		{
 			continue;
 		}
 
-		RenderPosition enemyPosition = InterpolatePosition(monster->GetPrevPosition(), monster->GetPosition(), monster->GetMoveAlpha());
+		RenderPosition enemyPosition = monster != nullptr
+			? InterpolatePosition(monster->GetPrevPosition(), monster->GetPosition(), monster->GetMoveAlpha())
+			: InterpolatePosition(projectile->GetPrevPosition(), projectile->GetPosition(), 1.0f);
 		float enemyX = enemyPosition.X;
 		float enemyY = enemyPosition.Y;
 		float vecX = enemyX - playerX;
@@ -784,7 +817,9 @@ void ViewportManager::Render2Dto3D()
 		}
 
 		int enemyScreenX = static_cast<int>((0.5f + enemyAngle / fov) * SCREEN_WIDTH);
-		int enemyHeight = max(1, static_cast<int>(SCREEN_HEIGHT / distanceFromPlayer));
+		int enemyHeight = monster != nullptr
+			? max(1, static_cast<int>(SCREEN_HEIGHT / distanceFromPlayer))
+			: 1;
 		int enemyWidth = max(1, enemyHeight / 2);
 		int enemyTop = max(0, SCREEN_HEIGHT / 2 - enemyHeight / 2);
 		int enemyBottom = min(SCREEN_HEIGHT - 1, SCREEN_HEIGHT / 2 + enemyHeight / 2);
@@ -800,16 +835,18 @@ void ViewportManager::Render2Dto3D()
 
 			wallDepths[x] = distanceFromPlayer;
 
-			wchar_t monsterCharacter = GetMonsterIcon(monster);
-			WORD monsterAttribute = MakeAttribute(monster->IsHitFlashActive() ? CC_WHITE : GetMonsterColor(monster));
+			wchar_t objectCharacter = monster != nullptr ? GetMonsterIcon(monster) : GetDirectionArrow(projectile->GetDirection());
+			WORD objectAttribute = monster != nullptr
+				? MakeAttribute(monster->IsHitFlashActive() ? CC_WHITE : GetMonsterColor(monster))
+				: MakeAttribute(CC_CYAN);
 
 			for (int y = enemyTop; y <= enemyBottom; ++y)
 			{
-				renderManager->PutCell(y, x, monsterCharacter, monsterAttribute);
+				renderManager->PutCell(y, x, objectCharacter, objectAttribute);
 			}
 		}
 
-		if (monster->ShouldShowDamageText())
+		if (monster != nullptr && monster->ShouldShowDamageText())
 		{
 			renderManager->AddRender(max(0, enemyTop - 1), max(0, enemyScreenX - 2), L"-" + to_wstring(monster->GetLastDamage()));
 		}
