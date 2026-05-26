@@ -38,7 +38,7 @@ void UCombatComponent::Tick(float DeltaTime)
 		AttackTotalTime += DeltaTime;
 		ProjectileTotalTime += DeltaTime;
 		
-		if (InputManager::GetInstance()->IsKeyDown(eKeyCode::Z) && (AttackTotalTime >= AttackDelayTime))
+		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::Z) && (AttackTotalTime >= AttackDelayTime))
 		{
 			if (!(PlayerPtr->GetIsAttack()))
 			{
@@ -80,7 +80,7 @@ void UCombatComponent::Tick(float DeltaTime)
 			AttackTotalTime = 0.0f;
 			AttackDelayTime = 2.0f;
 		}
-		if (InputManager::GetInstance()->IsKeyDown(eKeyCode::X) && (ProjectileTotalTime >= ProjectileDelayTime))
+		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::X) && (ProjectileTotalTime >= ProjectileDelayTime))
 		{
 			ProjectileInfo Info;
 			Info.Range = 10;

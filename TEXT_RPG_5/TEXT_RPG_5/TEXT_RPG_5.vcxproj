@@ -710,7 +710,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
@@ -794,7 +794,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
@@ -878,7 +878,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
@@ -962,7 +962,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
@@ -1214,7 +1214,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
@@ -1554,7 +1554,7 @@
       <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
       <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
       <IncludeInUnityFile>true</IncludeInUnityFile>
-      <UnityFilesDirectory>F:\VS_Project\TEXT_RPG_5\TEXT_RPG_5\TEXT_RPG_5\Unity</UnityFilesDirectory>
+      <UnityFilesDirectory>$(ProjectDir)Unity</UnityFilesDirectory>
       <OrderInUnityFile>100</OrderInUnityFile>
       <CombineFilesOnlyFromTheSameFolder>false</CombineFilesOnlyFromTheSameFolder>
       <MinFilesInUnityFile>8</MinFilesInUnityFile>
