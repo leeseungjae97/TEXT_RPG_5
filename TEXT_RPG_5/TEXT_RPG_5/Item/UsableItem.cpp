@@ -2,6 +2,7 @@
 
 #include "UsableItem.h"
 #include "../Player.h"
+#include "../Component/EffectComponent.h"
 #include "ItemDB.h"
 
 
@@ -18,6 +19,7 @@ void UsableItem::Use(Player* player)
         break;
         
     case ItemId::STRENGTH_POTION:
+        player->GetComponent<UEffectComponent>()->AddBuff(StatType::Power, ItemInfo.EffectAmount, 60.0f);
         break;
         
         

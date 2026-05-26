@@ -29,11 +29,11 @@ void InventoryUI::Render()
 		for (int j = 0 ; j < container[i].size() ; j++)
 		{
 			UItem* item = container[i][j];
-			FItemInfo ItemInfo = item->GetItemInfo();
 			if (item == nullptr)
 			{
 				continue;
 			}
+			FItemInfo ItemInfo = item->GetItemInfo();
 
 			if (ItemInfo.Type == ItemType::Equipment)
 			{
