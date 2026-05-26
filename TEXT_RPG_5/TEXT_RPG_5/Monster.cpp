@@ -1,6 +1,8 @@
 #include "Monster.h"
 #include "Manager/SceneManager.h"
+#include "Manager/MapManager.h"
 #include "Player.h"
+#include "Define.h"
 #include <cstdlib>
 #include <cmath>
 
@@ -23,6 +25,8 @@ Monster::Monster()
 	MoveInterval = 0.7f;
 	
 	DetectionRange = 4;
+	
+	bUseBfs = true;
 }
 
 Monster::~Monster()
@@ -120,7 +124,14 @@ void Monster::Tick(float DeltaTime)
 
 	if (Distance <= DetectionRange)
 	{
-		MoveTowardPlayer(player);
+		if (bUseBfs)
+		{
+			MoveTowardPlayerBfs();
+		}
+		else
+		{
+			MoveTowardPlayer(player);
+		}
 	}
 	else
 	{
@@ -147,32 +158,33 @@ void Monster::OnReturnToPool()
 Player* Monster::FindPlayer()
 {
 	
-	vector<AObject*>& objects = SceneManager::GetInstance()->GetObjects();
-
-	for (int i = 0; i < objects.size(); ++i)
-	{
-		AObject* obj = objects[i];
-
-		if (obj == nullptr)
-		{
-			continue;
-		}
-
-		
-		if (obj->IsDestroy())
-		{
-			continue;
-		}
-		
-		Player* player = dynamic_cast<Player*>(obj);
-
-		if (player != nullptr)
-		{
-			return player;
-		}
-	}
+	return SceneManager::GetInstance()->GetPlayer();
 	
-	return nullptr;
+	//vector<AObject*>& objects = SceneManager::GetInstance()->GetObjects();
+
+	//for (int i = 0; i < objects.size(); ++i)
+	//{
+		//AObject* obj = objects[i];
+
+		//if (obj == nullptr)
+		//{
+			//continue;
+		//}
+	
+	// 	if (obj->IsDestroy())
+	// 	{
+	// 		continue;
+	// 	}
+	// 	
+	// 	Player* player = dynamic_cast<Player*>(obj);
+	//
+	// 	if (player != nullptr)
+	// 	{
+	// 		return player;
+	// 	}
+	// }
+	//
+	// return nullptr;
 }
 
 int Monster::GetDistanceToPlayer(Player* player)
@@ -264,5 +276,119 @@ void Monster::MoveRandom()
 
 	}
 }
+
+void Monster::MoveTowardPlayerBfs()
+{
+	Player* player = SceneManager::GetInstance()->GetPlayer();
+	
+	if (player == nullptr)
+	{
+		return;
+	}
+	
+	Vector Start = Position;
+	Vector Target = player->GetPosition();
+	
+	vector<vector<Coordinate>>& WorldMap = MapManager::GetInstance()->GetMap();
+	
+	queue<Vector> Q;
+	bool visited[MAP_MAX_Y][MAP_MAX_X] = {};
+	Vector Parent[MAP_MAX_Y][MAP_MAX_X];
+	
+	
+	Vector Move[4]
+	{
+		{0,1},
+		{0,-1},
+		{1,0},
+		{-1,0},
+	};
+	
+	Q.push(Start);
+	visited[Start.Y][Start.X] = true;
+	
+	bool found = false;
+	
+	while (!Q.empty())
+	{
+		Vector Current = Q.front();
+		Q.pop();
+		
+		if (Current.X == Target.X && Current.Y == Target.Y)
+		{
+			found = true;
+			break;
+		}
+		for (int i = 0; i < 4; ++i)
+		{
+			Vector Go;
+			
+			Go.X = Current.X + Move[i].X;
+			Go.Y = Current.Y + Move[i].Y;
+			
+			if (Go.X < 0 || Go.X >= MAP_MAX_X || Go.Y < 0 || Go.Y >= MAP_MAX_Y)
+			{
+				continue;
+			}
+			
+			if (visited[Go.Y][Go.X])
+			{
+				continue;
+			}
+			
+			if (WorldMap[Go.Y][Go.X].Type == ObjectType::Wall)
+			{
+				continue;
+			}
+			if (WorldMap[Go.Y][Go.X].Type == ObjectType::Monster)
+			{
+				continue;
+			}
+			
+			visited[Go.Y][Go.X] = true;
+			Parent[Go.Y][Go.X]= Current;
+			Q.push(Go);
+		}
+	}	
+	if (!found)
+	{
+		MoveRandom();
+		return;
+	}
+	
+	vector<Vector> Moving;
+	
+	Vector Current = Target;
+	
+	while (!(Current.X == Start.X && Current.Y == Start.Y))
+	{
+		Moving.push_back(Current);
+		
+		Vector Before = Parent[Current.Y][Current.X];
+		
+		if (Before.X == -1 || Before.Y == -1)
+		{
+			return;
+		}
+		
+		Current = Before;
+	}
+	
+	Moving.push_back(Start);
+	
+	reverse(Moving.begin(), Moving.end());
+	
+	if (Moving.size() < 2)
+	{
+		return;
+	}
+	
+	Vector NextPosition = Moving[1];
+
+	PrevPosition = Position;
+	
+	Position = NextPosition;
+}
+		
 
 

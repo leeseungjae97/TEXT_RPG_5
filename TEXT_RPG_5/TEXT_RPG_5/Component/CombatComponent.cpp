@@ -8,6 +8,8 @@
 #include "../Manager/MapManager.h"
 #include "../Manager/ObjectPoolManager.h"
 #include "../Define.h"
+#include "../Projectile.h"
+#include "../Struct/ProjectileInfo.h"
 
 UCombatComponent::UCombatComponent(AObject* InOwner)
 	: UComponent(InOwner), Weapon(WeaponType::Melee)

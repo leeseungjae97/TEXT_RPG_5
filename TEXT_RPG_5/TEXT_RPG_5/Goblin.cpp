@@ -15,12 +15,14 @@ Goblin::Goblin(int playerLevel)
 
 
 	
-	MoveInterval = 0.5f;
+	MoveInterval = 0.6f;
 
 	
-	DetectionRange = 4;
+	DetectionRange = 7;
 
 	Position = Vector(4, 4);
 	PrevPosition = Position;
+	
+	bUseBfs = true;
 	
 }
