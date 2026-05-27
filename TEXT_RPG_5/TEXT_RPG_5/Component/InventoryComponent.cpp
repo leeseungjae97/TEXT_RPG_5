@@ -25,6 +25,7 @@ UInventoryComponent::UInventoryComponent(AObject* InOwner)
     AddItem(new UsableItem(ItemDB::HP_POTION));
     AddItem(new UsableItem(ItemDB::STRENGTH_POTION));
     AddItem(new UsableItem(ItemDB::LONGSWORD));
+    AddItem(new UsableItem(ItemDB::LONGSWORD));
     AddItem(new UsableItem(ItemDB::GOBLIN_LEATHER));
     AddItem(new UsableItem(ItemDB::HP_POTION));
     AddItem(new UsableItem(ItemDB::HP_POTION));
@@ -467,24 +468,26 @@ void UInventoryComponent::Tick(float DeltaTime)
     //         ShopManager::GetInstance()->SetPlayerInventory(this);
     // }
 
-    if (bOnShop && Input->IsKeyTap(KeyCode::E))
+    if (bOnShop && Input->IsKeyTap(KeyCode::C))
     {
+        if (ToggleOnShop())
+            ShopManager::GetInstance()->SetPlayerInventory(this);
         ShopManager::GetInstance()->ToggleSellMode();
     }
     
     //샵에 진입했을 때, 이걸 누르면 SellMode 활성화.
-    if (bOnShop && Input->IsKeyTap(KeyCode::C))
-    {
-        if (!ShopManager::GetInstance()->GetSellMode())
-            ShopManager::GetInstance()->SetSellMode(true);
-    }
+    // if (bOnShop && Input->IsKeyTap(KeyCode::C))
+    // {
+    //     if (!ShopManager::GetInstance()->GetSellMode())
+    //         ShopManager::GetInstance()->SetSellMode(true);
+    // }
     
     //
-    if (bOnShop && Input->IsKeyTap(KeyCode::V))
-    {
-        if (ShopManager::GetInstance()->GetSellMode())
-            ShopManager::GetInstance()->SetSellMode(false);
-    }
+    // if (bOnShop && Input->IsKeyTap(KeyCode::V))
+    // {
+    //     if (ShopManager::GetInstance()->GetSellMode())
+    //         ShopManager::GetInstance()->SetSellMode(false);
+    // }
     
     //퀵슬롯에 등록 (인벤토리 켜져있을 때)
     if (Input->IsKeyTap(KeyCode::_1)) RegisterOnQuickSlot(0);

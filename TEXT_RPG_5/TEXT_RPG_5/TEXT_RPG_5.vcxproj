@@ -1670,8 +1670,13 @@
     <ClCompile Include="test_main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Troll.cpp" />
+      </ClCompile>
+      <ClCompile Include="Troll.cpp" />
+      <ClCompile Include="Weapons\AxeWeapon.cpp" />
+      <ClCompile Include="Weapons\BowWeapon.cpp" />
+      <ClCompile Include="Weapons\MagicWeapon.cpp" />
+      <ClCompile Include="Weapons\SwordWeapon.cpp" />
+      <ClCompile Include="Weapons\Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\CombatComponent.h" />
@@ -1727,8 +1732,13 @@
     <ClInclude Include="UI\BattleUI.h" />
     <ClInclude Include="UI\DialogUI.h" />
     <ClInclude Include="UI\InventoryUI.h" />
-    <ClInclude Include="UI\ShopUI.h" />
-    <ClInclude Include="UI\HUDUI.h" />
+      <ClInclude Include="UI\ShopUI.h" />
+      <ClInclude Include="UI\HUDUI.h" />
+      <ClInclude Include="Weapons\AxeWeapon.h" />
+      <ClInclude Include="Weapons\BowWeapon.h" />
+      <ClInclude Include="Weapons\MagicWeapon.h" />
+      <ClInclude Include="Weapons\SwordWeapon.h" />
+      <ClInclude Include="Weapons\Weapon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

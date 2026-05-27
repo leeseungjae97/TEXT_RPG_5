@@ -28,6 +28,7 @@ public:
 	int GetID(Vector Pos);
 	void SetMapObjectCoordinate(int Y, int X, Coordinate InCoordinate);
 	void SetMapObjectType(int Y, int X, MapObjectType Type);
+	void SetMapObjectType(Vector Pos, MapObjectType Type);
 	void SetMapObjectID(int Y, int X, int InID);
 	MapObjectType GetType(Vector Pos);
 	MapObjectType GetType(int Y, int X);
