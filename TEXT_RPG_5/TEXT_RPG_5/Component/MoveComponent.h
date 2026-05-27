@@ -58,5 +58,8 @@ private:
 	float TeleportElapsedTime = 999.0f;
 	float TeleportInterval = 3.0f;
 	int TeleportDistance = 4;
+	
+	Vector NextPositions[4];
+	Vector TeleportDirections[4];
 };
 

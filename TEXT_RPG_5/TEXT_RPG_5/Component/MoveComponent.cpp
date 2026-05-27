@@ -10,6 +10,7 @@
 #include "../Define.h"
 #include "../pch.h"
 #include "../Manager/DisplayManager.h"
+#include "EquipmentComponent.h"
 
 UMoveComponent::UMoveComponent(AObject* InOwner)
 	: UComponent(InOwner)
@@ -17,6 +18,16 @@ UMoveComponent::UMoveComponent(AObject* InOwner)
 	PlayerPtr = dynamic_cast<Player*>(InOwner);
 	this->FacingDirection = EDirection::UP;
 	this->PreviousFacingDirection = EDirection::UP;
+	
+	TeleportDirections[0] = { 0, -1 };
+	TeleportDirections[1] = { 0, 1 };  
+	TeleportDirections[2] = { -1, 0 }; 
+	TeleportDirections[3] = { 1, 0 };
+	
+	NextPositions[0] = { 0, 0 };
+	NextPositions[1] = { 0, 0 };
+	NextPositions[2] = { 0, 0 };
+	NextPositions[3] = { 0, 0 };
 }
 
 UMoveComponent::~UMoveComponent()
@@ -239,14 +250,32 @@ bool UMoveComponent::FindTeleportPosition(Vector TargetPosition, Vector& OutPosi
 	Vector PlayerPosition = PlayerPtr->GetPosition();
 
 	vector<Vector> CheckList;
-	bool Visited[MAP_MAX_Y][MAP_MAX_X] = {};
+
+	const int MaxTeleportRange = 4;
+	const int LocalSize = MaxTeleportRange * 2 + 1;
+
+	int Range = TeleportDistance;
+	if (Range > MaxTeleportRange)
+	{
+		Range = MaxTeleportRange;
+	}
+
+	int VisitedRange = Range * 2 + 1;
+
+	int LocalMapX = PlayerPosition.X - Range;
+	int LocalMapY = PlayerPosition.Y - Range;
+
+	bool Visited[LocalSize][LocalSize] = {};
 
 	CheckList.push_back(TargetPosition);
 
-	if (TargetPosition.X >= 0 && TargetPosition.X < MAP_MAX_X &&
-		TargetPosition.Y >= 0 && TargetPosition.Y < MAP_MAX_Y)
+	int TargetLocalX = TargetPosition.X - LocalMapX;
+	int TargetLocalY = TargetPosition.Y - LocalMapY;
+
+	if (TargetLocalX >= 0 && TargetLocalX < VisitedRange &&
+		TargetLocalY >= 0 && TargetLocalY < VisitedRange)
 	{
-		Visited[TargetPosition.Y][TargetPosition.X] = true;
+		Visited[TargetLocalY][TargetLocalX] = true;
 	}
 
 	while (!CheckList.empty())
@@ -264,14 +293,14 @@ bool UMoveComponent::FindTeleportPosition(Vector TargetPosition, Vector& OutPosi
 			return true;
 		}
 
-		Vector Up = { Current.X, Current.Y - 1 };
-		Vector Down = { Current.X, Current.Y + 1 };
-		Vector Left = { Current.X - 1, Current.Y };
-		Vector Right = { Current.X + 1, Current.Y };
-
-		Vector NextPositions[4] = { Up, Down, Left, Right };
+		for (int i = 0; i < 4; ++i)
+		{
+			NextPositions[i] = {
+				Current.X + TeleportDirections[i].X,
+				Current.Y + TeleportDirections[i].Y
+			};
+		}
 		
-		// 방향 순서 랜덤 섞기
 		for (int i = 3; i > 0; --i)
 		{
 			int RandomIndex = rand() % (i + 1);
@@ -280,20 +309,13 @@ bool UMoveComponent::FindTeleportPosition(Vector TargetPosition, Vector& OutPosi
 			NextPositions[i] = NextPositions[RandomIndex];
 			NextPositions[RandomIndex] = Temp;
 		}
-				
+
 		for (int i = 0; i < 4; ++i)
 		{
 			Vector Next = NextPositions[i];
-			
-			// 맵 밖 제외
+
 			if (Next.X < 0 || Next.X >= MAP_MAX_X ||
 				Next.Y < 0 || Next.Y >= MAP_MAX_Y)
-			{
-				continue;
-			}
-			
-			// 담겨 있는 거면 제외
-			if (Visited[Next.Y][Next.X])
 			{
 				continue;
 			}
@@ -307,7 +329,21 @@ bool UMoveComponent::FindTeleportPosition(Vector TargetPosition, Vector& OutPosi
 				continue;
 			}
 
-			Visited[Next.Y][Next.X] = true;
+			int LocalX = Next.X - LocalMapX;
+			int LocalY = Next.Y - LocalMapY;
+
+			if (LocalX < 0 || LocalX >= VisitedRange ||
+				LocalY < 0 || LocalY >= VisitedRange)
+			{
+				continue;
+			}
+
+			if (Visited[LocalY][LocalX])
+			{
+				continue;
+			}
+
+			Visited[LocalY][LocalX] = true;
 			CheckList.push_back(Next);
 		}
 	}
@@ -400,6 +436,21 @@ void UMoveComponent::Tick(float DeltaTime)
 	
 	if (InputManager::GetInstance()->IsKeyTap(KeyCode::C))
 	{
+		UEquipmentComponent* EquipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>();
+
+		if (EquipmentComponent == nullptr)
+		{
+			return;
+		}
+
+		WeaponType CurrentWeapon = EquipmentComponent->GetCurrentWeaponType();
+		
+		// 매직 웨폰 타입 확인
+		if (CurrentWeapon != WeaponType::Magic)
+		{
+			return;
+		}
+		
 		if (TeleportElapsedTime >= TeleportInterval)
 		{
 			Teleport();
