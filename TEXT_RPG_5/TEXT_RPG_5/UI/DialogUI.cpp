@@ -3,7 +3,7 @@
 #include "../Define.h"
 #include "../GameInstance.h"
 #include "../Manager/InputManager.h"
-#include "../Manager/RenderManager.h"
+#include "../Manager/DisplayManager.h"
 
 void DialogUI::OpenExitConfirm()
 {
@@ -68,7 +68,7 @@ void DialogUI::Render()
 
 	if (!Renderer)
 	{
-		Renderer = RenderManager::GetInstance();
+		Renderer = DisplayManager::GetInstance();
 		return;
 	}
 

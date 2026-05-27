@@ -4,7 +4,7 @@
 #include "EquipmentComponent.h"
 #include "../Item/Item.h"
 #include "../Item/ItemDB.h"
-#include "../Manager/RenderManager.h"
+#include "../Manager/DisplayManager.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/ShopManager.h"
 #include "../Manager/ItemManager.h"
@@ -212,7 +212,7 @@ bool UInventoryComponent::UseItem(UItem* Item)
         Item->Use(PlayerPtr);
         if (PlayerPtr != nullptr)
         {
-            wstring ItemName = RenderManager::GetInstance()->ToWideString(ItemInfo.Name);
+            wstring ItemName = DisplayManager::GetInstance()->ToWideString(ItemInfo.Name);
             PlayerPtr->NotifyLog(L"ITEM: " + ItemName);
             ViewportManager::GetInstance()->ShowMessageDialog(ItemName + L" 사용", 1.5f);
         }

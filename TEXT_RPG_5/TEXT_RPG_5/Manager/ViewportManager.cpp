@@ -2,7 +2,7 @@
 
 #include "InputManager.h"
 #include "MapManager.h"
-#include "RenderManager.h"
+#include "DisplayManager.h"
 #include "SceneManager.h"
 #include "../Component/CombatComponent.h"
 #include "../Component/InventoryComponent.h"
@@ -39,6 +39,16 @@ namespace
 			static_cast<float>(PrevPosition.X) + static_cast<float>(CurrentPosition.X - PrevPosition.X) * Alpha + 0.5f,
 			static_cast<float>(PrevPosition.Y) + static_cast<float>(CurrentPosition.Y - PrevPosition.Y) * Alpha + 0.5f
 		};
+	}
+
+	Vector GetRenderTargetPosition(AObject* Object)
+	{
+		if (Object == nullptr)
+		{
+			return {0, 0};
+		}
+
+		return Object->IsMoving() ? Object->GetNextPosition() : Object->GetPosition();
 	}
 
 	float NormalizeAngle(float Angle)
@@ -157,7 +167,7 @@ namespace
 
 void ViewportManager::Render2DtoISO()
 {
-	RenderManager* renderManager = RenderManager::GetInstance();
+	DisplayManager* renderManager = DisplayManager::GetInstance();
 
 	const int originX = SCREEN_WIDTH / 2;
 	const int originY = SCREEN_HEIGHT / 3;
@@ -178,7 +188,7 @@ void ViewportManager::Render2DtoISO()
 			moveAlpha = moveComponent->GetMoveAlpha();
 		}
 
-		cameraPosition = InterpolatePosition(currentPlayer->GetPrevPosition(), currentPlayer->GetPosition(), moveAlpha);
+		cameraPosition = InterpolatePosition(currentPlayer->GetPrevPosition(), GetRenderTargetPosition(currentPlayer), moveAlpha);
 		cameraPosition.X -= 0.5f;
 		cameraPosition.Y -= 0.5f;
 	}
@@ -628,12 +638,12 @@ void ViewportManager::Render2DtoISO()
 				objectIcon = L'@';
 			}
 
-			renderPosition = InterpolatePosition(player->GetPrevPosition(), player->GetPosition(), moveAlpha);
+			renderPosition = InterpolatePosition(player->GetPrevPosition(), GetRenderTargetPosition(player), moveAlpha);
 			objectAttribute = MakeAttribute(player->IsHitFlashActive() ? CC_WHITE : CC_YELLOW);
 		}
 		else if (Monster* monster = dynamic_cast<Monster*>(object))
 		{
-			renderPosition = InterpolatePosition(monster->GetPrevPosition(), monster->GetPosition(), monster->GetMoveAlpha());
+			renderPosition = InterpolatePosition(monster->GetPrevPosition(), GetRenderTargetPosition(monster), monster->GetMoveAlpha());
 			objectIcon = GetMonsterIcon(monster);
 			objectAttribute = MakeAttribute(monster->IsHitFlashActive() ? CC_WHITE : GetMonsterColor(monster));
 			monsterForHpBar = monster;
@@ -749,7 +759,7 @@ Vector ViewportManager::GetISOPosition()
 		moveAlpha = playerMoveComponent->GetMoveAlpha();
 	}
 
-	FVector playerPosition = InterpolatePosition(currentPlayer->GetPrevPosition(), currentPlayer->GetPosition(), moveAlpha);
+	FVector playerPosition = InterpolatePosition(currentPlayer->GetPrevPosition(), GetRenderTargetPosition(currentPlayer), moveAlpha);
 	FVector cameraPosition = playerPosition;
 	cameraPosition.X -= 0.5f;
 	cameraPosition.Y -= 0.5f;
@@ -844,7 +854,7 @@ void ViewportManager::RenderUI()
 
 void ViewportManager::Render2Dto3D()
 {
-	RenderManager* renderManager = RenderManager::GetInstance();
+	DisplayManager* renderManager = DisplayManager::GetInstance();
 	if (!PlayerPtr)
 	{
 		PlayerPtr = SceneManager::GetInstance()->GetPlayer();
@@ -978,7 +988,7 @@ void ViewportManager::Render2Dto3D()
 		}
 
 		FVector enemyPosition = monster != nullptr
-			? InterpolatePosition(monster->GetPrevPosition(), monster->GetPosition(), monster->GetMoveAlpha())
+			? InterpolatePosition(monster->GetPrevPosition(), GetRenderTargetPosition(monster), monster->GetMoveAlpha())
 			: InterpolatePosition(projectile->GetPrevPosition(), projectile->GetPosition(), 1.0f);
 		float enemyX = enemyPosition.X;
 		float enemyY = enemyPosition.Y;

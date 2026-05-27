@@ -1,5 +1,5 @@
 #include "GameInstance.h"
-#include "Manager/RenderManager.h"
+#include "Manager/DisplayManager.h"
 #include "Manager/BattleManager.h"
 #include "Manager/ViewportManager.h"
 #include "Manager/MapManager.h"
@@ -12,11 +12,11 @@
 void GameInstance::BeginPlay()
 {
 	InputManager::GetInstance()->BeginPlay();
-	RenderManager::GetInstance()->BeginPlay();
+	DisplayManager::GetInstance()->BeginPlay();
 	TimeManager::GetInstance()->BeginPlay();
-	SceneManager::GetInstance()->BeginPlay();
 	ShopManager::GetInstance()->BeginPlay();
 	MapManager::GetInstance()->BeginPlay();
+	SceneManager::GetInstance()->BeginPlay();
 	BattleManager::GetInstance()->BeginPlay();
 }
 
@@ -27,16 +27,14 @@ void GameInstance::Tick()
 	
 	InputManager::GetInstance()->Tick(DeltaTime);
 
-	BattleManager::GetInstance()->Tick(DeltaTime);
 	SceneManager::GetInstance()->Tick(DeltaTime);
 
-	MapManager::GetInstance()->Tick(DeltaTime);
 	ViewportManager::GetInstance()->Tick(DeltaTime);
 }
 void GameInstance::Render()
 {
 	ViewportManager::GetInstance()->Render();
-	RenderManager::GetInstance()->Render();
+	DisplayManager::GetInstance()->Render();
 }
 
 void GameInstance::Destroy()

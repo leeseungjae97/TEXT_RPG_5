@@ -1,6 +1,6 @@
 ﻿#include "MapManager.h"
 #include "../Define.h"
-#include "RenderManager.h"
+#include "DisplayManager.h"
 #include "SceneManager.h"
 #include "ShopManager.h"
 #include "../Object.h"
@@ -20,7 +20,98 @@ MapManager::~MapManager()
 
 void MapManager::Tick(float DeltaTime)
 {
-	UpdateMap();
+}
+
+bool MapManager::IsValidPosition(Vector Pos) const
+{
+	return Pos.Y >= 1
+		&& Pos.Y < MAP_MAX_Y - 1
+		&& Pos.X >= 1
+		&& Pos.X < MAP_MAX_X - 1;
+}
+
+Coordinate MapManager::MakeCoordinate(AObject* Object) const
+{
+	if (Monster* monster = dynamic_cast<Monster*>(Object))
+	{
+		return {MapObjectType::Monster, monster->GetID()};
+	}
+
+	if (Player* player = dynamic_cast<Player*>(Object))
+	{
+		return {MapObjectType::Player, player->GetID()};
+	}
+
+	if (Projectile* projectile = dynamic_cast<Projectile*>(Object))
+	{
+		return {MapObjectType::Projectile, projectile->GetID()};
+	}
+
+	return {MapObjectType::Path, NO_ID};
+}
+
+bool MapManager::CanPlaceObject(AObject* Object, Vector Pos) const
+{
+	if (!IsValidPosition(Pos))
+	{
+		return false;
+	}
+
+	const Coordinate& Current = Map[Pos.Y][Pos.X];
+	if (Current.Type == MapObjectType::Wall || Current.Type == MapObjectType::Shop)
+	{
+		return false;
+	}
+
+	if (Current.ID != NO_ID && Current.ID != Object->GetID())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool MapManager::MoveObject(AObject* Object, Vector From, Vector To)
+{
+	if (Object == nullptr || Object->IsDestroy() || !IsMapInitSize())
+	{
+		return false;
+	}
+
+	if (!CanPlaceObject(Object, To))
+	{
+		return false;
+	}
+
+	if (From.Y >= 0 && From.Y < MAP_MAX_Y && From.X >= 0 && From.X < MAP_MAX_X)
+	{
+		if (Map[From.Y][From.X].ID == Object->GetID())
+		{
+			Map[From.Y][From.X] = {MapObjectType::Path, NO_ID};
+		}
+	}
+
+	Map[To.Y][To.X] = MakeCoordinate(Object);
+	return true;
+}
+
+void MapManager::ClearObject(AObject* Object)
+{
+	if (Object == nullptr || !IsMapInitSize())
+	{
+		return;
+	}
+
+	Vector Pos = Object->GetPosition();
+	if (Pos.Y < 0 || Pos.Y >= MAP_MAX_Y || Pos.X < 0 || Pos.X >= MAP_MAX_X)
+	{
+		return;
+	}
+
+	if (Map[Pos.Y][Pos.X].ID == Object->GetID())
+	{
+		Map[Pos.Y][Pos.X] = {MapObjectType::Path, NO_ID};
+	}
 }
 
 void MapManager::UpdateMap()
