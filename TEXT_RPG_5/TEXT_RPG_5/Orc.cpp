@@ -18,7 +18,7 @@ Orc::Orc(int playerLevel)
 	
 	DetectionRange = 9;
 
-	Position = Vector(3, 5);
+	//Position = Vector(3, 5);
 	PrevPosition = Position;
 	
 	bUseBfs = true;

@@ -18,7 +18,7 @@ Troll::Troll(int playerLevel)
 	
 	DetectionRange = 12;
 
-	Position = Vector(4, 4);
+	//Position = Vector(4, 4);
 	PrevPosition = Position;
 	
 	bUseBfs = true;
