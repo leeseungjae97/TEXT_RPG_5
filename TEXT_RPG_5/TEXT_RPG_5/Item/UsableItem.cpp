@@ -14,15 +14,28 @@
 void UsableItem::Use(Player* player)
 {
     UItem::Use(player);
+    if (player == nullptr)
+    {
+        return;
+    }
+
+    UEffectComponent* EffectComponent = player->GetComponent<UEffectComponent>();
     
     switch (ItemInfo.Id)
     {
     case ItemId::HP_POTION:
+    case ItemId::DRAGON_HEART:
         player->SetHP(min(player->GetMax_HP(), (player->GetHP() + ItemInfo.EffectAmount)));
+        if (EffectComponent != nullptr)
+            EffectComponent->PlayItemUseEffect(EItemUseEffectType::Consume);
         break;
         
     case ItemId::STRENGTH_POTION:
-        player->GetComponent<UEffectComponent>()->AddBuff(StatType::Power, ItemInfo.EffectAmount, 60.0f);
+        if (EffectComponent != nullptr)
+        {
+            EffectComponent->AddBuff(StatType::Power, ItemInfo.EffectAmount, 60.0f);
+            EffectComponent->PlayItemUseEffect(EItemUseEffectType::Buff);
+        }
         break;
 
     case ItemId::FIRE_WALL_SCROLL:
@@ -37,11 +50,17 @@ void UsableItem::Use(Player* player)
             CrossRange.push_back({ Pos.X + i, Pos.Y     });
         }
         player->GetComponent<UCombatComponent>()->TriggerCustomAttack(CrossRange, ItemInfo.EffectAmount);
+        if (EffectComponent != nullptr)
+            EffectComponent->PlayItemUseEffect(EItemUseEffectType::Consume);
         break;
     }
 
     case ItemId::FLAME_POTION:
-        player->GetComponent<UEffectComponent>()->AddPeriodicAttackBuff(ItemInfo.EffectAmount, 1.5f, 10.0f);
+        if (EffectComponent != nullptr)
+        {
+            EffectComponent->AddPeriodicAttackBuff(ItemInfo.EffectAmount, 1.5f, 10.0f);
+            EffectComponent->PlayItemUseEffect(EItemUseEffectType::Buff);
+        }
         break;
 
     case ItemId::LIGHTNING_STRIKE_SCROLL:
@@ -67,6 +86,8 @@ void UsableItem::Use(Player* player)
         }
 
         player->GetComponent<UCombatComponent>()->TriggerCustomAttack(FanRange, ItemInfo.EffectAmount);
+        if (EffectComponent != nullptr)
+            EffectComponent->PlayItemUseEffect(EItemUseEffectType::Consume);
         break;
     }
 

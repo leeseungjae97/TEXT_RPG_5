@@ -1402,7 +1402,11 @@
     <ClCompile Include="Spider.cpp" />
     <ClCompile Include="UI\BattleUI.cpp" />
     <ClCompile Include="UI\DialogUI.cpp" />
+    <ClCompile Include="UI\GameOverUI.cpp" />
     <ClCompile Include="UI\InventoryUI.cpp" />
+    <ClCompile Include="UI\ItemLogUI.cpp" />
+    <ClCompile Include="UI\MainMenuUI.cpp" />
+    <ClCompile Include="UI\NameInputUI.cpp" />
     <ClCompile Include="UI\ShopUI.cpp" />
     <ClCompile Include="UI\HUDUI.cpp" />
     <ClCompile Include="Manager\DisplayManager.cpp">
@@ -1819,7 +1823,11 @@
     <ClInclude Include="Troll.h" />
     <ClInclude Include="UI\BattleUI.h" />
     <ClInclude Include="UI\DialogUI.h" />
+    <ClInclude Include="UI\GameOverUI.h" />
     <ClInclude Include="UI\InventoryUI.h" />
+    <ClInclude Include="UI\ItemLogUI.h" />
+    <ClInclude Include="UI\MainMenuUI.h" />
+    <ClInclude Include="UI\NameInputUI.h" />
       <ClInclude Include="UI\ShopUI.h" />
       <ClInclude Include="UI\HUDUI.h" />
   </ItemGroup>

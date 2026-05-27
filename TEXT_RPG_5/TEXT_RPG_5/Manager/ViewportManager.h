@@ -5,10 +5,19 @@
 #include "../UI/ShopUI.h"
 #include "../UI/DialogUI.h"
 #include "../UI/BattleUI.h"
+#include "../UI/ItemLogUI.h"
 
 struct Vector;
 class UCombatComponent;
 class UMoveComponent;
+class UItem;
+
+enum class ViewportFadeState
+{
+	None,
+	FadeOut,
+	FadeIn
+};
 
 class ViewportManager : public Singleton<ViewportManager>
 {
@@ -31,6 +40,13 @@ public:
 	void OpenExitDialog();
 	void OpenBattleUI();
 	void ShowMessageDialog(const wstring& Message, float Duration = 1.5f);
+	void AddItemLog(const UItem* Item);
+	void ResetRuntimeCache();
+	void StartFadeOut(float Duration = 0.7f);
+	void StartFadeIn(float Duration = 0.7f);
+	void TickFade(float DeltaTime);
+	void RenderFade();
+	bool IsFadeFinished() const { return FadeState == ViewportFadeState::None; }
 
 	Vector WorldToIso(float WorldX, float WorldY, int OriginX, int OriginY);
 	Vector GetISOPosition();
@@ -45,6 +61,10 @@ private:
 	ShopUI Shop;
 	DialogUI Dialog;
 	BattleUI Battle;
+	ItemLogUI ItemLog;
+	ViewportFadeState FadeState = ViewportFadeState::None;
+	float FadeElapsed = 0.0f;
+	float FadeDuration = 0.7f;
 	Player* PlayerPtr;
 	UMoveComponent* moveComponent;
 	UCombatComponent* combatComponent;

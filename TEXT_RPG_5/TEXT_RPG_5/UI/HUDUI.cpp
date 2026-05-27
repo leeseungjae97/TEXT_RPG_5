@@ -36,6 +36,13 @@ void HUDUI::Render()
 	QuickSlotRender();
 }
 
+void HUDUI::ResetCache()
+{
+	PlayerPtr = nullptr;
+	ShopColorIndex = 0;
+	ColorChangeDuration = 0.0f;
+}
+
 void HUDUI::StatusRender()
 {
 	const int hudY = SCREEN_HEIGHT - 13;
@@ -59,7 +66,9 @@ void HUDUI::StatusRender()
 	if (PlayerPtr->ShouldShowLogText())
 	{
 		Vector isoPosition = ViewportManager::GetInstance()->GetISOPosition();
-		Renderer->AddRender(isoPosition.Y - 10, isoPosition.X, PlayerPtr->GetLogText());
+		const wstring& logText = PlayerPtr->GetLogText();
+		const int textWidth = Renderer->GetTextDisplayWidth(logText);
+		Renderer->AddRender(isoPosition.Y - 10, isoPosition.X - textWidth / 2, logText);
 	}
 
 	

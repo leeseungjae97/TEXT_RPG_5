@@ -40,6 +40,23 @@ void UEffectComponent::AddPeriodicAttackBuff(int Damage, float Period, float Dur
     ActiveBuffs.push_back(NewBuff);
 }
 
+void UEffectComponent::PlayItemUseEffect(EItemUseEffectType Type, float Duration)
+{
+    ItemUseEffectType = Type;
+    ItemUseEffectDuration = max(0.01f, Duration);
+    ItemUseEffectTime = ItemUseEffectDuration;
+}
+
+float UEffectComponent::GetItemUseEffectAlpha() const
+{
+    if (ItemUseEffectDuration <= 0.0f)
+    {
+        return 1.0f;
+    }
+
+    return min(max(1.0f - ItemUseEffectTime / ItemUseEffectDuration, 0.0f), 1.0f);
+}
+
 void UEffectComponent::Tick(float DeltaTime)
 {
     if (nullptr == PlayerPtr)
@@ -50,6 +67,16 @@ void UEffectComponent::Tick(float DeltaTime)
 
     if (nullptr == PlayerPtr)
         return;
+
+    if (ItemUseEffectTime > 0.0f)
+    {
+        ItemUseEffectTime -= DeltaTime;
+        if (ItemUseEffectTime <= 0.0f)
+        {
+            ItemUseEffectTime = 0.0f;
+            ItemUseEffectType = EItemUseEffectType::None;
+        }
+    }
 
     UCombatComponent* Combat = PlayerPtr->GetComponent<UCombatComponent>();
 

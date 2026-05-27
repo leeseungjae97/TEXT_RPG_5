@@ -2,17 +2,15 @@
 #include "Manager/SceneManager.h"
 #include "Manager/MapManager.h"
 #include "Manager/ItemManager.h"
+#include "Manager/ViewportManager.h"
 #include "component/InventoryComponent.h"
 #include "Item/Item.h"
 #include "Player.h"
 #include "Define.h"
-#include <cstdlib>
-#include <cmath>
-
+#include "pch.h"
 #include "Define.h"
 #include "Component/LevelComponent.h"
 #include "Manager/BattleManager.h"
-#include "Manager/MapManager.h"
 
 Monster::Monster()
 {
@@ -602,13 +600,13 @@ void Monster::DropItemToPlayer()
 		return;
 	}
 	
-	if (!InventoryComp->AddItem(DroppedItem))
+	if (InventoryComp->AddItem(DroppedItem))
+	{
+		ViewportManager::GetInstance()->AddItemLog(DroppedItem);
+	}
+	else
 	{
 		delete DroppedItem;
-		DroppedItem = nullptr;
-		
-		//
-		return;
 	}
 }
 

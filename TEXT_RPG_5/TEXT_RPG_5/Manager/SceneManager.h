@@ -16,6 +16,7 @@ public:
 	void Tick(float DeltaTime);
 	void BeginPlay();
 	void Destroy();
+	void Reset();
 
 public:
 	void AddObject(AObject* object);

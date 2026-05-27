@@ -8,6 +8,7 @@ class HUDUI
 {
 public:
 	void Render();
+	void ResetCache();
 	
 private:
 	void StatusRender();

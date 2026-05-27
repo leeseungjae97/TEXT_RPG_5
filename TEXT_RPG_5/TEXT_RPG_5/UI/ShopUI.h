@@ -10,6 +10,7 @@ class ShopUI
 {
 public:
 	void Render();
+	void ResetCache();
 
 private:
 	void DrawBackground(int Y, int X, int Width, int Height);

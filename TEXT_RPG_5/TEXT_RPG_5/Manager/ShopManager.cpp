@@ -62,6 +62,14 @@ void ShopManager::SetPlayerInventory(UInventoryComponent* Inventory)
     PlayerInventory = Inventory;
 }
 
+void ShopManager::ResetRuntimeCache()
+{
+    PlayerInventory = nullptr;
+    CurrentCursor = { 0, 0 };
+    bSellMode = false;
+    LastVisitedShopId = -1;
+}
+
 void ShopManager::RestoreShop()
 {
     for (int y = 0; y < Container.size(); ++y)
