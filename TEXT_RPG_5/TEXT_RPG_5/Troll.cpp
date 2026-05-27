@@ -8,7 +8,8 @@ Troll::Troll(int playerLevel)
 		playerLevel = 1;
 	}
 
-	Name = "Troll";
+	Name = L"Troll";
+	Level = playerLevel;
 	Health = playerLevel * 50 + rand() % (playerLevel * 20 + 1);
 	MaxHealth = Health;
 	Attack = playerLevel * 9 + rand() % (playerLevel * 6 + 1);

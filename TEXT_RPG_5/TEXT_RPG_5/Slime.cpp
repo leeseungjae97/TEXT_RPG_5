@@ -8,7 +8,8 @@ Slime::Slime(int playerLevel)
 		playerLevel = 1;
 	}
 
-	Name = "Slime";
+	Name = L"슬라임";
+	Level = playerLevel;
 	Health = playerLevel * 25 + rand() % (playerLevel * 10 + 1);
 	MaxHealth = Health;
 	Attack = playerLevel * 3 + rand() % (playerLevel * 3 + 1);

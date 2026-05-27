@@ -127,10 +127,12 @@ namespace
 			return L'M';
 		}
 
-		string name = MonsterPtr->GetName();
-		if (name == "Goblin") return L'G';
-		if (name == "Slime")  return L'S';
-		if (name == "Orc")    return L'O';
+		const wstring& name = MonsterPtr->GetDisplayName();
+		if (name.find(L"고블린") != wstring::npos) return L'G';
+		if (name.find(L"슬라임") != wstring::npos) return L'S';
+		if (name.find(L"오크") != wstring::npos) return L'O';
+		if (name.find(L"드래곤") != wstring::npos) return L'D';
+		if (name.find(L"거미") != wstring::npos) return L'A';
 		return L'M';
 	}
 
@@ -141,10 +143,14 @@ namespace
 			return CC_MAGENTA;
 		}
 
-		string name = MonsterPtr->GetName();
-		if (name == "Goblin") return CC_GREEN;
-		if (name == "Slime")  return CC_CYAN;
-		if (name == "Orc")    return CC_DARKYELLOW;
+		if (MonsterPtr->IsShiny()) return CC_RED;
+
+		const wstring& name = MonsterPtr->GetDisplayName();
+		if (name.find(L"고블린") != wstring::npos) return CC_GREEN;
+		if (name.find(L"슬라임") != wstring::npos) return CC_CYAN;
+		if (name.find(L"오크") != wstring::npos) return CC_DARKYELLOW;
+		if (name.find(L"드래곤") != wstring::npos) return CC_RED;
+		if (name.find(L"거미") != wstring::npos) return CC_DARKYELLOW;
 		return CC_MAGENTA;
 	}
 	wchar_t GetDirectionArrow(EDirection Direction)
@@ -452,8 +458,8 @@ void ViewportManager::Render2DtoISO()
 			renderManager->PutCell(iso.Y, iso.X, L'_', shadowAttribute);
 			renderManager->PutCell(iso.Y, iso.X + 1, L')', shadowAttribute);
 
-			string name = monster->GetName();
-			if (name == "Goblin")
+			const wstring& name = monster->GetDisplayName();
+			if (name.find(L"고블린") != wstring::npos)
 			{
 				renderManager->PutCell(iso.Y - 4, iso.X - 2, L'<', attribute);
 				renderManager->PutCell(iso.Y - 4, iso.X, L'G', attribute);
@@ -468,7 +474,7 @@ void ViewportManager::Render2DtoISO()
 				return;
 			}
 
-			if (name == "Slime")
+			if (name.find(L"슬라임") != wstring::npos)
 			{
 				renderManager->PutCell(iso.Y - 3, iso.X - 2, L'_', attribute);
 				renderManager->PutCell(iso.Y - 3, iso.X - 1, L'_', attribute);
@@ -487,7 +493,7 @@ void ViewportManager::Render2DtoISO()
 				return;
 			}
 
-			if (name == "Orc")
+			if (name.find(L"오크") != wstring::npos)
 			{
 				renderManager->PutCell(iso.Y - 5, iso.X, L'O', attribute);
 				renderManager->PutCell(iso.Y - 4, iso.X - 2, L'T', MakeAttribute(CC_DARKGRAY));
@@ -501,6 +507,56 @@ void ViewportManager::Render2DtoISO()
 				renderManager->PutCell(iso.Y - 2, iso.X + 1, L'|', attribute);
 				renderManager->PutCell(iso.Y - 1, iso.X - 1, L'/', attribute);
 				renderManager->PutCell(iso.Y - 1, iso.X + 1, L'\\', attribute);
+				return;
+			}
+
+			if (name.find(L"드래곤") != wstring::npos)
+			{
+				WORD wingAttribute = MakeAttribute(monster->IsShiny() ? CC_RED : CC_DARKRED);
+				WORD boneAttribute = MakeAttribute(CC_YELLOW);
+				renderManager->PutCell(iso.Y - 6, iso.X - 5, L'/', wingAttribute);
+				renderManager->PutCell(iso.Y - 6, iso.X + 5, L'\\', wingAttribute);
+				renderManager->PutCell(iso.Y - 5, iso.X - 4, L'/', wingAttribute);
+				renderManager->PutCell(iso.Y - 5, iso.X - 2, L'_', wingAttribute);
+				renderManager->PutCell(iso.Y - 5, iso.X + 2, L'_', wingAttribute);
+				renderManager->PutCell(iso.Y - 5, iso.X + 4, L'\\', wingAttribute);
+				renderManager->PutCell(iso.Y - 4, iso.X - 3, L'\\', wingAttribute);
+				renderManager->PutCell(iso.Y - 4, iso.X - 1, L'D', attribute);
+				renderManager->PutCell(iso.Y - 4, iso.X, L'R', attribute);
+				renderManager->PutCell(iso.Y - 4, iso.X + 1, L'>', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X - 2, L'/', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X, L'=', boneAttribute);
+				renderManager->PutCell(iso.Y - 3, iso.X + 2, L'\\', attribute);
+				renderManager->PutCell(iso.Y - 2, iso.X - 3, L'~', wingAttribute);
+				renderManager->PutCell(iso.Y - 2, iso.X - 1, L'/', attribute);
+				renderManager->PutCell(iso.Y - 2, iso.X + 1, L'\\', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X - 4, L'~', wingAttribute);
+				renderManager->PutCell(iso.Y - 1, iso.X - 2, L'/', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 2, L'\\', attribute);
+				return;
+			}
+
+			if (name.find(L"거미") != wstring::npos)
+			{
+				WORD legAttribute = MakeAttribute(CC_DARKYELLOW);
+				WORD eyeAttribute = MakeAttribute(CC_RED);
+				renderManager->PutCell(iso.Y - 4, iso.X - 3, L'\\', legAttribute);
+				renderManager->PutCell(iso.Y - 4, iso.X + 3, L'/', legAttribute);
+				renderManager->PutCell(iso.Y - 3, iso.X - 4, L'\\', legAttribute);
+				renderManager->PutCell(iso.Y - 3, iso.X - 1, L'(', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X, L'o', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X + 1, L')', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X + 4, L'/', legAttribute);
+				renderManager->PutCell(iso.Y - 2, iso.X - 5, L'/', legAttribute);
+				renderManager->PutCell(iso.Y - 2, iso.X - 2, L'/', legAttribute);
+				renderManager->PutCell(iso.Y - 2, iso.X - 1, L'x', eyeAttribute);
+				renderManager->PutCell(iso.Y - 2, iso.X, L'x', eyeAttribute);
+				renderManager->PutCell(iso.Y - 2, iso.X + 1, L'\\', legAttribute);
+				renderManager->PutCell(iso.Y - 2, iso.X + 5, L'\\', legAttribute);
+				renderManager->PutCell(iso.Y - 1, iso.X - 4, L'\\', legAttribute);
+				renderManager->PutCell(iso.Y - 1, iso.X - 2, L'|', legAttribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 2, L'|', legAttribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 4, L'/', legAttribute);
 				return;
 			}
 
@@ -534,6 +590,22 @@ void ViewportManager::Render2DtoISO()
 			int maxHealth = max(1, monster->GetMaxHealth());
 			int currentHealth = min(max(monster->GetHealth(), 0), maxHealth);
 			drawStatusBar(iso.Y - 6, iso.X, static_cast<float>(currentHealth) / static_cast<float>(maxHealth), CC_RED);
+		};
+
+	auto drawMonsterNameLabel = [&](Vector iso, Monster* monster)
+		{
+			if (monster == nullptr)
+			{
+				return;
+			}
+
+			wstring label = L"LV." + to_wstring(monster->GetLevel()) + L" " + monster->GetDisplayName();
+			const int textWidth = renderManager->GetTextDisplayWidth(label);
+			const int startX = iso.X - textWidth / 2;
+			const int y = iso.Y - 8;
+
+			const int labelColor = monster->IsShiny() ? CC_RED : CC_WHITE;
+			renderManager->AddRender(y, startX, label, labelColor);
 		};
 
 	auto drawObjectHitEffect = [&](Vector iso, AObject* object)
@@ -900,11 +972,12 @@ void ViewportManager::Render2DtoISO()
 		}
 		drawPlayerBars(iso, playerForBars);
 		drawLevelUpEffect(iso, playerForBars);
+		drawMonsterNameLabel(iso, monsterForHpBar);
 		drawMonsterHpBar(iso, monsterForHpBar);
 		drawObjectHitEffect(iso, object);
 		if (dynamic_cast<Player*>(object) == nullptr && object->ShouldShowDamageText())
 		{
-			renderManager->AddRender(iso.Y - 8, iso.X - 1, L"-" + to_wstring(object->GetLastDamage()));
+			renderManager->AddRender(iso.Y - 9, iso.X - 1, L"-" + to_wstring(object->GetLastDamage()));
 		}
 	}
 

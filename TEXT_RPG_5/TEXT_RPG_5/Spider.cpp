@@ -10,7 +10,8 @@ Spider::Spider(int playerLevel)
         playerLevel = 1;
     }
 
-    Name = "Spider";
+    Name = L"거미";
+    Level = playerLevel;
     Health = playerLevel * 30 + rand() % (playerLevel * 10 + 1);
     MaxHealth = Health;
     Attack = playerLevel * 4 + rand() % (playerLevel * 4 + 1);

@@ -48,27 +48,37 @@ void DisplayManager::AddRender(int Y, int X, string Content)
 	AddRender(Y, X, ToWideString(Content));
 }
 
+void DisplayManager::AddRender(int Y, int X, string Content, int Color, int BackgroundColor)
+{
+	AddRender(Y, X, ToWideString(Content), Color, BackgroundColor);
+}
+
 void DisplayManager::AddRender(int Y, int X, wstring Content)
 {
-    int drawX = X;
+	AddRender(Y, X, Content, CC_GRAY);
+}
+
+void DisplayManager::AddRender(int Y, int X, wstring Content, int Color, int BackgroundColor)
+{
+	int drawX = X;
 
 	for (int i = 0; i < Content.length(); ++i)
 	{
 		int drawY = Y;
-        int characterWidth = GetCharacterDisplayWidth(Content[i]);
-        WORD attribute = MakeConsoleAttribute(CC_GRAY);
+		int characterWidth = GetCharacterDisplayWidth(Content[i]);
+		WORD attribute = MakeConsoleAttribute(Color, BackgroundColor);
 
-        if (characterWidth == 2)
-        {
-            PutCell(drawY, drawX, Content[i], attribute | COMMON_LVB_LEADING_BYTE);
-            PutCell(drawY, drawX + 1, L' ', attribute | COMMON_LVB_TRAILING_BYTE);
-            drawX += characterWidth;
-            continue;
-        }
+		if (characterWidth == 2)
+		{
+			PutCell(drawY, drawX, Content[i], attribute | COMMON_LVB_LEADING_BYTE);
+			PutCell(drawY, drawX + 1, L' ', attribute | COMMON_LVB_TRAILING_BYTE);
+			drawX += characterWidth;
+			continue;
+		}
 
 		PutCell(drawY, drawX, Content[i], attribute);
 
-        drawX += characterWidth;
+		drawX += characterWidth;
 	}
 }
 
