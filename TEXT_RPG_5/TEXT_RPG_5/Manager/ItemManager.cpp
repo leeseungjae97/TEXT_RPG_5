@@ -57,6 +57,15 @@ UItem* ItemManager::CreateItem(ItemId Id)
         
     case ItemId::DRAGON_HEART:
         return new UsableItem(ItemDB::DRAGON_HEART);
+
+    case ItemId::FIRE_WALL_SCROLL:
+        return new UsableItem(ItemDB::FIRE_WALL_SCROLL);
+
+    case ItemId::LIGHTNING_STRIKE_SCROLL:
+        return new UsableItem(ItemDB::LIGHTNING_STRIKE_SCROLL);
+
+    case ItemId::FLAME_POTION:
+        return new UsableItem(ItemDB::FLAME_POTION);
         
     case ItemId::LONGSWORD:
         return new EquipmentItem(ItemDB::LONGSWORD);

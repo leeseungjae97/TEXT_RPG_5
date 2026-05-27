@@ -28,6 +28,7 @@ public:
 	float GetAttackCooldownAlpha() const;
 	// void SetAttackValue();
 	void Attack();
+	void TriggerCustomAttack(const vector<Vector>& CustomRange, int Damage);
 	void HandleAttack();
 	void LaunchProjectile();
 	void MakeSwordRange();

@@ -21,7 +21,11 @@ namespace ItemDB
 	const FItemInfo PLATE_ARMOR     = { "플레이트 갑옷", ItemType::Equipment, ItemId::PLATE_ARMOR,    900,  120, StatType::MaxHP, EquipmentType::Body   };
 	const FItemInfo PLATE_BOOTS     = { "플레이트 장화", ItemType::Equipment, ItemId::PLATE_BOOTS,    400,  60,  StatType::MaxHP, EquipmentType::Boots  };
 
-	const static FItemInfo ItemDBs[17] = {
+	const FItemInfo FIRE_WALL_SCROLL     = { "불기둥 주문서",  ItemType::Usable,    ItemId::FIRE_WALL_SCROLL,    120,  80,  StatType::None,  EquipmentType::NONE   };
+	const FItemInfo LIGHTNING_STRIKE_SCROLL       = { "전격 주문서", ItemType::Usable,   ItemId::LIGHTNING_STRIKE_SCROLL,      200,  60,  StatType::None,  EquipmentType::NONE   };
+	const FItemInfo FLAME_POTION      = { "불의 영약",   ItemType::Usable,   ItemId::FLAME_POTION,     350,  40,  StatType::None,  EquipmentType::NONE   };
+
+	const static FItemInfo ItemDBs[20] = {
 		{ "HP포션",       ItemType::Usable,    ItemId::HP_POTION,       50,   50,  StatType::HP,    EquipmentType::NONE   }, //0
 		{ "힘 포션",      ItemType::Usable,    ItemId::STRENGTH_POTION, 50,   10,  StatType::Power, EquipmentType::NONE   }, //1
 		{ "롱소드",       ItemType::Equipment, ItemId::LONGSWORD,       200,  10,  StatType::Power, EquipmentType::Weapon, WeaponType::Sword      }, //2
@@ -39,5 +43,8 @@ namespace ItemDB
 		{ "플레이트 투구", ItemType::Equipment, ItemId::PLATE_HELMET,   400,  60,  StatType::MaxHP, EquipmentType::Head   }, //14
 		{ "플레이트 갑옷", ItemType::Equipment, ItemId::PLATE_ARMOR,    900,  120, StatType::MaxHP, EquipmentType::Body   }, //15
 		{ "플레이트 장화", ItemType::Equipment, ItemId::PLATE_BOOTS,    400,  60,  StatType::MaxHP, EquipmentType::Boots  }, //16
+		{ "불기둥 주문서",  ItemType::Usable,    ItemId::FIRE_WALL_SCROLL,    120,  80,  StatType::None,  EquipmentType::NONE   }, //17
+		{ "전격 주문서", ItemType::Usable,   ItemId::LIGHTNING_STRIKE_SCROLL,      200,  60,  StatType::None,  EquipmentType::NONE   }, //18
+		{ "불의 영약",   ItemType::Usable,   ItemId::FLAME_POTION,     350,  40,  StatType::None,  EquipmentType::NONE   }, //19
 	};
 }
