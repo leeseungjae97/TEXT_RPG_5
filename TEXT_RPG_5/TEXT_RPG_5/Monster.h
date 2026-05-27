@@ -31,6 +31,7 @@ protected:
 	float AttackVisibleDuration;
 	vector<Vector> AttackValue;
 
+	bool bIsShiny = false;
 	
 public:
 	Monster();
@@ -46,6 +47,10 @@ public:
 
 	void TakeDamage(int damage);
 	bool IsDead();
+	
+	bool IsShiny() const;
+	void TrySetShiny();
+	
 
 	
 
@@ -64,7 +69,7 @@ protected:
 	
 	bool CanAttackplayer(Player* player);
 	
-	void Attackplayer(Player* player);
+	virtual void Attackplayer(Player* player);
 	
 	void MoveTowardPlayer(Player* player);
 	

@@ -1399,6 +1399,7 @@
     </ClCompile>
     <ClCompile Include="Manager\ObjectPoolManager.cpp" />
     <ClCompile Include="Manager\ViewportManager.cpp" />
+    <ClCompile Include="Spider.cpp" />
     <ClCompile Include="UI\BattleUI.cpp" />
     <ClCompile Include="UI\DialogUI.cpp" />
     <ClCompile Include="UI\InventoryUI.cpp" />
@@ -1805,6 +1806,7 @@
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
+    <ClInclude Include="Spider.h" />
     <ClInclude Include="Struct\ItemInfo.h" />
     <ClInclude Include="Struct\Buff.h" />
     <ClInclude Include="Troll.h" />

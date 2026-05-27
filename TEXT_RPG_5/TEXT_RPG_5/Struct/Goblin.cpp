@@ -29,5 +29,5 @@ Goblin::Goblin(int playerLevel)
 	AttackInterval = 1.1f;
 	AttackElapsedtime = 0.0f;
 	
-	//TrySetShiny();
+	TrySetShiny();
 }
