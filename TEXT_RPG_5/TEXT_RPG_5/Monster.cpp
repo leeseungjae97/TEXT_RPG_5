@@ -554,6 +554,11 @@ void Monster::TrySetShiny()
 	}
 }
 
+vector<FItemWeight> Monster::GetDropTable()
+{
+	return {};
+}
+
 
 
 		

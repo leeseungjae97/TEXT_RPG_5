@@ -27,7 +27,7 @@ if (PlayerLevel <= 0)
     AttackInterval = 3.0f;
     AttackElapsedtime = 0.0f;
     
-    //TrySetShiny();
+    TrySetShiny();
 }
 
 void Dragon::Attackplayer(Player* player)
@@ -100,4 +100,14 @@ void Dragon::Attackplayer(Player* player)
     AttackVisibleTime = AttackVisibleDuration;
     
     AttackElapsedtime = 0.0f;
+}
+
+vector<FItemWeight> Dragon::GetDropTable()
+{
+    return {
+		    { ItemId::DRAGON_HEART,     55 },
+            { ItemId::STRENGTH_POTION,  25 },
+            { ItemId::PLATE_ARMOR,      20 },
+            { ItemId::STAFF,            10 },
+        };
 }

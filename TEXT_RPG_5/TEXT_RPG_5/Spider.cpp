@@ -28,7 +28,7 @@ Spider::Spider(int playerLevel)
     AttackInterval = 1.8f;
     AttackElapsedtime = 0.0f;
     
-    //TrySetShiny();
+    TrySetShiny();
 }
 
 void Spider::Attackplayer(Player* player)
@@ -87,18 +87,31 @@ void Spider::Attackplayer(Player* player)
                 Direction = {0, -1};
             }
         }
+        for (int i = 1; i <= AttackRange; ++i)
+        {
+            Vector attackPosition;
+            attackPosition.X = Position.X + Direction.X * i;
+            attackPosition.Y = Position.Y + Direction.Y * i;
+
+            AttackValue.push_back(attackPosition);
+        }
         
-        
+        player->TakeDamage(Attack);
     }
-    
-    
-    
     
     AttackVisibleTime = AttackVisibleDuration;
     
-    
-    
     AttackElapsedtime = 0.0f;
-    
 }
 
+vector<FItemWeight> Spider::GetDropTable()
+{
+    return 
+    {
+        { ItemId::SPIDER_EYE, 70 },
+        { ItemId::HP_POTION,  20 },
+        { ItemId::BOW,        10 },
+        { ItemId::STAFF, 5},
+        
+        };
+}

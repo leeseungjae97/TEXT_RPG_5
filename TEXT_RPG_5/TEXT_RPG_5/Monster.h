@@ -3,6 +3,7 @@
 #include "pch.h"
 #include "Struct/Vector.h"
 #include "Object.h"
+#include "struct/ItemWeight.h"
 
 class Player;
 
@@ -76,4 +77,7 @@ protected:
 	void MoveTowardPlayerBfs();
 	
 	void MoveRandom();
+	
+	virtual vector<FItemWeight> GetDropTable();
+	
 };

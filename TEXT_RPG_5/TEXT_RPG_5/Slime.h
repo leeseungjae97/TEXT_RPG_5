@@ -9,4 +9,5 @@ public:
 	
 protected:
 	//virtual void Attackplayer(Player* player) override;
+	virtual vector<FItemWeight> GetDropTable() override;
 };

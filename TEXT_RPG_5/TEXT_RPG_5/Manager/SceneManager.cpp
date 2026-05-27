@@ -7,6 +7,8 @@
 #include "../Goblin.h"
 #include "../Orc.h"
 #include "../Slime.h"
+#include "../Spider.h"
+#include "../Dragon.h"
 #include "../Projectile.h"
 
 SceneManager::SceneManager()
@@ -50,10 +52,14 @@ void SceneManager::BeginPlay()
 	ObjectPoolManager::GetInstance()->Preload<Goblin>(10, 1);
 	ObjectPoolManager::GetInstance()->Preload<Orc>(10, 1);
 	ObjectPoolManager::GetInstance()->Preload<Slime>(10, 1);
+	//테스트
+	ObjectPoolManager::GetInstance()->Preload<Spider>(10, 1);
+	ObjectPoolManager::GetInstance()->Preload<Dragon>(3, 1);
 	ObjectPoolManager::GetInstance()->Preload<Projectile>(10);
 	CurrentPlayer = SpawnObject<Player>("player", 100, 10);
 	CurrentPlayer->SetPosition(20, 20);
-	for (int i = 1; i <= 3; ++i)
+	
+	 for (int i = 1; i <= 3; ++i)
 	{
 		Goblin* Gob = SpawnObject<Goblin>(1);
 		Gob->SetPosition(i, i);
@@ -66,7 +72,18 @@ void SceneManager::BeginPlay()
 		Slime* Sli = SpawnObject<Slime>(1);
 		Sli->SetPosition(i * 2 + 1, i * 2 + 1);
 		Sli->SetPrevPosition(i * 2 + 1, i * 2 + 1);
-	}
+		
+		//테스트
+		Spider* spi = SpawnObject<Spider>(1);
+		spi->SetPosition(i * 3, i * 3);
+		spi->SetPrevPosition(i * 3, i * 3);
+	 }
+	
+	
+	//테스트
+	//Dragon* Dra = SpawnObject<Dragon>(1);
+	//Dra->SetPosition(10, 10);
+	//Dra->SetPrevPosition(10, 10);
 }
 
 void SceneManager::AddObject(AObject* object)
