@@ -17,6 +17,7 @@ public:
 	void BeginPlay();
 	void Destroy();
 	void Reset();
+	void LoadCurrentStage();
 
 public:
 	void AddObject(AObject* object);
@@ -38,6 +39,9 @@ public:
 	}
 
 private:
+	void EnsurePools();
+	void ClearStageObjects();
 	vector<AObject*> Objects;
 	Player* CurrentPlayer = nullptr;
+	bool bPoolsInitialized = false;
 };

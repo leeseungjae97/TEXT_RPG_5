@@ -8,6 +8,13 @@
 class Player;
 class UMoveComponent;
 
+struct FTeleportEffect
+{
+	Vector Position;
+	float Elapsed = 0.0f;
+	float Duration = 0.6f;
+};
+
 class UCombatComponent : public UComponent
 {
 	friend class AObject;
@@ -38,6 +45,8 @@ public:
 	void MakeMagicRange();
 	void AttackEffectTimeAcc(float DeltaTime);
 	void HandleAttackInput(float DeltaTime);
+	void PlayTeleportEffect(Vector StartPosition, Vector EndPosition, float Duration = 0.6f);
+	const vector<FTeleportEffect>& GetTeleportEffects() const { return TeleportEffects; }
 	
 	void ProjectileAttack();
 	
@@ -68,4 +77,5 @@ private:
 	float AxeElapsedTime;
 	float BowElapsedTime;
 	float MagicElapsedTime;
+	vector<FTeleportEffect> TeleportEffects;
 };

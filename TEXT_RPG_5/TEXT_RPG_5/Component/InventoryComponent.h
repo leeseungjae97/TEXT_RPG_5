@@ -62,7 +62,7 @@ public:
 	bool AddItem(UItem* Item);
 	bool RemoveItem(UItem* Item);
 	bool UseRandomItem();
-	bool UseItem(UItem* Item, bool bShowDialog = true);
+	bool UseItem(UItem* Item, bool bShowDialog = false);
 	UItem* FindItemById(ItemId Id);
 	
 	void SelectCursor();

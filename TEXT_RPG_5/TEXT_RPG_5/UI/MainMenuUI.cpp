@@ -73,13 +73,13 @@ void MainMenuUI::Render()
 	const int borderHeight = SCREEN_HEIGHT - 2;
 	Renderer->DrawBox(borderY, borderX, borderWidth, borderHeight);
 
-	RenderTitle(10, 4);
-	RenderLandscape(SCREEN_WIDTH / 2 - 12, 5);
-	RenderMenu(12, 28);
+	RenderTitle(10, 12);
+	RenderLandscape(SCREEN_WIDTH / 2 + 8, 6);
+	RenderMenu(34, 32);
 
 	if (bShowCredits)
 	{
-		RenderCredits(12, 45);
+		RenderCredits(34, 46);
 	}
 }
 
@@ -87,26 +87,19 @@ void MainMenuUI::RenderTitle(int X, int Y)
 {
 	static const vector<wstring> title =
 	{
-		L"  ####  #   # #####   ####  #   #  ####   ####",
-		L" #      #   # #   #  #   #  ##  # #   #  #    ",
-		L" #      ##### #####  #   #  # # # #   #   ### ",
-		L" #      #   # #  #   #   #  #  ## #   #      #",
-		L"  ####  #   # #   #   ####  #   #  ####  #### ",
+		L"  ____ _   _ ____   ___  _   _  ___  ____    ____  _____    _    _     __  __",
+		L" / ___| | | |  _ \\ / _ \\| \\ | |/ _ \\/ ___|  |  _ \\| ____|  / \\  | |   |  \\/  |",
+		L"| |   | |_| | |_) | | | |  \\| | | | \\___ \\  | |_) |  _|   / _ \\ | |   | |\\/| |",
+		L"| |___|  _  |  _ <| |_| | |\\  | |_| |___) | |  _ <| |___ / ___ \\| |___| |  | |",
+		L" \\____|_| |_|_| \\_\\\\___/|_| \\_|\\___/|____/  |_| \\_\\_____/_/   \\_\\_____|_|  |_|",
 		L"",
-		L" #####  #####    #    #      #   #",
-		L" #   #  #       # #   #      ## ##",
-		L" #####  ####   #####  #      # # #",
-		L" #  #   #      #   #  #      #   #",
-		L" #   #  #####  #   #  #####  #   #"
+		L"        R E A L - T I M E   I S O M E T R I C   T E X T   R P G"
 	};
 
 	for (int i = 0; i < static_cast<int>(title.size()); ++i)
 	{
-		Renderer->AddRender(Y + i, X, title[i], CC_DARKYELLOW);
+		Renderer->AddRender(Y + i, X, title[i], i == 6 ? CC_DARKYELLOW : CC_LIGHTGRAY);
 	}
-
-	Renderer->AddRender(Y + 13, X + 18, L"Chronos Realm", CC_DARKYELLOW);
-	Renderer->AddRender(Y + 15, X + 10, L"Text RPG in Real-Time Isometric World", CC_GRAY);
 }
 
 void MainMenuUI::RenderLandscape(int X, int Y)

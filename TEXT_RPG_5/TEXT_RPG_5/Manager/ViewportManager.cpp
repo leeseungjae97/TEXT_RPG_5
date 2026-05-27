@@ -4,6 +4,7 @@
 #include "MapManager.h"
 #include "DisplayManager.h"
 #include "SceneManager.h"
+#include "StageManager.h"
 #include "../Component/CombatComponent.h"
 #include "../Component/EffectComponent.h"
 #include "../Component/EquipmentComponent.h"
@@ -309,6 +310,22 @@ void ViewportManager::Render2DtoISO()
 			renderManager->PutCell(iso.Y, iso.X - 5, L'/', darkWoodAttribute);
 			renderManager->PutCell(iso.Y, iso.X + 5, L'\\', darkWoodAttribute);
 			renderManager->PutCell(iso.Y, iso.X + 6, L'o', woodAttribute);
+		};
+
+	auto drawIsoCrystal = [&](Vector iso)
+		{
+			WORD crystalAttribute = MakeAttribute(StageManager::GetInstance()->GetCrystalColor());
+			WORD shineAttribute = MakeAttribute(CC_WHITE);
+			renderManager->PutCell(iso.Y - 5, iso.X, L'*', shineAttribute);
+			renderManager->PutCell(iso.Y - 4, iso.X - 1, L'/', crystalAttribute);
+			renderManager->PutCell(iso.Y - 4, iso.X, L'C', crystalAttribute);
+			renderManager->PutCell(iso.Y - 4, iso.X + 1, L'\\', crystalAttribute);
+			renderManager->PutCell(iso.Y - 3, iso.X - 2, L'<', crystalAttribute);
+			renderManager->PutCell(iso.Y - 3, iso.X, L'|', shineAttribute);
+			renderManager->PutCell(iso.Y - 3, iso.X + 2, L'>', crystalAttribute);
+			renderManager->PutCell(iso.Y - 2, iso.X - 1, L'\\', crystalAttribute);
+			renderManager->PutCell(iso.Y - 2, iso.X, L'V', crystalAttribute);
+			renderManager->PutCell(iso.Y - 2, iso.X + 1, L'/', crystalAttribute);
 		};
 
 	auto drawIsoActor = [&](Vector iso, wchar_t icon, WORD attribute, bool player)
@@ -735,6 +752,38 @@ void ViewportManager::Render2DtoISO()
 			renderManager->PutCell(iso.Y - 4 - rise, iso.X + 1, L'+', consumeAttribute);
 		};
 
+	auto drawTeleportEffects = [&](UCombatComponent* combatComponent)
+		{
+			if (combatComponent == nullptr)
+			{
+				return;
+			}
+
+			for (const FTeleportEffect& effect : combatComponent->GetTeleportEffects())
+			{
+				if (fabsf(static_cast<float>(effect.Position.X) - 0.5f - cameraPosition.X) > viewRadiusX ||
+					fabsf(static_cast<float>(effect.Position.Y) - 0.5f - cameraPosition.Y) > viewRadiusY)
+				{
+					continue;
+				}
+
+				Vector iso = WorldToIso(
+					static_cast<float>(effect.Position.X) - 0.5f - cameraPosition.X,
+					static_cast<float>(effect.Position.Y) - 0.5f - cameraPosition.Y,
+					originX,
+					originY
+				);
+
+				const float alpha = effect.Duration <= 0.0f ? 1.0f : effect.Elapsed / effect.Duration;
+				WORD attribute = MakeAttribute(alpha < 0.5f ? CC_MAGENTA : CC_CYAN);
+				renderManager->PutCell(iso.Y - 2, iso.X, L'*', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X - 2, L'/', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 2, L'\\', attribute);
+				renderManager->PutCell(iso.Y, iso.X - 4, L'<', attribute);
+				renderManager->PutCell(iso.Y, iso.X + 4, L'>', attribute);
+			}
+		};
+
 	auto drawIsoTile = [&](int mapX, int mapY, bool wall)
 		{
 			Vector iso = WorldToIso(
@@ -866,6 +915,7 @@ void ViewportManager::Render2DtoISO()
 		};
 
 	vector<Vector> shopPositions;
+	vector<Vector> crystalPositions;
 
 	const int startY = max(0, static_cast<int>(cameraPosition.Y) - viewRadiusY);
 	const int endY = min(static_cast<int>(MAP_MAX_Y) - 1, static_cast<int>(cameraPosition.Y) + viewRadiusY);
@@ -887,12 +937,26 @@ void ViewportManager::Render2DtoISO()
 					originY
 				));
 			}
+			else if (mapType == MapObjectType::Crystal)
+			{
+				crystalPositions.push_back(WorldToIso(
+					static_cast<float>(x) - cameraPosition.X,
+					static_cast<float>(y) - cameraPosition.Y,
+					originX,
+					originY
+				));
+			}
 		}
 	}
 
 	for (const Vector& shopPosition : shopPositions)
 	{
 		drawIsoShop(shopPosition);
+	}
+
+	for (const Vector& crystalPosition : crystalPositions)
+	{
+		drawIsoCrystal(crystalPosition);
 	}
 
 	drawAttackPositions();
@@ -1007,6 +1071,7 @@ void ViewportManager::Render2DtoISO()
 		{
 			if (Player* player = dynamic_cast<Player*>(object))
 			{
+				drawTeleportEffects(player->GetComponent<UCombatComponent>());
 				drawIsoPlayerActor(iso, objectIcon, objectAttribute, player);
 			}
 			else

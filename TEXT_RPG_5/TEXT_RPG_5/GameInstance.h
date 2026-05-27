@@ -2,6 +2,7 @@
 #include "Singleton.h"
 #include "UI/MainMenuUI.h"
 #include "UI/GameOverUI.h"
+#include "UI/GameClearUI.h"
 #include "UI/NameInputUI.h"
 
 enum class GameFlowState
@@ -11,9 +12,14 @@ enum class GameFlowState
 	FadeOutToGame,
 	Game,
 	FadeInGame,
+	FadeOutToNextStage,
+	FadeInNextStage,
 	FadeOutToGameOver,
 	FadeInGameOver,
-	GameOver
+	GameOver,
+	FadeOutToGameClear,
+	FadeInGameClear,
+	GameClear
 };
 
 class GameInstance : public Singleton<GameInstance>
@@ -40,9 +46,16 @@ private:
 	void TickNameInput(float DeltaTime);
 	void TickFadeOutToGame(float DeltaTime);
 	void TickFadeInGame(float DeltaTime);
+	void TickFadeOutToNextStage(float DeltaTime);
+	void TickFadeInNextStage(float DeltaTime);
 	void TickFadeOutToGameOver(float DeltaTime);
 	void TickFadeInGameOver(float DeltaTime);
 	void TickGameOver(float DeltaTime);
+	void TickFadeOutToGameClear(float DeltaTime);
+	void TickFadeInGameClear(float DeltaTime);
+	void TickGameClear(float DeltaTime);
+	void TickStagePrompt(float DeltaTime);
+	void RenderStagePrompt();
 	void ResetGameWorld();
 
 private:
@@ -51,4 +64,5 @@ private:
 	MainMenuUI MainMenu;
 	NameInputUI NameInput;
 	GameOverUI GameOver;
+	GameClearUI GameClear;
 };

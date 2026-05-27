@@ -543,6 +543,13 @@ void UCombatComponent::AttackEffectTimeAcc(float DeltaTime)
 	}
 }
 
+void UCombatComponent::PlayTeleportEffect(Vector StartPosition, Vector EndPosition, float Duration)
+{
+	Duration = max(0.01f, Duration);
+	TeleportEffects.push_back({ StartPosition, 0.0f, Duration });
+	TeleportEffects.push_back({ EndPosition, 0.0f, Duration });
+}
+
 void UCombatComponent::HandleAttackInput(float DeltaTime)
 {
 	RockElapsedTime += DeltaTime;
@@ -657,6 +664,18 @@ void UCombatComponent::HandleAttackInput(float DeltaTime)
 
 void UCombatComponent::Tick(float DeltaTime)
 {
+	for (FTeleportEffect& Effect : TeleportEffects)
+	{
+		Effect.Elapsed += DeltaTime;
+	}
+
+	TeleportEffects.erase(
+		remove_if(TeleportEffects.begin(), TeleportEffects.end(), [](const FTeleportEffect& Effect)
+			{
+				return Effect.Elapsed >= Effect.Duration;
+			}),
+		TeleportEffects.end());
+
 	HandleAttackInput(DeltaTime);
 	HandleAttack();
 }

@@ -12,6 +12,8 @@ public:
 	
 private:
 	void StatusRender();
+	void BuffStatusRender(int BaseY, int BaseX);
+	void TeleportCooldownRender();
 	void MapRender();
 	void QuickSlotRender();
 	void DrawStatusBar(int Y, int X, int Width, float Ratio, int FilledColor);

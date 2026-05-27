@@ -49,9 +49,9 @@ void GameOverUI::Render()
 	const int borderHeight = SCREEN_HEIGHT - 2;
 	Renderer->DrawBox(borderY, borderX, borderWidth, borderHeight);
 
-	RenderTitle(42, 20);
-	RenderGraveyard(SCREEN_WIDTH / 2 + 8, 5);
-	RenderMenu(56, 35);
+	RenderTitle(24, 20);
+	RenderGraveyard(SCREEN_WIDTH / 2 + 26, 24);
+	RenderMenu(44, 38);
 }
 
 void GameOverUI::RenderTitle(int X, int Y)
@@ -67,8 +67,9 @@ void GameOverUI::RenderTitle(int X, int Y)
 
 	for (int i = 0; i < static_cast<int>(title.size()); ++i)
 	{
-		Renderer->AddRender(Y + i, X, title[i], CC_DARKYELLOW);
+		Renderer->AddRender(Y + i, X, title[i], CC_LIGHTGRAY);
 	}
+	Renderer->AddRender(Y + 7, X + 26, L"----  C H R O N O S   R E A L M  ----", CC_DARKYELLOW);
 }
 
 void GameOverUI::RenderGraveyard(int X, int Y)

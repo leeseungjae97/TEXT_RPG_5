@@ -34,6 +34,7 @@ protected:
 	vector<Vector> AttackValue;
 
 	bool bIsShiny = false;
+	bool bIsBoss = false;
 	
 public:
 	Monster();
@@ -54,6 +55,9 @@ public:
 	
 	bool IsShiny() const;
 	void TrySetShiny();
+	bool IsBoss() const { return bIsBoss; }
+	void SetBoss(bool InBoss) { bIsBoss = InBoss; }
+	void ConfigureForStage(int InLevel, bool InBoss = false);
 	
 
 	

@@ -15,6 +15,12 @@ enum class EItemUseEffectType
     Buff
 };
 
+struct FBuffDisplayInfo
+{
+    wstring Text;
+    float RemainingTime = 0.0f;
+};
+
 class UEffectComponent : public UComponent
 {
     friend class AObject;
@@ -33,6 +39,7 @@ public:
     bool ShouldShowItemUseEffect() const { return ItemUseEffectTime > 0.0f && ItemUseEffectType != EItemUseEffectType::None; }
     EItemUseEffectType GetItemUseEffectType() const { return ItemUseEffectType; }
     float GetItemUseEffectAlpha() const;
+    vector<FBuffDisplayInfo> GetBuffDisplayInfos() const;
     virtual void Tick(float DeltaTime) override;
 
 private:

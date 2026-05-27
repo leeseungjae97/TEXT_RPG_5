@@ -11,6 +11,7 @@
 #include "Define.h"
 #include "Component/LevelComponent.h"
 #include "Manager/BattleManager.h"
+#include "Manager/StageManager.h"
 
 Monster::Monster()
 {
@@ -186,6 +187,10 @@ void Monster::Destroy()
 	DropItemToPlayer();
 	
 	MapManager::GetInstance()->SetMapObjectCoordinate(Position.Y, Position.X, {MapObjectType::Path, NO_ID});
+	if (bIsBoss)
+	{
+		StageManager::GetInstance()->OnBossKilled(Position);
+	}
 	bIsDestroy = true;
 }
 
@@ -193,6 +198,7 @@ void Monster::OnSpawnFromPool()
 {
 	AObject::OnSpawnFromPool();
 	Health = MaxHealth;
+	bIsBoss = false;
 }
 
 void Monster::OnReturnToPool()
@@ -547,6 +553,64 @@ void Monster::Attackplayer(Player* player)
 bool Monster::IsShiny() const
 {
 	return bIsShiny;
+}
+
+void Monster::ConfigureForStage(int InLevel, bool InBoss)
+{
+	if (InLevel <= 0)
+	{
+		InLevel = 1;
+	}
+
+	if (Name.find(L"강한 ") == 0)
+	{
+		Name = Name.substr(3);
+	}
+
+	bIsShiny = false;
+	bIsBoss = InBoss;
+	Level = InLevel;
+
+	string typeName = GetName();
+	if (typeName == "Goblin")
+	{
+		MaxHealth = Level * 25 + rand() % (Level * 10 + 1);
+		Attack = Level * 3 + rand() % (Level * 3 + 1);
+	}
+	else if (typeName == "Slime")
+	{
+		MaxHealth = Level * 20 + rand() % (Level * 8 + 1);
+		Attack = Level * 2 + rand() % (Level * 2 + 1);
+	}
+	else if (typeName == "Orc")
+	{
+		MaxHealth = Level * 50 + rand() % (Level * 20 + 1);
+		Attack = Level * 7 + rand() % (Level * 5 + 1);
+	}
+	else if (typeName == "Spider")
+	{
+		MaxHealth = Level * 30 + rand() % (Level * 10 + 1);
+		Attack = Level * 4 + rand() % (Level * 4 + 1);
+	}
+	else if (typeName == "Dragon")
+	{
+		MaxHealth = Level * 80 + rand() % (Level * 30 + 1);
+		Attack = Level * 12 + rand() % (Level * 8 + 1);
+	}
+	else
+	{
+		MaxHealth = Level * 35 + rand() % (Level * 10 + 1);
+		Attack = Level * 5 + rand() % (Level * 4 + 1);
+	}
+
+	if (bIsBoss)
+	{
+		MaxHealth *= 2;
+		Attack += Level * 5;
+	}
+
+	Health = MaxHealth;
+	TrySetShiny();
 }
 
 void Monster::TrySetShiny()

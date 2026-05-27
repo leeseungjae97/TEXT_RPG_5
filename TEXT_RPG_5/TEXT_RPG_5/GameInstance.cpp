@@ -9,6 +9,7 @@
 #include "Manager/SceneManager.h"
 #include "Manager/InputManager.h"
 #include "Manager/ShopManager.h"
+#include "Manager/StageManager.h"
 #include "Player.h"
 
 namespace
@@ -45,6 +46,7 @@ void GameInstance::BeginPlay()
 	TimeManager::GetInstance()->BeginPlay();
 	
 	ShopManager::GetInstance()->BeginPlay();
+	StageManager::GetInstance()->BeginPlay();
 	MapManager::GetInstance()->BeginPlay();
 	SceneManager::GetInstance()->BeginPlay();
 	BattleManager::GetInstance()->BeginPlay();
@@ -56,6 +58,7 @@ void GameInstance::Tick()
 	const float DeltaTime = static_cast<float>(TimeManager::GetInstance()->GetDeltaTime());
 	
 	InputManager::GetInstance()->Tick(DeltaTime);
+	StageManager::GetInstance()->Tick(DeltaTime);
 
 	SceneManager::GetInstance()->Tick(DeltaTime);
 
@@ -109,6 +112,24 @@ void GameInstance::Run()
 		Destroy();
 		return;
 
+	case GameFlowState::FadeOutToNextStage:
+		TickFadeOutToNextStage(DeltaTime);
+		ViewportManager::GetInstance()->Render();
+		ViewportManager::GetInstance()->RenderFade();
+		DisplayManager::GetInstance()->Render();
+		Destroy();
+		return;
+
+	case GameFlowState::FadeInNextStage:
+		SceneManager::GetInstance()->Tick(DeltaTime);
+		ViewportManager::GetInstance()->Tick(DeltaTime);
+		TickFadeInNextStage(DeltaTime);
+		ViewportManager::GetInstance()->Render();
+		ViewportManager::GetInstance()->RenderFade();
+		DisplayManager::GetInstance()->Render();
+		Destroy();
+		return;
+
 	case GameFlowState::FadeOutToGameOver:
 		TickFadeOutToGameOver(DeltaTime);
 		ViewportManager::GetInstance()->Render();
@@ -130,8 +151,52 @@ void GameInstance::Run()
 		DisplayManager::GetInstance()->Render();
 		return;
 
+	case GameFlowState::FadeOutToGameClear:
+		TickFadeOutToGameClear(DeltaTime);
+		ViewportManager::GetInstance()->Render();
+		ViewportManager::GetInstance()->RenderFade();
+		DisplayManager::GetInstance()->Render();
+		Destroy();
+		return;
+
+	case GameFlowState::FadeInGameClear:
+		TickFadeInGameClear(DeltaTime);
+		GameClear.Render();
+		ViewportManager::GetInstance()->RenderFade();
+		DisplayManager::GetInstance()->Render();
+		return;
+
+	case GameFlowState::GameClear:
+		TickGameClear(DeltaTime);
+		GameClear.Render();
+		DisplayManager::GetInstance()->Render();
+		return;
+
 	case GameFlowState::Game:
 	default:
+		StageManager::GetInstance()->Tick(DeltaTime);
+		if (StageManager::GetInstance()->ShouldStartGameClear())
+		{
+			StageManager::GetInstance()->ClearGameClearRequest();
+			FlowState = GameFlowState::FadeOutToGameClear;
+			ViewportManager::GetInstance()->StartFadeOut();
+			ViewportManager::GetInstance()->Render();
+			ViewportManager::GetInstance()->RenderFade();
+			DisplayManager::GetInstance()->Render();
+			Destroy();
+			return;
+		}
+
+		if (StageManager::GetInstance()->IsPromptOpen())
+		{
+			TickStagePrompt(DeltaTime);
+			ViewportManager::GetInstance()->Render();
+			RenderStagePrompt();
+			DisplayManager::GetInstance()->Render();
+			Destroy();
+			return;
+		}
+
 		SceneManager::GetInstance()->Tick(DeltaTime);
 		if (Player* player = SceneManager::GetInstance()->GetPlayer())
 		{
@@ -211,6 +276,29 @@ void GameInstance::TickFadeInGame(float DeltaTime)
 	}
 }
 
+void GameInstance::TickFadeOutToNextStage(float DeltaTime)
+{
+	ViewportManager::GetInstance()->TickFade(DeltaTime);
+	if (ViewportManager::GetInstance()->IsFadeFinished())
+	{
+		StageManager::GetInstance()->AdvanceStage();
+		MapManager::GetInstance()->BeginPlay();
+		SceneManager::GetInstance()->LoadCurrentStage();
+		ViewportManager::GetInstance()->ResetRuntimeCache();
+		FlowState = GameFlowState::FadeInNextStage;
+		ViewportManager::GetInstance()->StartFadeIn();
+	}
+}
+
+void GameInstance::TickFadeInNextStage(float DeltaTime)
+{
+	ViewportManager::GetInstance()->TickFade(DeltaTime);
+	if (ViewportManager::GetInstance()->IsFadeFinished())
+	{
+		FlowState = GameFlowState::Game;
+	}
+}
+
 void GameInstance::TickFadeOutToGameOver(float DeltaTime)
 {
 	ViewportManager::GetInstance()->TickFade(DeltaTime);
@@ -248,12 +336,101 @@ void GameInstance::TickGameOver(float DeltaTime)
 	}
 }
 
+void GameInstance::TickFadeOutToGameClear(float DeltaTime)
+{
+	ViewportManager::GetInstance()->TickFade(DeltaTime);
+	if (ViewportManager::GetInstance()->IsFadeFinished())
+	{
+		FlowState = GameFlowState::FadeInGameClear;
+		ViewportManager::GetInstance()->StartFadeIn();
+	}
+}
+
+void GameInstance::TickFadeInGameClear(float DeltaTime)
+{
+	ViewportManager::GetInstance()->TickFade(DeltaTime);
+	if (ViewportManager::GetInstance()->IsFadeFinished())
+	{
+		FlowState = GameFlowState::GameClear;
+	}
+}
+
+void GameInstance::TickGameClear(float DeltaTime)
+{
+	GameClearAction action = GameClear.Tick(DeltaTime);
+	if (action == GameClearAction::Retry)
+	{
+		ResetGameWorld();
+		FlowState = GameFlowState::FadeInGame;
+		ViewportManager::GetInstance()->StartFadeIn();
+		return;
+	}
+
+	if (action == GameClearAction::MainMenu)
+	{
+		ResetGameWorld();
+		FlowState = GameFlowState::MainMenu;
+	}
+}
+
+void GameInstance::TickStagePrompt(float DeltaTime)
+{
+	InputManager* input = InputManager::GetInstance();
+	if (input->IsKeyTap(KeyCode::Z))
+	{
+		if (!StageManager::GetInstance()->IsLastStage())
+		{
+			StageManager::GetInstance()->CloseStageClearPrompt(false);
+			FlowState = GameFlowState::FadeOutToNextStage;
+			ViewportManager::GetInstance()->StartFadeOut();
+		}
+		else
+		{
+			StageManager::GetInstance()->CloseStageClearPrompt(true);
+		}
+		return;
+	}
+
+	if (input->IsKeyTap(KeyCode::ESCAPE))
+	{
+		StageManager::GetInstance()->CloseStageClearPrompt(true);
+	}
+}
+
+void GameInstance::RenderStagePrompt()
+{
+	DisplayManager* renderer = DisplayManager::GetInstance();
+	const int width = 52;
+	const int height = 9;
+	const int x = max(1, (SCREEN_WIDTH - width) / 2);
+	const int y = max(1, (SCREEN_HEIGHT - height) / 2);
+
+	const WORD background = renderer->MakeConsoleAttribute(CC_BLACK, CC_BLACK);
+	for (int row = 0; row < height; ++row)
+	{
+		for (int col = 0; col < width; ++col)
+		{
+			renderer->PutCell(y + row, x + col, L' ', background);
+		}
+	}
+
+	renderer->DrawBox(y, x, width, height);
+	const wstring clearText = StageManager::GetInstance()->IsLastStage() ? L"모든 스테이지 클리어!" : L"클리어!";
+	const wstring moveText = StageManager::GetInstance()->IsLastStage() ? L"마지막 스테이지입니다." : L"다음 스테이지로 이동하시겠습니까?";
+	const wstring inputText = StageManager::GetInstance()->IsLastStage() ? L"(ESC) 닫기" : L"(Z) 예        (ESC) 아니오";
+
+	renderer->AddRender(y + 2, x + (width - renderer->GetTextDisplayWidth(clearText)) / 2, clearText, CC_YELLOW);
+	renderer->AddRender(y + 4, x + (width - renderer->GetTextDisplayWidth(moveText)) / 2, moveText, CC_WHITE);
+	renderer->AddRender(y + 6, x + (width - renderer->GetTextDisplayWidth(inputText)) / 2, inputText, CC_CYAN);
+}
+
 void GameInstance::ResetGameWorld()
 {
 	ViewportManager::GetInstance()->ResetRuntimeCache();
 	ShopManager::GetInstance()->ResetRuntimeCache();
 	ShopManager::GetInstance()->RestoreShop();
 	BattleManager::GetInstance()->Reset();
+	StageManager::GetInstance()->Reset();
 	SceneManager::GetInstance()->Reset();
 	ViewportManager::GetInstance()->ResetRuntimeCache();
 	
@@ -263,6 +440,7 @@ void GameInstance::ResetGameWorld()
 void GameInstance::RestartGame()
 {
 	ShopManager::GetInstance()->BeginPlay();
+	StageManager::GetInstance()->BeginPlay();
 	MapManager::GetInstance()->BeginPlay();
 	SceneManager::GetInstance()->BeginPlay();
 	BattleManager::GetInstance()->BeginPlay();

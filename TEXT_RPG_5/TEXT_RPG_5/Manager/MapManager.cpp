@@ -3,6 +3,7 @@
 #include "DisplayManager.h"
 #include "SceneManager.h"
 #include "ShopManager.h"
+#include "StageManager.h"
 #include "../Object.h"
 #include "../Monster.h"
 #include "../Player.h"
@@ -58,7 +59,7 @@ bool MapManager::CanPlaceObject(AObject* Object, Vector Pos) const
 	}
 
 	const Coordinate& Current = Map[Pos.Y][Pos.X];
-	if (Current.Type == MapObjectType::Wall || Current.Type == MapObjectType::Shop)
+	if (Current.Type == MapObjectType::Wall || Current.Type == MapObjectType::Shop || Current.Type == MapObjectType::Crystal)
 	{
 		return false;
 	}
@@ -133,7 +134,8 @@ void MapManager::UpdateMap()
 			|| Pos.X < 0
 			|| Pos.X >= MAP_MAX_X 
 			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Wall
-			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Shop)
+			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Shop
+			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Crystal)
 		{
 			// Obj->SetPosition(PrevPos);
 			continue;
@@ -158,6 +160,7 @@ void MapManager::UpdateMap()
 
 void MapManager::BeginPlay()
 {
+	Map.clear();
 	Map.resize(MAP_MAX_Y, vector<Coordinate>(MAP_MAX_X, {MapObjectType::Path, NO_ID}));
 	vector<Vector>& ShopPoses = ShopManager::GetInstance()->GetShopPoses();
 	
@@ -176,6 +179,43 @@ void MapManager::BeginPlay()
 	{
 		Vector Pos = ShopPoses[i];
 		Map[Pos.Y][Pos.X] = {MapObjectType::Shop, NO_ID};
+	}
+
+	const int stage = StageManager::GetInstance()->GetCurrentStage();
+	if (stage == 1)
+	{
+		for (int y = 8; y < MAP_MAX_Y - 8; ++y)
+		{
+			if (y % 3 != 0)
+			{
+				Map[y][MAP_MAX_X / 2] = { MapObjectType::Wall, NO_ID };
+			}
+		}
+		for (int x = 10; x < MAP_MAX_X - 10; ++x)
+		{
+			if (x % 4 != 0)
+			{
+				Map[MAP_MAX_Y / 2][x] = { MapObjectType::Wall, NO_ID };
+			}
+		}
+	}
+	else if (stage == 2)
+	{
+		for (int y = 5; y < MAP_MAX_Y - 5; ++y)
+		{
+			int leftX = 8 + (y % 8);
+			int rightX = MAP_MAX_X - 9 - (y % 8);
+			Map[y][leftX] = { MapObjectType::Wall, NO_ID };
+			Map[y][rightX] = { MapObjectType::Wall, NO_ID };
+		}
+		for (int x = 16; x < MAP_MAX_X - 16; ++x)
+		{
+			if (x % 5 != 0)
+			{
+				Map[10][x] = { MapObjectType::Wall, NO_ID };
+				Map[MAP_MAX_Y - 11][x] = { MapObjectType::Wall, NO_ID };
+			}
+		}
 	}
 	
 	// for (int i = 0; i < 30; ++i)
@@ -232,7 +272,7 @@ void MapManager::SetMapObjectCoordinate(int Y, int X, Coordinate InCoordinate)
 	if (Y < 0 || Y > MAP_MAX_Y - 1 || X < 0 || X > MAP_MAX_X - 1)
 		return;
 	
-	Map[Y][X] = {MapObjectType::Path, NO_ID};
+	Map[Y][X] = InCoordinate;
 }
 
 void MapManager::SetMapObjectType(int Y, int X, MapObjectType Type)
