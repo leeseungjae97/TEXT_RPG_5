@@ -20,10 +20,10 @@ for (int y = 0; y < Container.size(); ++y)
 }
 */
 
-static const FItemWeight ShopItemPool[] =
+static const vector<FItemWeight> ShopItemPool =
 {
-    { ItemId::HP_POTION,       30 },
-    { ItemId::STRENGTH_POTION, 20 },
+    { ItemId::HP_POTION,       150 },
+    { ItemId::STRENGTH_POTION, 50 },
     { ItemId::LONGSWORD,       10 },
     { ItemId::BOW,             10 },
     { ItemId::AXE,             10 },
@@ -118,20 +118,7 @@ UItem* ShopManager::GetItem(Vector Index)
 
 UItem* ShopManager::GetRandomItem()
 {
-    int Total = 0;
-    for (const FItemWeight& Entry : ShopItemPool)
-        Total += Entry.Weight;
-
-    int Roll = rand() % Total;
-    int Acc = 0;
-    for (const FItemWeight& Entry : ShopItemPool)
-    {
-        Acc += Entry.Weight;
-        if (Roll < Acc)
-            return ItemManager::GetInstance()->CreateItem(Entry.Id);
-    }
-
-    return nullptr;
+    return ItemManager::GetInstance()->CreateRandomItem(ShopItemPool);
 }
 
 

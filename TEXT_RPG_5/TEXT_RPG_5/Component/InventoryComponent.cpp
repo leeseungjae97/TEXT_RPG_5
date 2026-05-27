@@ -241,14 +241,16 @@ void UInventoryComponent::SelectCursor()
     }
     
     
-    UItem* Item = GetItem(GetCursor());
-    if (Item == nullptr) return;
-    
     if (bOnShop)
     {
         ShopManager::GetInstance()->SelectCursor();
+        return;
     }
-    else if (Item->GetItemInfo().Type == ItemType::Equipment)
+
+    UItem* Item = GetItem(GetCursor());
+    if (Item == nullptr) return;
+
+    if (Item->GetItemInfo().Type == ItemType::Equipment)
     {
         UEquipmentComponent* EC = PlayerPtr->GetComponent<UEquipmentComponent>();
         UItem* Displaced = nullptr;

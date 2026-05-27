@@ -52,7 +52,8 @@ public:
 	bool GetOpenedInventory(){return bOpenedInventory;}
 
 	int GetGold(){return Gold;}
-	void AddGold(int Amount) {Gold += Amount;} 
+	void SetGold(int Value) { Gold = Value; }
+	void AddGold(int Amount) {Gold += Amount;}
 
 	vector<vector<UItem*>>& GetContainer() { return Container; }
 	Vector GetItemIndex(UItem* Item);
