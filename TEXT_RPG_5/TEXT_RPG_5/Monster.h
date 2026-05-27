@@ -79,5 +79,6 @@ protected:
 	void MoveRandom();
 	
 	virtual vector<FItemWeight> GetDropTable();
+	void DropItemToPlayer();
 	
 };

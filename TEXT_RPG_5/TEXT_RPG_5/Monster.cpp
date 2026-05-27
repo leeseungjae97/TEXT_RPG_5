@@ -1,6 +1,9 @@
 #include "Monster.h"
 #include "Manager/SceneManager.h"
 #include "Manager/MapManager.h"
+#include "Manager/ItemManager.h"
+#include "component/InventoryComponent.h"
+#include "Item/Item.h"
 #include "Player.h"
 #include "Define.h"
 #include <cstdlib>
@@ -174,6 +177,9 @@ void Monster::Destroy()
 			LevelComp->AddExp(50);
 		}
 	}
+	
+	DropItemToPlayer();
+	
 	MapManager::GetInstance()->SetMapObjectCoordinate(Position.Y, Position.X, {MapObjectType::Path, NO_ID});
 	bIsDestroy = true;
 }
@@ -557,6 +563,46 @@ void Monster::TrySetShiny()
 vector<FItemWeight> Monster::GetDropTable()
 {
 	return {};
+}
+
+void Monster::DropItemToPlayer()
+{
+	Player* PlayerPtr = SceneManager::GetInstance()->GetPlayer();
+	
+	if (PlayerPtr == nullptr)
+	{
+		return;
+	}
+	
+	UInventoryComponent* InventoryComp = PlayerPtr->GetComponent<UInventoryComponent>();
+	
+	if (InventoryComp == nullptr)
+	{
+		return;
+	}
+	
+	vector<FItemWeight> DropTable = GetDropTable();
+	
+	if (DropTable.empty())
+	{
+		return;
+	}
+	
+	UItem* DroppedItem = ItemManager::GetInstance()->CreateRandomItem(DropTable);
+	
+	if (DroppedItem == nullptr)
+	{
+		return;
+	}
+	
+	if (!InventoryComp->AddItem(DroppedItem))
+	{
+		delete DroppedItem;
+		DroppedItem = nullptr;
+		
+		//
+		return;
+	}
 }
 
 
