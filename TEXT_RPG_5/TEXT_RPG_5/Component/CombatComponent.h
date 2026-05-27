@@ -37,14 +37,12 @@ public:
 	// void SetAttackValue();
 	void Attack();
 	void TriggerCustomAttack(const vector<Vector>& CustomRange, int Damage);
-	void HandleAttack();
-	void LaunchProjectile();
+	void HandleAttack(float DeltaTime);
 	void MakeSwordRange();
 	void MakeAxeRange();
 	void MakeRockRange();
 	void MakeMagicRange();
 	void AttackEffectTimeAcc(float DeltaTime);
-	void HandleAttackInput(float DeltaTime);
 	void PlayTeleportEffect(Vector StartPosition, Vector EndPosition, float Duration = 0.6f);
 	const vector<FTeleportEffect>& GetTeleportEffects() const { return TeleportEffects; }
 	
@@ -63,7 +61,6 @@ private:
 	WeaponType Weapon;
 	float AttackVisibleTime;
 	float AttackVisibleDuration;
-	bool bAttackRequested;
 	
 	
 	float RockInterval;

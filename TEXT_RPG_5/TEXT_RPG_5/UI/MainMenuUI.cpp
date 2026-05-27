@@ -181,13 +181,14 @@ void MainMenuUI::RenderCredits(int X, int Y)
 {
 	const int width = 64;
 	const int height = 12;
+	Y += 4;
 	Renderer->DrawBox(Y, X, width, height);
-	Renderer->AddRender(Y + 2, X + 4, L"Credits ~2026-05-28", CC_WHITE);
-	Renderer->AddRender(Y + 4, X + 4, L"Commit() : 이승재", CC_GRAY);
-	Renderer->AddRender(Y + 5, X + 4, L"Commit() : 박성규", CC_GRAY);
-	Renderer->AddRender(Y + 6, X + 4, L"Commit() : 김인철", CC_GRAY);
-	Renderer->AddRender(Y + 7, X + 4, L"Commit() : 최현준", CC_GRAY);
-	Renderer->AddRender(Y + 8, X + 4, L"Commit() : 성창훈", CC_GRAY);
+	Renderer->AddRender(Y + 2, X + 4, L"Credits", CC_WHITE);
+	Renderer->AddRender(Y + 4, X + 4, L"Render, Engine, UI, Logic : 이승재", CC_GRAY);
+	Renderer->AddRender(Y + 5, X + 4, L"Player, Weapon : 박성규", CC_GRAY);
+	Renderer->AddRender(Y + 6, X + 4, L"Inventory, Item, Shop : 김인철", CC_GRAY);
+	Renderer->AddRender(Y + 7, X + 4, L"Monster, Attack Pattern : 최현준", CC_GRAY);
+	Renderer->AddRender(Y + 8, X + 4, L"LevelUp 성창훈", CC_GRAY);
 	Renderer->AddRender(Y + 10, X + 4, L"Chronos Realm - Console Isometric RPG", CC_DARKYELLOW);
 	Renderer->AddRender(Y + 12, X + 4, L"(ESC/Z/X) 돌아가기", CC_DARKGRAY);
 }

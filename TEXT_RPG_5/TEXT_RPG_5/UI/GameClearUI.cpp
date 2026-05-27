@@ -86,7 +86,14 @@ void GameClearUI::RenderCastle(int X, int Y)
 		L"       ||      |       /__\\       |      ||",
 		L"       ||______|________||________|______||",
 		L"          | | | | | | | || | | | | | |",
-		L"          | | | | | | | || | | | | | |"
+		L"          | | | | | | | || | | | | | |",
+			L" ",
+		L"Render, Engine, UI, Logic : 이승재",
+		L"Player, Weapon : 박성규",
+		L"Inventory, Item, Shop : 김인철",
+		L"Monster, Attack Pattern : 최현준",
+		L"LevelUp 성창훈",
+		L"Chronos Realm - Console Isometric RPG",
 	};
 
 	for (int i = 0; i < static_cast<int>(castle.size()); ++i)

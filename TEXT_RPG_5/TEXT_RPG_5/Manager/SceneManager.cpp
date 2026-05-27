@@ -54,7 +54,7 @@ void SceneManager::BeginPlay()
 	EnsurePools();
 	if (CurrentPlayer == nullptr)
 	{
-		CurrentPlayer = SpawnObject<Player>("player", 100, 100);
+		CurrentPlayer = SpawnObject<Player>("player", 100, 200);
 	}
 
 	LoadCurrentStage();
@@ -98,7 +98,7 @@ void SceneManager::LoadCurrentStage()
 
 	if (CurrentPlayer == nullptr)
 	{
-		CurrentPlayer = SpawnObject<Player>("player", 100, 100);
+		CurrentPlayer = SpawnObject<Player>("player", 100, 200);
 	}
 
 	Vector playerStart = StageManager::GetInstance()->GetPlayerStartPosition();
