@@ -25,4 +25,6 @@ Slime::Slime(int playerLevel)
 	AttackRange = 1;
 	AttackInterval = 2.0f;
 	AttackElapsedtime = 0.0f;
+	
+	//TrySetShiny();
 }

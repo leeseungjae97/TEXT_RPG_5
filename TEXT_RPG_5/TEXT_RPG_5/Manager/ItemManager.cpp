@@ -15,6 +15,24 @@ ItemManager::~ItemManager()
 }
 
 
+UItem* ItemManager::CreateRandomItem(const vector<FItemWeight>& Pool)
+{
+    int Total = 0;
+    for (const FItemWeight& Entry : Pool)
+        Total += Entry.Weight;
+
+    int Roll = rand() % Total;
+    int Acc = 0;
+    for (const FItemWeight& Entry : Pool)
+    {
+        Acc += Entry.Weight;
+        if (Roll < Acc)
+            return CreateItem(Entry.Id);
+    }
+
+    return nullptr;
+}
+
 UItem* ItemManager::CreateItem(ItemId Id)
 {
     switch (Id)

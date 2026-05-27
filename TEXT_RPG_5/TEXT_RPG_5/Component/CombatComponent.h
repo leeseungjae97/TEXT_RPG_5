@@ -28,10 +28,13 @@ public:
 	float GetAttackCooldownAlpha() const;
 	float GetAttackAnimationAlpha() const;
 	// void SetAttackValue();
-	void SwordAttack();
+	void Attack();
 	void HandleAttack();
 	void LaunchProjectile();
 	void MakeSwordRange();
+	void MakeAxeRange();
+	void MakeRockRange();
+	void MakeMagicRange();
 	void AttackEffectTimeAcc(float DeltaTime);
 	void HandleAttackInput(float DeltaTime);
 	
@@ -48,22 +51,20 @@ private:
 	Player* PlayerPtr;
 	UMoveComponent* MoveComponentPtr;
 	WeaponType Weapon;
-	float AttackElapsedTime;
-	float AttackInterval;
 	float AttackVisibleTime;
 	float AttackVisibleDuration;
 	bool bAttackRequested;
 	
-	float ProjectileTotalTime;
-	float ProjectileDelayTime;
 	
-	// 무기 타입별 쿨타임 관리
-	float SwordElapsedTime;
+	float RockInterval;
 	float SwordInterval;
+	float AxeInterval;
+	float BowInterval;
+	float MagicInterval;
 
-	float SpearElapsedTime;
-	float SpearInterval;
-
-	float ProjectileElapsedTime;
-	float ProjectileInterval;
+	float RockElapsedTime;
+	float SwordElapsedTime;
+	float AxeElapsedTime;
+	float BowElapsedTime;
+	float MagicElapsedTime;
 };

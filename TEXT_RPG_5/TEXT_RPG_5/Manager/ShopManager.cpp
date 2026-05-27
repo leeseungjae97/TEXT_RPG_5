@@ -5,6 +5,7 @@
 #include "../Item/ItemDB.h"
 #include "../Item/Item.h"
 #include "../Component/InventoryComponent.h"
+#include "../Struct/ItemWeight.h"
 
 /* for template
 for (int y = 0; y < Container.size(); ++y)
@@ -18,6 +19,22 @@ for (int y = 0; y < Container.size(); ++y)
     }
 }
 */
+
+static const vector<FItemWeight> ShopItemPool =
+{
+    { ItemId::HP_POTION,       150 },
+    { ItemId::STRENGTH_POTION, 50 },
+    { ItemId::LONGSWORD,       10 },
+    { ItemId::BOW,             10 },
+    { ItemId::AXE,             10 },
+    { ItemId::STAFF,           10 },
+    { ItemId::LEATHER_HELMET,   5 },
+    { ItemId::LEATHER_ARMOR,    5 },
+    { ItemId::LEATHER_BOOTS,    5 },
+    { ItemId::PLATE_HELMET,     2 },
+    { ItemId::PLATE_ARMOR,      2 },
+    { ItemId::PLATE_BOOTS,      2 },
+};
 
 ShopManager::ShopManager()
 {
@@ -101,18 +118,7 @@ UItem* ShopManager::GetItem(Vector Index)
 
 UItem* ShopManager::GetRandomItem()
 {
-    int n = rand() % 2;
-
-    switch (n)
-    {
-    case 0:
-        return ItemManager::GetInstance()->CreateItem(ItemId::HP_POTION);
-
-    case 1:
-        return ItemManager::GetInstance()->CreateItem(ItemId::STRENGTH_POTION);
-    }
-
-    return nullptr;
+    return ItemManager::GetInstance()->CreateRandomItem(ShopItemPool);
 }
 
 
