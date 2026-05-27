@@ -533,6 +533,29 @@ void Monster::Attackplayer(Player* player)
 	AttackElapsedtime = 0.0f;
 }
 
+bool Monster::IsShiny() const
+{
+	return bIsShiny;
+}
+
+void Monster::TrySetShiny()
+{
+	if (rand() % 3 == 0)
+	{
+		bIsShiny = true;
+		
+		//임시
+		
+		Name = "Shiny" + Name;
+		
+		MaxHealth += 100;
+		Health = MaxHealth;
+		Attack += 10;
+	}
+}
+
+
+
 		
 
 

@@ -6,4 +6,7 @@ class Orc : public Monster
 {
 public:
 	Orc(int PlayerLevel);
+	
+protected:
+	virtual void Attackplayer(Player* player) override;
 };
