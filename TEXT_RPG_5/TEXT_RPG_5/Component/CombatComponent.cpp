@@ -208,6 +208,26 @@ void UCombatComponent::Attack()
 	}
 }
 
+void UCombatComponent::TriggerCustomAttack(const vector<Vector>& CustomRange, int Damage)
+{
+	AttackValue = CustomRange;
+	PlayerPtr->SetIsAttack(true);
+	AttackVisibleTime = AttackVisibleDuration;
+
+	for (const Vector& AttackPos : CustomRange)
+	{
+		if (AttackPos.Y < 0 || AttackPos.Y >= MAP_MAX_Y || AttackPos.X < 0 || AttackPos.X >= MAP_MAX_X)
+			continue;
+
+		if (MapManager::GetInstance()->IsTypeExist(AttackPos.Y, AttackPos.X, MapObjectType::Monster))
+		{
+			const int ID = MapManager::GetInstance()->GetID(AttackPos.Y, AttackPos.X);
+			if (Monster* const Mon = dynamic_cast<Monster*>(ObjectPoolManager::GetInstance()->GetObjectByID(ID)))
+			{
+				Mon->TakeDamage(Damage);
+			}
+		}
+	}
 float UCombatComponent::GetAttackAnimationAlpha() const
 {
 	if (AttackVisibleDuration <= 0.0f || AttackVisibleTime <= 0.0f)

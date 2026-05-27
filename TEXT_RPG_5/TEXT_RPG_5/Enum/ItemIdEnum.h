@@ -21,6 +21,9 @@ enum class ItemId
 	PLATE_HELMET,    // 14
 	PLATE_ARMOR,     // 15
 	PLATE_BOOTS,     // 16
+	FIRE_WALL_SCROLL,    // 17
+	LIGHTNING_STRIKE_SCROLL,      // 18
+	FLAME_POTION,     // 19
 
 	MAX
 };
