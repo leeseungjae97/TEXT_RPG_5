@@ -3,6 +3,7 @@
 #include "../Enum/ComponentTypeEnum.h"
 #include "../Enum/Direction.h"
 #include "../Item/AllItems.h"
+#include "../Struct/Vector.h"
 
 class Player;
 
@@ -42,5 +43,19 @@ private:
 	float TurnElapsedTime = 0.0f;
 	float TurnDuration = 0.18f;
 	bool bWasOnShop = false;
+	
+	
+public:
+	void Teleport();
+	bool CanTeleportPosition(Vector Position);
+	bool FindTeleportPosition(Vector TargetPosition, Vector& OutPosition);
+	Vector GetTeleportTargetPosition();
+	
+	bool IsNearShop(Vector Position);
+	
+private:
+	float TeleportElapsedTime = 999.0f;
+	float TeleportInterval = 3.0f;
+	int TeleportDistance = 4;
 };
 
