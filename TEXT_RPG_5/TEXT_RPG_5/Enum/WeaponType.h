@@ -2,9 +2,11 @@
 
 enum class WeaponType
 {
+	NONE,
 	Sword,
-	Spear,
-	Projectile,
-	
+	Bow,
+	Axe,
+	Magic,
+
 	MAX
 };

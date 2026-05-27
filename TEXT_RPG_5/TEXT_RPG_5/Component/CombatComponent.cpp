@@ -140,7 +140,7 @@ void UCombatComponent::HandleAttack()
 			SwordAttack();
 		}
 		break;
-		case WeaponType::Projectile:
+		case WeaponType::Bow:
 		{
 			ProjectileAttack();
 		}

@@ -688,14 +688,14 @@ void ViewportManager::Render2DtoISO()
 
 void ViewportManager::OpenInventory()
 {
-	if (!inventoryComponent) return;
+	/*if (!inventoryComponent) return;
 	if (InputManager::GetInstance()->IsKeyTap(KeyCode::I))
 	{
 		if (!inventoryComponent->GetOpenedInventory())	inventoryComponent->OpenInventory();
 		else											inventoryComponent->CloseInventory();
 	}
 
-	bIsInvenOpen = inventoryComponent->GetOpenedInventory();
+	bIsInvenOpen = inventoryComponent->GetOpenedInventory();*/
 }
 
 void ViewportManager::OpenExitDialog()

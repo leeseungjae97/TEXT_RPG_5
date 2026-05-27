@@ -42,6 +42,8 @@ UInventoryComponent::~UInventoryComponent()
         }
     }
     Container.clear();
+    
+    
 }
 
 void UInventoryComponent::OpenInventory()
@@ -49,8 +51,10 @@ void UInventoryComponent::OpenInventory()
     bOpenedInventory = true;
 }
 
-void UInventoryComponent::OpenShop()
+void UInventoryComponent::OpenShop(int ShopId)
 {
+    ShopManager::GetInstance()->SetPlayerInventory(this);
+    ShopManager::GetInstance()->EnterNewShop(ShopId);
     OpenInventory();
     SetOnShop(true);
 }
@@ -247,8 +251,13 @@ void UInventoryComponent::SelectCursor()
     else if (Item->GetItemInfo().Type == ItemType::Equipment)
     {
         UEquipmentComponent* EC = PlayerPtr->GetComponent<UEquipmentComponent>();
-        if (EC && EC->Equip(Item))
+        UItem* Displaced = nullptr;
+        if (EC && EC->Equip(Item, Displaced))
+        {
             DetachItem(Item);
+            if (Displaced != nullptr)
+                AddItem(Displaced);
+        }
     }
     else
     {
@@ -419,6 +428,12 @@ bool UInventoryComponent::ToggleOnShop()
     return bOnShop;
 }
 
+vector<vector<UItem*>>& UInventoryComponent::GetFocusedContainer()
+{
+    if (bOnShop && !ShopManager::GetInstance()->GetSellMode())
+        return ShopManager::GetInstance()->GetContainerRef();
+    return Container;
+}
 
 void UInventoryComponent::Tick(float DeltaTime)
 {
@@ -437,10 +452,14 @@ void UInventoryComponent::Tick(float DeltaTime)
         if (Input->IsKeyTap(KeyCode::_2)) UseQuickSlot(1);
         if (Input->IsKeyTap(KeyCode::_3)) UseQuickSlot(2);
         if (Input->IsKeyTap(KeyCode::_4)) UseQuickSlot(3);
+        if (Input->IsKeyTap(KeyCode::I)) OpenInventory();
+        if (Input->IsKeyTap(KeyCode::E)) OpenShop(1);
         return;
     }
     
     //이 밑으로는 다 bOpenedInventory가 true일 때만(인벤토리 열었을 경우에만) 작동.
+    
+    if (Input->IsKeyTap(KeyCode::I)) CloseInventory();
     
     //아이템 및 골드 지급(디버그용)
     if (Input->IsKeyTap(KeyCode::B))
@@ -448,17 +467,31 @@ void UInventoryComponent::Tick(float DeltaTime)
         AddItem(ItemManager::GetInstance()->CreateItem(ItemId::HP_POTION));
         AddItem(ItemManager::GetInstance()->CreateItem(ItemId::STRENGTH_POTION));
         AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LONGSWORD));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_HELMET));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_ARMOR));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_BOOTS));
         AddGold(500);
     }
-    
-    
-    
+
+    //추가 아이템 지급
+    if (Input->IsKeyTap(KeyCode::V))
+    {
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::BOW));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::AXE));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::STAFF));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_HELMET));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_ARMOR));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_BOOTS));
+    }
+
+
+
     //커서 이동 및 결정(사용 or 판매 or 구매) 버튼
     if (Input->IsKeyTap(KeyCode::UP))    CursorUp();
     if (Input->IsKeyTap(KeyCode::DOWN))  CursorDown();
     if (Input->IsKeyTap(KeyCode::LEFT))  CursorLeft();
     if (Input->IsKeyTap(KeyCode::RIGHT)) CursorRight();
-    if (Input->IsKeyTap(KeyCode::Z))     SelectCursor();
+    if (Input->IsKeyTap(KeyCode::E))     SelectCursor();
     
     
     //누르면 샵 진입 or 퇴장 토글
@@ -470,24 +503,8 @@ void UInventoryComponent::Tick(float DeltaTime)
 
     if (bOnShop && Input->IsKeyTap(KeyCode::C))
     {
-        if (ToggleOnShop())
-            ShopManager::GetInstance()->SetPlayerInventory(this);
         ShopManager::GetInstance()->ToggleSellMode();
     }
-    
-    //샵에 진입했을 때, 이걸 누르면 SellMode 활성화.
-    // if (bOnShop && Input->IsKeyTap(KeyCode::C))
-    // {
-    //     if (!ShopManager::GetInstance()->GetSellMode())
-    //         ShopManager::GetInstance()->SetSellMode(true);
-    // }
-    
-    //
-    // if (bOnShop && Input->IsKeyTap(KeyCode::V))
-    // {
-    //     if (ShopManager::GetInstance()->GetSellMode())
-    //         ShopManager::GetInstance()->SetSellMode(false);
-    // }
     
     //퀵슬롯에 등록 (인벤토리 켜져있을 때)
     if (Input->IsKeyTap(KeyCode::_1)) RegisterOnQuickSlot(0);

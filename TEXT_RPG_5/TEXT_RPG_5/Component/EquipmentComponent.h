@@ -24,11 +24,12 @@ public:
     ~UEquipmentComponent();
     virtual void Tick(float DeltaTime) override;
 
-    bool Equip(UItem* Item);
+    bool Equip(UItem* Item, UItem*& OutDisplaced);
     bool UnEquip(Vector Cursor, UInventoryComponent* Inventory);
 
     vector<vector<UItem*>>& GetContainer() { return Container; }
     UItem* GetItem(Vector Index);
+    WeaponType GetCurrentWeaponType() const;
 
 private:
     void ApplyEquipEffect(UItem* Item);

@@ -1768,11 +1768,13 @@
     <ClInclude Include="Component\MoveComponent.h" />
     <ClInclude Include="Component\SubActionComponent.h" />
     <ClInclude Include="Define.h" />
+    <ClInclude Include="Enum\EquipmentTypeEnum.h" />
     <ClInclude Include="Dragon.h" />
     <ClInclude Include="Enum\ItemIdEnum.h" />
     <ClInclude Include="Enum\ComponentTypeEnum.h" />
     <ClInclude Include="Enum\Direction.h" />
     <ClInclude Include="Enum\ItemTypeEnum.h" />
+    <ClInclude Include="Enum\StatType.h" />
     <ClInclude Include="Enum\MapObjectTypeEnum.h" />
     <ClInclude Include="Enum\WeaponType.h" />
     <ClInclude Include="Item\AllItems.h" />
@@ -1804,6 +1806,7 @@
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
     <ClInclude Include="Struct\ItemInfo.h" />
+    <ClInclude Include="Struct\Buff.h" />
     <ClInclude Include="Troll.h" />
     <ClInclude Include="Struct\Coordinate.h" />
     <ClInclude Include="Struct\ItemData.h" />
