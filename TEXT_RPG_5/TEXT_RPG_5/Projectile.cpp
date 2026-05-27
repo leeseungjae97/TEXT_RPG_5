@@ -181,7 +181,7 @@ bool Projectile::CanTickProjectile()
         return false;
     }
     
-    if (MapManager::GetInstance()->IsMapInitSize())
+    if (!MapManager::GetInstance()->IsMapInitSize())
     {
         Destroy();
         return false;
