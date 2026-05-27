@@ -8,6 +8,8 @@
 #include "../Player.h"
 #include "../Struct/Coordinate.h"
 #include "../Define.h"
+#include "../pch.h"
+#include "../Manager/DisplayManager.h"
 
 UMoveComponent::UMoveComponent(AObject* InOwner)
 	: UComponent(InOwner)
@@ -268,7 +270,17 @@ bool UMoveComponent::FindTeleportPosition(Vector TargetPosition, Vector& OutPosi
 		Vector Right = { Current.X + 1, Current.Y };
 
 		Vector NextPositions[4] = { Up, Down, Left, Right };
+		
+		// 방향 순서 랜덤 섞기
+		for (int i = 3; i > 0; --i)
+		{
+			int RandomIndex = rand() % (i + 1);
 
+			Vector Temp = NextPositions[i];
+			NextPositions[i] = NextPositions[RandomIndex];
+			NextPositions[RandomIndex] = Temp;
+		}
+				
 		for (int i = 0; i < 4; ++i)
 		{
 			Vector Next = NextPositions[i];
@@ -326,6 +338,8 @@ Vector UMoveComponent::GetTeleportTargetPosition()
 
 	return TargetPosition;
 }
+
+
 
 bool UMoveComponent::IsNearShop(Vector Position)
 {
