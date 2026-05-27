@@ -464,27 +464,30 @@ void UInventoryComponent::Tick(float DeltaTime)
     
     if (Input->IsKeyTap(KeyCode::I)) CloseInventory();
     
-    //아이템 및 골드 지급(디버그용)
+    //장비 아이템 지급(디버그용)
     if (Input->IsKeyTap(KeyCode::B))
     {
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::HP_POTION));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::STRENGTH_POTION));
         AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LONGSWORD));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_HELMET));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_ARMOR));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_BOOTS));
-        AddGold(500);
-    }
-
-    //추가 아이템 지급
-    if (Input->IsKeyTap(KeyCode::V))
-    {
         AddItem(ItemManager::GetInstance()->CreateItem(ItemId::BOW));
         AddItem(ItemManager::GetInstance()->CreateItem(ItemId::AXE));
         AddItem(ItemManager::GetInstance()->CreateItem(ItemId::STAFF));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_HELMET));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_ARMOR));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_BOOTS));
         AddItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_HELMET));
         AddItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_ARMOR));
         AddItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_BOOTS));
+    }
+
+    //추가 아이템 지급 소모품 및 골드
+    if (Input->IsKeyTap(KeyCode::V))
+    {
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::HP_POTION));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::STRENGTH_POTION));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LIGHTNING_STRIKE_SCROLL));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::FLAME_POTION));
+        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::FIRE_WALL_SCROLL));
+        AddGold(500);
     }
 
 
@@ -497,12 +500,12 @@ void UInventoryComponent::Tick(float DeltaTime)
     if (Input->IsKeyTap(KeyCode::E))     SelectCursor();
     
     
-    //누르면 샵 진입 or 퇴장 토글
-    // if (Input->IsKeyTap(KeyCode::X))
-    // {
-    //     if (ToggleOnShop())
-    //         ShopManager::GetInstance()->SetPlayerInventory(this);
-    // }
+    //아이템 버리기
+    bool bBuyMode = bOnShop && !ShopManager::GetInstance()->GetSellMode();
+    if (Input->IsKeyTap(KeyCode::X) && !bOnEquipment && !bBuyMode)
+    {
+        RemoveItem(GetItem(GetCursor()));
+    }
 
     if (bOnShop && Input->IsKeyTap(KeyCode::C))
     {

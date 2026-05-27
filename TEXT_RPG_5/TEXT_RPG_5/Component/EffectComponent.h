@@ -21,6 +21,7 @@ protected:
 
 public:
     void AddBuff(StatType Stat, int Amount, float Duration);
+    void AddPeriodicAttackBuff(int Damage, float Period, float Duration);
     virtual void Tick(float DeltaTime) override;
 
 private:

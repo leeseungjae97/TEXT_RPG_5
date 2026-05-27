@@ -59,31 +59,31 @@ void SceneManager::BeginPlay()
 	CurrentPlayer = SpawnObject<Player>("player", 100, 10);
 	CurrentPlayer->SetPosition(20, 20);
 	
-	 for (int i = 1; i <= 3; ++i)
-	{
-		Goblin* Gob = SpawnObject<Goblin>(1);
-		Gob->SetPosition(i, i);
-		Gob->SetPrevPosition(i, i);
-		
-		Orc* Or = SpawnObject<Orc>(1);
-		Or->SetPosition(i * 2, i * 2);
-		Or->SetPrevPosition(i * 2, i * 2);
-		
-		Slime* Sli = SpawnObject<Slime>(1);
-		Sli->SetPosition(i * 2 + 1, i * 2 + 1);
-		Sli->SetPrevPosition(i * 2 + 1, i * 2 + 1);
-		
-		//테스트
-		Spider* spi = SpawnObject<Spider>(1);
-		spi->SetPosition(i * 3, i * 3);
-		spi->SetPrevPosition(i * 3, i * 3);
-	 }
+	//  for (int i = 1; i <= 3; ++i)
+	// {
+	// 	Goblin* Gob = SpawnObject<Goblin>(1);
+	// 	Gob->SetPosition(i, i);
+	// 	Gob->SetPrevPosition(i, i);
+	// 	
+	// 	Orc* Or = SpawnObject<Orc>(1);
+	// 	Or->SetPosition(i * 2, i * 2);
+	// 	Or->SetPrevPosition(i * 2, i * 2);
+	// 	
+	// 	Slime* Sli = SpawnObject<Slime>(1);
+	// 	Sli->SetPosition(i * 2 + 1, i * 2 + 1);
+	// 	Sli->SetPrevPosition(i * 2 + 1, i * 2 + 1);
+	// 	
+	// 	//테스트
+	// 	Spider* spi = SpawnObject<Spider>(1);
+	// 	spi->SetPosition(i * 3, i * 3);
+	// 	spi->SetPrevPosition(i * 3, i * 3);
+	//  }
 	
 	
 	//테스트
-	//Dragon* Dra = SpawnObject<Dragon>(1);
-	//Dra->SetPosition(10, 10);
-	//Dra->SetPrevPosition(10, 10);
+	Dragon* Dra = SpawnObject<Dragon>(1);
+	Dra->SetPosition(10, 10);
+	Dra->SetPrevPosition(10, 10);
 }
 
 void SceneManager::AddObject(AObject* object)
