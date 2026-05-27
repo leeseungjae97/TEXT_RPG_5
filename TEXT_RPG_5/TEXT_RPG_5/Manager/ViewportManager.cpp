@@ -5,6 +5,7 @@
 #include "DisplayManager.h"
 #include "SceneManager.h"
 #include "../Component/CombatComponent.h"
+#include "../Component/EquipmentComponent.h"
 #include "../Component/InventoryComponent.h"
 #include "../Component/LevelComponent.h"
 #include "../Component/MoveComponent.h"
@@ -315,6 +316,130 @@ void ViewportManager::Render2DtoISO()
 			renderManager->PutCell(iso.Y - 2, iso.X + 1, L'\\', attribute);
 			renderManager->PutCell(iso.Y - 1, iso.X - 1, L'/', attribute);
 			renderManager->PutCell(iso.Y - 1, iso.X + 1, L'\\', attribute);
+		};
+
+	auto drawPlayerWeapon = [&](Vector iso, WeaponType weaponType, EDirection direction, float attackAnimationAlpha, bool bAttackAnimating)
+		{
+			if (weaponType == WeaponType::NONE)
+			{
+				return;
+			}
+
+			const int handSide = direction == EDirection::DOWN || direction == EDirection::LEFT ? -1 : 1;
+			int handX = iso.X + 2;
+			int handY = iso.Y - 3;
+			switch (direction)
+			{
+			case EDirection::DOWN:
+				handX = iso.X - 2;
+				handY = iso.Y - 3;
+				break;
+			case EDirection::LEFT:
+				handX = iso.X - 2;
+				handY = iso.Y - 2;
+				break;
+			case EDirection::RIGHT:
+				handX = iso.X + 2;
+				handY = iso.Y - 2;
+				break;
+			case EDirection::UP:
+			case EDirection::NONE:
+			default:
+				break;
+			}
+
+			WORD weaponAttribute = MakeAttribute(CC_WHITE);
+			wchar_t weaponChar = L'|';
+			const float returnAlpha = attackAnimationAlpha < 0.5f
+				? attackAnimationAlpha * 2.0f
+				: (1.0f - attackAnimationAlpha) * 2.0f;
+
+			if (weaponType == WeaponType::Sword || weaponType == WeaponType::Axe)
+			{
+				weaponAttribute = MakeAttribute(weaponType == WeaponType::Axe ? CC_DARKGRAY : CC_LIGHTGRAY);
+				if (bAttackAnimating)
+				{
+					if (attackAnimationAlpha < 0.34f)
+					{
+						weaponChar = handSide < 0 ? L'\\' : L'/';
+						handY -= 1;
+					}
+					else if (attackAnimationAlpha < 0.67f)
+					{
+						weaponChar = weaponType == WeaponType::Axe ? L'T' : L'-';
+						handX += handSide;
+					}
+					else
+					{
+						weaponChar = handSide < 0 ? L'/' : L'\\';
+						handY += 1;
+					}
+				}
+				else
+				{
+					weaponChar = weaponType == WeaponType::Axe
+						? L'P'
+						: (handSide < 0 ? L'/' : L'\\');
+				}
+			}
+			else if (weaponType == WeaponType::Bow)
+			{
+				weaponAttribute = MakeAttribute(CC_YELLOW);
+				weaponChar = handX < iso.X ? L'(' : L')';
+				const int pullOffset = bAttackAnimating && returnAlpha > 0.35f ? -handSide : 0;
+				renderManager->PutCell(handY, handX, weaponChar, weaponAttribute);
+				renderManager->PutCell(handY, handX - handSide + pullOffset, returnAlpha > 0.35f ? L'<' : L'|', MakeAttribute(CC_LIGHTGRAY));
+				if (bAttackAnimating && returnAlpha > 0.65f)
+				{
+					renderManager->PutCell(handY, handX + handSide, handSide > 0 ? L'>' : L'<', MakeAttribute(CC_CYAN));
+				}
+				return;
+			}
+			else if (weaponType == WeaponType::Magic)
+			{
+				weaponAttribute = MakeAttribute(CC_MAGENTA);
+				const int lift = bAttackAnimating ? static_cast<int>(returnAlpha * 2.0f + 0.5f) : 0;
+				weaponChar = L'|';
+				handY -= lift;
+				if (bAttackAnimating && lift > 0)
+				{
+					renderManager->PutCell(handY - 1, handX, L'*', MakeAttribute(CC_MAGENTA));
+				}
+			}
+
+			renderManager->PutCell(handY, handX, weaponChar, weaponAttribute);
+		};
+
+	auto drawIsoPlayerActor = [&](Vector iso, wchar_t icon, WORD attribute, Player* player)
+		{
+			drawIsoActor(iso, icon, attribute, true);
+
+			if (player == nullptr)
+			{
+				return;
+			}
+
+			WeaponType weaponType = WeaponType::NONE;
+			if (UEquipmentComponent* equipmentComponent = player->GetComponent<UEquipmentComponent>())
+			{
+				weaponType = equipmentComponent->GetCurrentWeaponType();
+			}
+
+			EDirection direction = EDirection::UP;
+			if (UMoveComponent* moveComponent = player->GetComponent<UMoveComponent>())
+			{
+				direction = moveComponent->GetFacingDirection();
+			}
+
+			float attackAnimationAlpha = 1.0f;
+			bool bAttackAnimating = false;
+			if (UCombatComponent* combatComponent = player->GetComponent<UCombatComponent>())
+			{
+				bAttackAnimating = combatComponent->IsAttackVisible();
+				attackAnimationAlpha = combatComponent->GetAttackAnimationAlpha();
+			}
+
+			drawPlayerWeapon(iso, weaponType, direction, attackAnimationAlpha, bAttackAnimating);
 		};
 
 	auto drawIsoMonsterActor = [&](Vector iso, Monster* monster, WORD attribute)
@@ -682,7 +807,14 @@ void ViewportManager::Render2DtoISO()
 		}
 		else
 		{
-			drawIsoActor(iso, objectIcon, objectAttribute, dynamic_cast<Player*>(object) != nullptr);
+			if (Player* player = dynamic_cast<Player*>(object))
+			{
+				drawIsoPlayerActor(iso, objectIcon, objectAttribute, player);
+			}
+			else
+			{
+				drawIsoActor(iso, objectIcon, objectAttribute, false);
+			}
 		}
 		drawPlayerBars(iso, playerForBars);
 		drawLevelUpEffect(iso, playerForBars);

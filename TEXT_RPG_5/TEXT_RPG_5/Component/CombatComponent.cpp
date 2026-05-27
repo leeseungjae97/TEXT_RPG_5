@@ -60,6 +60,16 @@ float UCombatComponent::GetAttackCooldownAlpha() const
 	return min(max(AttackElapsedTime / AttackInterval, 0.0f), 1.0f);
 }
 
+float UCombatComponent::GetAttackAnimationAlpha() const
+{
+	if (AttackVisibleDuration <= 0.0f || AttackVisibleTime <= 0.0f)
+	{
+		return 1.0f;
+	}
+
+	return min(max(1.0f - AttackVisibleTime / AttackVisibleDuration, 0.0f), 1.0f);
+}
+
 void UCombatComponent::SwordAttack()
 {
 	if (AttackValue.empty())
