@@ -14,6 +14,7 @@ ItemManager::~ItemManager()
 {
 }
 
+
 UItem* ItemManager::CreateItem(ItemId Id)
 {
     switch (Id)
@@ -26,9 +27,48 @@ UItem* ItemManager::CreateItem(ItemId Id)
         
     case ItemId::GOBLIN_LEATHER:
         return new MiscItem(ItemDB::GOBLIN_LEATHER);
-
+    
+    case ItemId::SLIME_JELLY:
+        return new MiscItem(ItemDB::SLIME_JELLY);
+        
+    case ItemId::ORC_TUSK:
+        return new MiscItem(ItemDB::ORC_TUSK);
+        
+    case ItemId::SPIDER_EYE:
+        return new MiscItem(ItemDB::SPIDER_EYE);
+        
+    case ItemId::DRAGON_HEART:
+        return new UsableItem(ItemDB::DRAGON_HEART);
+        
     case ItemId::LONGSWORD:
         return new EquipmentItem(ItemDB::LONGSWORD);
+
+    case ItemId::BOW:
+        return new EquipmentItem(ItemDB::BOW);
+
+    case ItemId::AXE:
+        return new EquipmentItem(ItemDB::AXE);
+
+    case ItemId::STAFF:
+        return new EquipmentItem(ItemDB::STAFF);
+
+    case ItemId::LEATHER_HELMET:
+        return new EquipmentItem(ItemDB::LEATHER_HELMET);
+
+    case ItemId::LEATHER_ARMOR:
+        return new EquipmentItem(ItemDB::LEATHER_ARMOR);
+
+    case ItemId::LEATHER_BOOTS:
+        return new EquipmentItem(ItemDB::LEATHER_BOOTS);
+
+    case ItemId::PLATE_HELMET:
+        return new EquipmentItem(ItemDB::PLATE_HELMET);
+
+    case ItemId::PLATE_ARMOR:
+        return new EquipmentItem(ItemDB::PLATE_ARMOR);
+
+    case ItemId::PLATE_BOOTS:
+        return new EquipmentItem(ItemDB::PLATE_BOOTS);
 
     default:
         return nullptr;

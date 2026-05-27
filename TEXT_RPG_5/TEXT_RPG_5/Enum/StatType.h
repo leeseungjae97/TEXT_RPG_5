@@ -3,5 +3,13 @@
 enum class StatType
 {
     None,
-    Power
+    HP,
+    MaxHP,
+    Power,
+    Exp,
+    MaxExp,
+    Level,
+    Gold,
+    
+    Max
 };

@@ -5,6 +5,9 @@
 #include "../pch.h"
 #include "../Enum/ItemTypeEnum.h"
 #include "../Enum/ItemIdEnum.h"
+#include "../Enum/StatType.h"
+#include "../Enum/EquipmentTypeEnum.h"
+#include "../Enum/WeaponType.h"
 
 
 struct FItemInfo
@@ -14,5 +17,7 @@ struct FItemInfo
     ItemId Id;
     int Price;
     int EffectAmount;
-	
+    StatType EffectType = StatType::None;
+    EquipmentType EquipSlot = EquipmentType::NONE;
+    WeaponType AttackType = WeaponType::NONE;
 };

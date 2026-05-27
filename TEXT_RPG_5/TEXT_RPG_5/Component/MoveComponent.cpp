@@ -101,7 +101,7 @@ void UMoveComponent::OpenShop()
 		if (UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>())
 		{
 			ShopManager::GetInstance()->SetPlayerInventory(InventoryComponent);
-			InventoryComponent->OpenShop();
+			InventoryComponent->OpenShop(1);
 		}
 	}
 

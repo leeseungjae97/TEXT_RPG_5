@@ -12,7 +12,7 @@
 #include "../Struct/ProjectileInfo.h"
 
 UCombatComponent::UCombatComponent(AObject* InOwner)
-	: UComponent(InOwner), Weapon(WeaponType::Melee)
+	: UComponent(InOwner), Weapon(WeaponType::Sword)
 {
 	PlayerPtr = dynamic_cast<Player*>(InOwner);
 	MoveComponentPtr = PlayerPtr != nullptr ? PlayerPtr->GetComponent<UMoveComponent>() : nullptr;
@@ -125,12 +125,12 @@ void UCombatComponent::HandleAttack()
 
 	switch (Weapon)
 	{
-		case WeaponType::Melee:
+		case WeaponType::Sword:
 		{
 			SwordAttack();
 		}
 		break;
-		case WeaponType::Projectile:
+		case WeaponType::Bow:
 		{
 			ProjectileAttack();
 		}

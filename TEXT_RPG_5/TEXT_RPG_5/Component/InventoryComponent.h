@@ -38,6 +38,8 @@ protected:
 	bool bOnShop = false;
 	bool bOnEquipment = false;
 	bool bOpenedInventory = false;
+	
+
 
 public:
 	~UInventoryComponent();
@@ -45,7 +47,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void OpenInventory();
-	void OpenShop();
+	void OpenShop(int ShopId);
 	void CloseInventory();
 	bool GetOpenedInventory(){return bOpenedInventory;}
 
@@ -85,6 +87,8 @@ public:
 	bool GetOnShop(){return bOnShop;}
 	bool BuyItem(UItem* Item);
 	void SellItem(UItem* Item);
+
+	vector<vector<UItem*>>& GetFocusedContainer();
 
 	bool GetOnEquipment() { return bOnEquipment; }
 	void OpenEquipmentPanel() { bOnEquipment = true; ResetCursor(); }

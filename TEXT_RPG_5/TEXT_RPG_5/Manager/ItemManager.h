@@ -15,5 +15,6 @@ private:
     ~ItemManager();
 
 public:
+    
     UItem* CreateItem(ItemId Id);
 };

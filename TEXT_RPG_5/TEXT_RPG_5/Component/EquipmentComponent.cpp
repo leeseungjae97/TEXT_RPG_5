@@ -1,7 +1,7 @@
 #include "EquipmentComponent.h"
 #include "InventoryComponent.h"
 #include "../Player.h"
-#include "../Enum/ItemIdEnum.h"
+#include "../Enum/EquipmentTypeEnum.h"
 
 UEquipmentComponent::UEquipmentComponent(AObject* InOwner)
     : UComponent(InOwner)
@@ -30,22 +30,25 @@ void UEquipmentComponent::Tick(float DeltaTime)
         PlayerPtr = dynamic_cast<Player*>(GetOwner());
 }
 
-bool UEquipmentComponent::Equip(UItem* Item)
+bool UEquipmentComponent::Equip(UItem* Item, UItem*& OutDisplaced)
 {
-    for (int y = 0; y < MaxRow; ++y)
+    OutDisplaced = nullptr;
+
+    EquipmentType SlotType = Item->GetItemInfo().EquipSlot;
+    if (SlotType == EquipmentType::NONE)
+        return false;
+
+    int Row = (int)SlotType;
+
+    if (Container[Row][0] != nullptr)
     {
-        if (nullptr == Container[y][0])
-        {
-            Container[y][0] = Item;
-            ApplyEquipEffect(Item);
-            
-            return true;
-            
-        }
-        
-        
+        OutDisplaced = Container[Row][0];
+        RemoveEquipEffect(OutDisplaced);
     }
-    return false;
+
+    Container[Row][0] = Item;
+    ApplyEquipEffect(Item);
+    return true;
 }
 
 bool UEquipmentComponent::UnEquip(Vector Cursor, UInventoryComponent* Inventory)
@@ -73,16 +76,27 @@ UItem* UEquipmentComponent::GetItem(Vector Index)
     return Container[Index.Y][0];
 }
 
+WeaponType UEquipmentComponent::GetCurrentWeaponType() const
+{
+    int WeaponRow = (int)EquipmentType::Weapon;
+    
+    if (Container[WeaponRow][0] == nullptr)
+        return WeaponType::NONE;
+    
+    return Container[WeaponRow][0]->GetItemInfo().AttackType;
+}
+
 void UEquipmentComponent::ApplyEquipEffect(UItem* Item)
 {
-    if (PlayerPtr == nullptr)
-        return;
+    if (PlayerPtr == nullptr) return;
 
-    switch (Item->GetItemInfo().Id)
+    const FItemInfo& Info = Item->GetItemInfo();
+    switch (Info.EffectType)
     {
-    case ItemId::LONGSWORD:
-        PlayerPtr->SetPower(PlayerPtr->GetPower() + Item->GetItemInfo().EffectAmount);
-        break;
+    case StatType::HP:    PlayerPtr->SetHP(PlayerPtr->GetHP() + Info.EffectAmount);          break;
+    case StatType::MaxHP: PlayerPtr->SetMax_HP(PlayerPtr->GetMax_HP() + Info.EffectAmount);  break;
+    case StatType::Power: PlayerPtr->SetPower(PlayerPtr->GetPower() + Info.EffectAmount);    break;
+    default: break;
     }
 }
 
@@ -90,10 +104,12 @@ void UEquipmentComponent::RemoveEquipEffect(UItem* Item)
 {
     if (PlayerPtr == nullptr) return;
 
-    switch (Item->GetItemInfo().Id)
+    const FItemInfo& Info = Item->GetItemInfo();
+    switch (Info.EffectType)
     {
-    case ItemId::LONGSWORD:
-        PlayerPtr->SetPower(PlayerPtr->GetPower() - Item->GetItemInfo().EffectAmount);
-        break;
+    case StatType::HP:    PlayerPtr->SetHP(PlayerPtr->GetHP() - Info.EffectAmount);          break;
+    case StatType::MaxHP: PlayerPtr->SetMax_HP(PlayerPtr->GetMax_HP() - Info.EffectAmount);  break;
+    case StatType::Power: PlayerPtr->SetPower(PlayerPtr->GetPower() - Info.EffectAmount);    break;
+    default: break;
     }
 }

@@ -181,6 +181,15 @@ void ShopManager::TryBuyItem()
     }
 }
 
+void ShopManager::EnterNewShop(int ShopId)
+{
+    if (ShopId != LastVisitedShopId)
+    {
+        RestoreShop();
+        LastVisitedShopId = ShopId;
+    }
+}
+
 void ShopManager::TrySellItem()
 {
     PlayerInventory->SellItem(PlayerInventory->GetItem(PlayerInventory->GetCursor()));
