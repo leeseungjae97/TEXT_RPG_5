@@ -241,14 +241,16 @@ void UInventoryComponent::SelectCursor()
     }
     
     
-    UItem* Item = GetItem(GetCursor());
-    if (Item == nullptr) return;
-    
     if (bOnShop)
     {
         ShopManager::GetInstance()->SelectCursor();
+        return;
     }
-    else if (Item->GetItemInfo().Type == ItemType::Equipment)
+
+    UItem* Item = GetItem(GetCursor());
+    if (Item == nullptr) return;
+
+    if (Item->GetItemInfo().Type == ItemType::Equipment)
     {
         UEquipmentComponent* EC = PlayerPtr->GetComponent<UEquipmentComponent>();
         UItem* Displaced = nullptr;
@@ -403,9 +405,10 @@ bool UInventoryComponent::BuyItem(UItem* Item)
 
 void UInventoryComponent::SellItem(UItem* Item)
 {
+    if (Item == nullptr) return;
     int Price = Item->GetItemInfo().Price;
     if (RemoveItem(Item))
-        AddGold(Price);
+        AddGold(Price / 2);
 }
 
 bool UInventoryComponent::SetOnShop(bool OnShop)

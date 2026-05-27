@@ -1808,6 +1808,7 @@
     <ClInclude Include="Slime.h" />
     <ClInclude Include="Spider.h" />
     <ClInclude Include="Struct\ItemInfo.h" />
+    <ClInclude Include="Struct\ItemWeight.h" />
     <ClInclude Include="Struct\Buff.h" />
     <ClInclude Include="Troll.h" />
     <ClInclude Include="Struct\Coordinate.h" />

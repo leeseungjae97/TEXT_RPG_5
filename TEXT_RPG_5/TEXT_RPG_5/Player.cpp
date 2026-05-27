@@ -13,7 +13,6 @@ Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 	this->TotalStat.Max_HP = TotalStat.HP;
 	this->TotalStat.Exp = 0;
 	this->TotalStat.Max_Exp = 100;
-	this->TotalStat.Gold = 0;
 	this->TotalStat.IsAttack = false;
 
 	this->MoveComponent = CreateDefaultComponent<UMoveComponent>();
@@ -69,7 +68,7 @@ int Player::GetMax_Exp()
 }
 int Player::GetGold()
 {
-	return this->TotalStat.Gold;
+	return InventoryComponent->GetGold();
 }
 bool Player::GetIsAttack()
 {
@@ -107,7 +106,7 @@ void Player::SetMax_Exp(int Max_Exp)
 }
 void Player::SetGold(int Gold)
 {
-	this->TotalStat.Gold = Gold;
+	InventoryComponent->SetGold(Gold);
 }
 void Player::SetIsAttack(bool Value)
 {
