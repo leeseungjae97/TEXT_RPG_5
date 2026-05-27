@@ -267,6 +267,7 @@ bool Projectile::HandleCurrentTile()
         if (Monster* Mons = dynamic_cast<Monster*>(Obj))
         {
             Mons->TakeDamage(Info.Damage);
+            Mons->NotifyHitEffect(HitEffectType::Bow);
         }
         Destroy();
         return true;

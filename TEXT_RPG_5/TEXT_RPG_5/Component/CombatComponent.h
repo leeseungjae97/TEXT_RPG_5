@@ -26,6 +26,7 @@ public:
 	bool IsAttackVisible() const { return AttackVisibleTime > 0.0f; }
 	bool IsAttackCoolingDown() const;
 	float GetAttackCooldownAlpha() const;
+	float GetAttackAnimationAlpha() const;
 	// void SetAttackValue();
 	void Attack();
 	void HandleAttack();
