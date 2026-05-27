@@ -12,6 +12,7 @@ public:
 public:
 	void Tick(float DeltaTime);
 	void BeginPlay();
+	void Reset();
 	void RegisterKilledMonster(const string& MonsterName);
 	const vector<pair<string, int>>& GetKilledMonsters() const { return KilledMonsters; }
 

@@ -62,7 +62,7 @@ public:
 	bool AddItem(UItem* Item);
 	bool RemoveItem(UItem* Item);
 	bool UseRandomItem();
-	bool UseItem(UItem* Item);
+	bool UseItem(UItem* Item, bool bShowDialog = false);
 	UItem* FindItemById(ItemId Id);
 	
 	void SelectCursor();
@@ -80,7 +80,7 @@ public:
 	vector<UItem*> GetQuickSlot(){return QuickSlot;}
 	void RegisterOnQuickSlot(int Number);
 	UItem* GetItemFromQuickSlot(int Number){return QuickSlot[Number];}
-	void UseQuickSlot(int Number){UseItem(QuickSlot[Number]);}
+	void UseQuickSlot(int Number);
 	void ClearQuickSlot(UItem* Item);
 	
 	bool SetOnShop(bool OnShop);

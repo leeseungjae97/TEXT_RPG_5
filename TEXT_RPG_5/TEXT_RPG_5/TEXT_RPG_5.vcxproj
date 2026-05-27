@@ -1402,7 +1402,12 @@
     <ClCompile Include="Spider.cpp" />
     <ClCompile Include="UI\BattleUI.cpp" />
     <ClCompile Include="UI\DialogUI.cpp" />
+    <ClCompile Include="UI\GameOverUI.cpp" />
+    <ClCompile Include="UI\GameClearUI.cpp" />
     <ClCompile Include="UI\InventoryUI.cpp" />
+    <ClCompile Include="UI\ItemLogUI.cpp" />
+    <ClCompile Include="UI\MainMenuUI.cpp" />
+    <ClCompile Include="UI\NameInputUI.cpp" />
     <ClCompile Include="UI\ShopUI.cpp" />
     <ClCompile Include="UI\HUDUI.cpp" />
     <ClCompile Include="Manager\DisplayManager.cpp">
@@ -1657,6 +1662,7 @@
       <AdditionalOptions>/utf-8 </AdditionalOptions>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Manager\StageManager.cpp" />
     <ClCompile Include="Manager\TimeManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1794,6 +1800,7 @@
     <ClInclude Include="Manager\DisplayManager.h" />
     <ClInclude Include="Manager\SceneManager.h" />
     <ClInclude Include="Manager\ShopManager.h" />
+    <ClInclude Include="Manager\StageManager.h" />
     <ClInclude Include="Manager\TimeManager.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="Object.h" />
@@ -1819,7 +1826,12 @@
     <ClInclude Include="Troll.h" />
     <ClInclude Include="UI\BattleUI.h" />
     <ClInclude Include="UI\DialogUI.h" />
+    <ClInclude Include="UI\GameOverUI.h" />
+    <ClInclude Include="UI\GameClearUI.h" />
     <ClInclude Include="UI\InventoryUI.h" />
+    <ClInclude Include="UI\ItemLogUI.h" />
+    <ClInclude Include="UI\MainMenuUI.h" />
+    <ClInclude Include="UI\NameInputUI.h" />
       <ClInclude Include="UI\ShopUI.h" />
       <ClInclude Include="UI\HUDUI.h" />
   </ItemGroup>

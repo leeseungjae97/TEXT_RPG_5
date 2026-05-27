@@ -18,6 +18,11 @@ void BattleManager::BeginPlay()
 	
 }
 
+void BattleManager::Reset()
+{
+	KilledMonsters.clear();
+}
+
 void BattleManager::RegisterKilledMonster(const string& MonsterName)
 {
 	for (pair<string, int>& killedMonster : KilledMonsters)

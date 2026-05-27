@@ -186,7 +186,7 @@ bool UInventoryComponent::UseRandomItem()
     }
 }
 
-bool UInventoryComponent::UseItem(UItem* Item)
+bool UInventoryComponent::UseItem(UItem* Item, bool bShowDialog)
 {
     if (Item == nullptr)
     {
@@ -214,7 +214,10 @@ bool UInventoryComponent::UseItem(UItem* Item)
         {
             wstring ItemName = DisplayManager::GetInstance()->ToWideString(ItemInfo.Name);
             PlayerPtr->NotifyLog(L"ITEM: " + ItemName);
-            ViewportManager::GetInstance()->ShowMessageDialog(ItemName + L" 사용", 1.5f);
+            if (bShowDialog)
+            {
+                ViewportManager::GetInstance()->ShowMessageDialog(ItemName + L" 사용", 1.5f);
+            }
         }
         RemoveItem(Item);
 
@@ -227,6 +230,16 @@ bool UInventoryComponent::UseItem(UItem* Item)
     {
         return false;
     }
+}
+
+void UInventoryComponent::UseQuickSlot(int Number)
+{
+    if (Number < 0 || Number >= static_cast<int>(QuickSlot.size()))
+    {
+        return;
+    }
+
+    UseItem(QuickSlot[Number], false);
 }
 
 

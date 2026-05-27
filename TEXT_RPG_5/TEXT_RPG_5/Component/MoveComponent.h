@@ -27,6 +27,8 @@ public:
 	void SetFacingDirection(EDirection Str);
 	float GetMoveAlpha() const;
 	float GetTurnAlpha() const;
+	float GetTeleportCooldownAlpha() const;
+	float GetTeleportRemainingTime() const;
 	
 public:
 	void OpenShop();

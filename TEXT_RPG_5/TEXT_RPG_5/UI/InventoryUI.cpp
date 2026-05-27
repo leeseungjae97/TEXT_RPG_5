@@ -18,6 +18,12 @@ InventoryUI::~InventoryUI()
 {
 }
 
+void InventoryUI::ResetCache()
+{
+	PlayerPtr = nullptr;
+	InventoryComponent = nullptr;
+}
+
 void InventoryUI::Render()
 {
 	InventoryRender();

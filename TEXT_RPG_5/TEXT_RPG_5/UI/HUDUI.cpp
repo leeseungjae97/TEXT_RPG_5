@@ -1,9 +1,11 @@
 #include "HUDUI.h"
 
 #include "../Component/CombatComponent.h"
+#include "../Component/EffectComponent.h"
 #include "../Component/EquipmentComponent.h"
 #include "../Component/InventoryComponent.h"
 #include "../Component/LevelComponent.h"
+#include "../Component/MoveComponent.h"
 #include "../Define.h"
 #include "../Enum/Direction.h"
 #include "../Item/Item.h"
@@ -13,6 +15,7 @@
 #include "../Manager/SceneManager.h"
 #include "../Manager/TimeManager.h"
 #include "../Manager/ViewportManager.h"
+#include "../Manager/StageManager.h"
 #include "../Monster.h"
 #include "../Player.h"
 #include "../Projectile.h"
@@ -33,7 +36,15 @@ void HUDUI::Render()
 
 	StatusRender();
 	MapRender();
+	TeleportCooldownRender();
 	QuickSlotRender();
+}
+
+void HUDUI::ResetCache()
+{
+	PlayerPtr = nullptr;
+	ShopColorIndex = 0;
+	ColorChangeDuration = 0.0f;
 }
 
 void HUDUI::StatusRender()
@@ -59,7 +70,9 @@ void HUDUI::StatusRender()
 	if (PlayerPtr->ShouldShowLogText())
 	{
 		Vector isoPosition = ViewportManager::GetInstance()->GetISOPosition();
-		Renderer->AddRender(isoPosition.Y - 10, isoPosition.X, PlayerPtr->GetLogText());
+		const wstring& logText = PlayerPtr->GetLogText();
+		const int textWidth = Renderer->GetTextDisplayWidth(logText);
+		Renderer->AddRender(isoPosition.Y - 10, isoPosition.X - textWidth / 2, logText);
 	}
 
 	
@@ -96,6 +109,72 @@ void HUDUI::StatusRender()
 	{
 		Renderer->AddRender(hudY - 3, hudX, L"LEVEL UP!");
 		Renderer->AddRender(hudY - 2, hudX, levelComponent->GetLevelUpStateText());
+	}
+
+	BuffStatusRender(hudY - 2, hudX);
+}
+
+void HUDUI::BuffStatusRender(int BaseY, int BaseX)
+{
+	UEffectComponent* effectComponent = PlayerPtr->GetComponent<UEffectComponent>();
+	if (effectComponent == nullptr)
+	{
+		return;
+	}
+
+	vector<FBuffDisplayInfo> buffInfos = effectComponent->GetBuffDisplayInfos();
+	if (buffInfos.empty())
+	{
+		return;
+	}
+
+	const int lineGap = 2;
+	const int startY = max(1, BaseY - static_cast<int>(buffInfos.size() - 1) * lineGap);
+	for (int i = 0; i < static_cast<int>(buffInfos.size()); ++i)
+	{
+		const int remainingSeconds = max(0, static_cast<int>(ceilf(buffInfos[i].RemainingTime)));
+		const wstring text = buffInfos[i].Text + L" : " + to_wstring(remainingSeconds) + L"s";
+		Renderer->AddRender(startY + i * lineGap, BaseX, text, CC_WHITE);
+	}
+}
+
+void HUDUI::TeleportCooldownRender()
+{
+	UEquipmentComponent* equipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>();
+	if (equipmentComponent == nullptr || equipmentComponent->GetCurrentWeaponType() != WeaponType::Magic)
+	{
+		return;
+	}
+
+	UMoveComponent* moveComponent = PlayerPtr->GetComponent<UMoveComponent>();
+	if (moveComponent == nullptr)
+	{
+		return;
+	}
+
+	const int width = 24;
+	const int height = 8;
+	const int quickSlotWidth = 4 * (8 - 1) + 1;
+	const int quickSlotX = SCREEN_WIDTH - quickSlotWidth - 6;
+	const int x = quickSlotX - width - 8;
+	const int y = SCREEN_HEIGHT - height - 4;
+	const float cooldownFillRatio = moveComponent->GetTeleportCooldownAlpha();
+	const float remainingTime = moveComponent->GetTeleportRemainingTime();
+
+	Renderer->DrawBox(y, x, width, height);
+	Renderer->AddRender(y + 1, x + 7, L"TELEPORT", CC_WHITE);
+	Renderer->AddRender(y + 2, x + 7, L"COOLDOWN", CC_GRAY);
+	DrawStatusBar(y + 4, (x + width / 7) + 1, width - 8, cooldownFillRatio, CC_CYAN);
+	
+	if (remainingTime > 0.0f)
+	{
+		wstring remainingText = to_wstring(static_cast<int>(ceilf(remainingTime))) + L"s";
+		const int textWidth = Renderer->GetTextDisplayWidth(remainingText);
+		Renderer->AddRender(y + 6, x + width / 2 - textWidth / 2, remainingText, CC_CYAN);
+	}
+	else
+	{
+		Renderer->AddRender(y + 6, x + 10, L"READY", CC_GREEN);
 	}
 }
 
@@ -200,6 +279,8 @@ wchar_t HUDUI::GetMapIcon(int MapY, int MapX)
 		return L'P';
 	case MapObjectType::Shop:
 		return L'S';
+	case MapObjectType::Crystal:
+		return L'C';
 	case MapObjectType::Monster:
 		if (Monster* monster = dynamic_cast<Monster*>(MapManager::GetInstance()->GetMapObject(MapY, MapX, MapObjectType::Monster)))
 		{
@@ -255,6 +336,8 @@ int HUDUI::GetMapIconColor(int MapY, int MapX)
 		return CC_LIGHTGRAY;
 	case MapObjectType::Shop:
 		return (ShopColorIndex %= CC_WHITE);
+	case MapObjectType::Crystal:
+		return StageManager::GetInstance()->GetCrystalColor();
 	case MapObjectType::Player:
 		return CC_YELLOW;
 	case MapObjectType::Monster:
