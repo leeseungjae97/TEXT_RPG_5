@@ -99,6 +99,11 @@ void Monster::Tick(float DeltaTime)
 
 	MoveElapsedtime += DeltaTime * GetSlowRatio();
 	AttackElapsedtime += DeltaTime * GetSlowRatio();
+	if (IsMoving())
+	{
+		CommitMoveIfNeeded(GetMoveAlpha());
+	}
+
 	if (AttackVisibleTime > 0.0f)
 	{
 		AttackVisibleTime -= DeltaTime;
@@ -120,6 +125,11 @@ void Monster::Tick(float DeltaTime)
 	if (player->IsDead())
 	{
 		return;
+	}
+
+	if (MoveElapsedtime >= MoveInterval)
+	{
+		FinishMoveIfNeeded(GetMoveAlpha());
 	}
 	
 	if (CanAttackplayer(player))
@@ -208,10 +218,8 @@ void Monster::MoveTowardPlayer(Player* player)
 		return;
 	}
 
-	
-	PrevPosition = Position;
-	
 	Vector PlayerPos = player->GetPosition();
+	Vector NextPosition = Position;
 	
 	int DiffX = PlayerPos.X - Position.X;
 	int DiffY = PlayerPos.Y - Position.Y;
@@ -221,11 +229,11 @@ void Monster::MoveTowardPlayer(Player* player)
 	{
 		if (DiffX > 0)
 		{
-			Position.X++;
+			NextPosition.X++;
 		}
 		else if (DiffX < 0)
 		{
-			Position.X--;
+			NextPosition.X--;
 		}
 	}
 	
@@ -233,13 +241,28 @@ void Monster::MoveTowardPlayer(Player* player)
 	{
 		if (DiffY > 0)
 		{
-			Position.Y++;
+			NextPosition.Y++;
 		}
 		else if (DiffY < 0)
 		{
-			Position.Y--;
+			NextPosition.Y--;
 		}
 	}
+
+	if (NextPosition.X < 1 || NextPosition.X >= MAP_MAX_X - 1 || NextPosition.Y < 1 || NextPosition.Y >= MAP_MAX_Y - 1)
+	{
+		return;
+	}
+
+	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Wall)
+		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Shop)
+		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Monster)
+		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Player))
+	{
+		return;
+	}
+
+	BeginMoveTo(NextPosition);
 }
 
 void Monster::MoveRandom()
@@ -267,6 +290,11 @@ void Monster::MoveRandom()
 	{
 		return;
 	}
+
+	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Shop))
+	{
+		return;
+	}
 	
 	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Monster))
 	{
@@ -278,8 +306,7 @@ void Monster::MoveRandom()
 		return;
 	}
 	
-	PrevPosition = Position;
-	Position = NextPosition;
+	BeginMoveTo(NextPosition);
 }
 	
 
@@ -455,9 +482,7 @@ void Monster::MoveTowardPlayerBfs()
 		return;
 	}
 	
-	PrevPosition = Position;
-	
-	Position = NextPosition;
+	BeginMoveTo(NextPosition);
 }
 
 bool Monster::CanAttackplayer(Player* player)

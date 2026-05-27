@@ -9,7 +9,7 @@
 #include "../Item/Item.h"
 #include "../Manager/MapManager.h"
 #include "../Manager/ObjectPoolManager.h"
-#include "../Manager/RenderManager.h"
+#include "../Manager/DisplayManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/TimeManager.h"
 #include "../Manager/ViewportManager.h"
@@ -21,7 +21,7 @@ void HUDUI::Render()
 {
 	if (!Renderer)
 	{
-		Renderer = RenderManager::GetInstance();
+		Renderer = DisplayManager::GetInstance();
 		return;
 	}
 

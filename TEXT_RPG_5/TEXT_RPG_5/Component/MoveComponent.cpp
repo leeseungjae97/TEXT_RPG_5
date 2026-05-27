@@ -22,16 +22,6 @@ UMoveComponent::~UMoveComponent()
 
 }
 
-EDirection UMoveComponent::GetFacingDirection()
-{
-	return FacingDirection;
-}
-
-EDirection UMoveComponent::GetPreviousFacingDirection()
-{
-	return PreviousFacingDirection;
-}
-
 void UMoveComponent::SetFacingDirection(EDirection Str)
 {
 	if (Str == EDirection::NONE || Str == FacingDirection)
@@ -110,67 +100,58 @@ void UMoveComponent::OpenShop()
 
 void UMoveComponent::HandleMoveInput()
 {
+	if (PlayerPtr->IsMoving())
+	{
+		return;
+	}
+
 	int NextX = PlayerPtr->GetPosition().X;
 	int NextY = PlayerPtr->GetPosition().Y;
+	EDirection NextDirection = EDirection::NONE;
 	
 	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::UP))
 	{
 		NextY = max(NextY - 1, 0);
-		if (!MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster)
-			&& !MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Wall))
-		{
-			SetFacingDirection(EDirection::UP);
-			MoveElapsedTime = 0.0f;
-			PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-			PlayerPtr->SetPosition({ NextX, NextY });
-			SetFacingDirection(EDirection::UP);
-			MoveElapsedTime = 0.0f;
-		}
+		NextDirection = EDirection::UP;
 	}
 	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::DOWN))
 	{
 		NextY = min(NextY + 1, MAP_MAX_Y);
-
-		if (!MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster)
-			&& !MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Wall))
-		{
-			SetFacingDirection(EDirection::DOWN);
-			MoveElapsedTime = 0.0f;
-			PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-			PlayerPtr->SetPosition({ NextX, NextY });
-			SetFacingDirection(EDirection::DOWN);
-			MoveElapsedTime = 0.0f;
-		}
+		NextDirection = EDirection::DOWN;
 	}
 	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::LEFT))
 	{
 		NextX = max(NextX - 1, 0);
-
-		if (!MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster)
-			&& !MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Wall))
-		{
-			SetFacingDirection(EDirection::LEFT);
-			MoveElapsedTime = 0.0f;
-			PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-			PlayerPtr->SetPosition({ NextX, NextY });
-			SetFacingDirection(EDirection::LEFT);
-			MoveElapsedTime = 0.0f;
-		}
+		NextDirection = EDirection::LEFT;
 	}
 	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::RIGHT))
 	{
 		NextX = min(NextX + 1, MAP_MAX_X);
-		if (!MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster)
-			&& !MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Wall))
-		{
-			SetFacingDirection(EDirection::RIGHT);
-			MoveElapsedTime = 0.0f;
-			PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-			PlayerPtr->SetPosition({ NextX, NextY });
-			SetFacingDirection(EDirection::RIGHT);
-			MoveElapsedTime = 0.0f;
-		}
+		NextDirection = EDirection::RIGHT;
 	}
+
+	if (NextDirection == EDirection::NONE)
+	{
+		return;
+	}
+
+	Vector NextPosition = {NextX, NextY};
+	if (NextPosition.X < 1 || NextPosition.X >= MAP_MAX_X - 1 ||
+		NextPosition.Y < 1 || NextPosition.Y >= MAP_MAX_Y - 1)
+	{
+		return;
+	}
+
+	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Monster)
+		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Wall)
+		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Shop))
+	{
+		return;
+	}
+
+	SetFacingDirection(NextDirection);
+	PlayerPtr->BeginMoveTo(NextPosition);
+	MoveElapsedTime = 0.0f;
 }
 
 // 여기서 부터 작업
@@ -380,10 +361,17 @@ void UMoveComponent::Tick(float DeltaTime)
 	TurnElapsedTime += DeltaTime;
 	TeleportElapsedTime += DeltaTime;
 
+	if (PlayerPtr->IsMoving())
+	{
+		PlayerPtr->CommitMoveIfNeeded(GetMoveAlpha());
+	}
+
 	if (MoveElapsedTime < MoveInterval)
 	{
 		return;
 	}
+
+	PlayerPtr->FinishMoveIfNeeded(GetMoveAlpha());
 	
 	OpenShop();
 	if (UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>())
@@ -408,52 +396,3 @@ void UMoveComponent::Tick(float DeltaTime)
 	
 	HandleMoveInput();
 }
-
-
-/*void UMoveComponent::Tick(float DeltaTime)
-{
-	if(nullptr == PlayerPtr)
-		PlayerPtr = dynamic_cast<Player*>(GetOwner());
-
-	if (PlayerPtr == nullptr)
-	{
-		return;
-	}
-
-	MoveElapsedTime += DeltaTime;
-	TurnElapsedTime += DeltaTime;
-
-	if (MoveElapsedTime < MoveInterval)
-	{
-		return;
-	}
-	
-	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::UP))
-	{
-		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, max(PlayerPtr->GetPosition().Y - 1, 0) });
-		SetFacingDirection(EDirection::UP);
-		MoveElapsedTime = 0.0f;
-	}
-	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::DOWN))
-	{
-		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X, PlayerPtr->GetPosition().Y + 1 });
-		SetFacingDirection(EDirection::DOWN);
-		MoveElapsedTime = 0.0f;
-	}
-	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::LEFT))
-	{
-		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-		PlayerPtr->SetPosition({ max(PlayerPtr->GetPosition().X - 1, 0 ), PlayerPtr->GetPosition().Y});
-		SetFacingDirection(EDirection::LEFT);
-		MoveElapsedTime = 0.0f;
-	}
-	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::RIGHT))
-	{
-		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-		PlayerPtr->SetPosition({ PlayerPtr->GetPosition().X + 1, PlayerPtr->GetPosition().Y});
-		SetFacingDirection(EDirection::RIGHT);
-		MoveElapsedTime = 0.0f;
-	}
-}*/

@@ -2,7 +2,7 @@
 #include "../pch.h"
 
 class Player;
-class RenderManager;
+class DisplayManager;
 class UInventoryComponent;
 class UItem;
 
@@ -20,5 +20,5 @@ private:
 private:
 	Player* PlayerPtr = nullptr;
 	UInventoryComponent* InventoryComponent = nullptr;
-	RenderManager* Renderer = nullptr;
+	DisplayManager* Renderer = nullptr;
 };

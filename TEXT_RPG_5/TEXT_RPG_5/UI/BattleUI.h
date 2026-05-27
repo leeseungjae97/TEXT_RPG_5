@@ -2,7 +2,7 @@
 
 #include "../pch.h"
 
-class RenderManager;
+class DisplayManager;
 
 class BattleUI
 {
@@ -15,5 +15,5 @@ public:
 
 private:
 	bool bOpen = false;
-	RenderManager* Renderer = nullptr;
+	DisplayManager* Renderer = nullptr;
 };

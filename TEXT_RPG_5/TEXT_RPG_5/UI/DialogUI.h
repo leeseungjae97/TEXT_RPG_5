@@ -2,7 +2,7 @@
 
 #include "../pch.h"
 
-class RenderManager;
+class DisplayManager;
 
 enum class DialogType
 {
@@ -26,5 +26,5 @@ private:
 	DialogType Type = DialogType::None;
 	wstring MessageText;
 	float RemainTime = 0.0f;
-	RenderManager* Renderer = nullptr;
+	DisplayManager* Renderer = nullptr;
 };

@@ -36,13 +36,20 @@ public:
 	float GetSlowRatio() const { return IsSlowed() ? SlowRatio : 1.0f; }
 
 	Vector GetPosition() const { return Position; }
-	void SetPosition(Vector InPosition) { Position = InPosition; }
+	Vector GetNextPosition() const { return NextPosition; }
+	bool IsMoving() const { return bIsMoving; }
+	bool HasCommittedMove() const { return bPositionCommitted; }
+	void SetPosition(Vector InPosition);
 
 	Vector GetPrevPosition() const { return PrevPosition; }
 	void SetPrevPosition(Vector InPosition) { PrevPosition = InPosition; }
+	void SetNextPosition(Vector InPosition) { NextPosition = InPosition; }
+	void BeginMoveTo(Vector InNextPosition);
+	bool CommitMoveIfNeeded(float Alpha);
+	void FinishMoveIfNeeded(float Alpha);
 	
 	//테스트
-	void SetPosition(int Y, int X) { Position = {Y, X}; }
+	void SetPosition(int Y, int X) { SetPosition({Y, X}); }
 	void SetPrevPosition(int Y, int X) { PrevPosition = {Y, X}; }
 
 	template <typename T>
@@ -93,6 +100,9 @@ public:
 protected:
 	Vector Position;
 	Vector PrevPosition;
+	Vector NextPosition;
+	bool bIsMoving;
+	bool bPositionCommitted;
 	int LastDamage;
 	float HitFlashTime;
 	float DamageTextTime;
