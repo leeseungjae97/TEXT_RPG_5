@@ -20,7 +20,7 @@ Goblin::Goblin(int playerLevel)
 	
 	DetectionRange = 7;
 
-	Position = Vector(4, 5);
+	//Position = Vector(4, 5);
 	PrevPosition = Position;
 	
 	bUseBfs = true;

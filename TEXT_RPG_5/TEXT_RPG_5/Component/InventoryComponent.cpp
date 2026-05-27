@@ -25,6 +25,7 @@ UInventoryComponent::UInventoryComponent(AObject* InOwner)
     AddItem(new UsableItem(ItemDB::HP_POTION));
     AddItem(new UsableItem(ItemDB::STRENGTH_POTION));
     AddItem(new UsableItem(ItemDB::LONGSWORD));
+    AddItem(new UsableItem(ItemDB::LONGSWORD));
     AddItem(new UsableItem(ItemDB::GOBLIN_LEATHER));
     AddItem(new UsableItem(ItemDB::HP_POTION));
     AddItem(new UsableItem(ItemDB::HP_POTION));
@@ -451,14 +452,14 @@ void UInventoryComponent::Tick(float DeltaTime)
         if (Input->IsKeyTap(KeyCode::_2)) UseQuickSlot(1);
         if (Input->IsKeyTap(KeyCode::_3)) UseQuickSlot(2);
         if (Input->IsKeyTap(KeyCode::_4)) UseQuickSlot(3);
-        //if (Input->IsKeyTap(KeyCode::I)) OpenInventory();
+        if (Input->IsKeyTap(KeyCode::I)) OpenInventory();
         if (Input->IsKeyTap(KeyCode::E)) OpenShop(1);
         return;
     }
     
     //이 밑으로는 다 bOpenedInventory가 true일 때만(인벤토리 열었을 경우에만) 작동.
     
-    //if (Input->IsKeyTap(KeyCode::I)) CloseInventory();
+    if (Input->IsKeyTap(KeyCode::I)) CloseInventory();
     
     //아이템 및 골드 지급(디버그용)
     if (Input->IsKeyTap(KeyCode::B))

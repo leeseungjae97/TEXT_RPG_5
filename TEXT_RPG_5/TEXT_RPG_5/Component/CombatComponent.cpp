@@ -23,6 +23,16 @@ UCombatComponent::UCombatComponent(AObject* InOwner)
 	bAttackRequested = false;
 	ProjectileTotalTime = 0.0f;
 	ProjectileDelayTime = 0.0f;
+	
+	
+	SwordElapsedTime = 999.0f;
+	SwordInterval = 2.0f;
+
+	SpearElapsedTime = 999.0f;
+	SpearInterval = 2.0f;
+
+	ProjectileElapsedTime = 999.0f;
+	ProjectileInterval = 0.5f;
 }
 
 UCombatComponent::~UCombatComponent()
