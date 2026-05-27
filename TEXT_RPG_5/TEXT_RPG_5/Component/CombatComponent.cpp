@@ -13,7 +13,7 @@
 #include "EquipmentComponent.h"
 #include "InventoryComponent.h"
 
-UCombatComponent::UCombatComponent(AObject* InOwner)
+/*UCombatComponent::UCombatComponent(AObject* InOwner)
 	: UComponent(InOwner), Weapon(WeaponType::Sword)
 {
 	PlayerPtr = dynamic_cast<Player*>(InOwner);
@@ -25,6 +25,30 @@ UCombatComponent::UCombatComponent(AObject* InOwner)
 	bAttackRequested = false;
 	ProjectileTotalTime = 0.0f;
 	ProjectileDelayTime = 0.0f;
+	CurrentAttackInterval = AttackInterval;
+}*/
+
+UCombatComponent::UCombatComponent(AObject* InOwner)
+	: UComponent(InOwner), Weapon(WeaponType::Sword)
+{
+	PlayerPtr = dynamic_cast<Player*>(InOwner);
+	MoveComponentPtr = PlayerPtr != nullptr ? PlayerPtr->GetComponent<UMoveComponent>() : nullptr;
+
+	AttackVisibleTime = 0.0f;
+	AttackVisibleDuration = 0.18f;
+	bAttackRequested = false;
+
+	RockInterval = 0.8f;
+	SwordInterval = 1.3f;
+	AxeInterval = 2.0f;
+	BowInterval = 1.0f;
+	MagicInterval = 8.0f;
+
+	RockElapsedTime = RockInterval;
+	SwordElapsedTime = SwordInterval;
+	AxeElapsedTime = AxeInterval;
+	BowElapsedTime = BowInterval;
+	MagicElapsedTime = MagicInterval;
 }
 
 UCombatComponent::~UCombatComponent()
@@ -37,11 +61,48 @@ vector<Vector> UCombatComponent::GetAttackValue()
 	return AttackValue;
 }
 
-bool UCombatComponent::IsAttackCoolingDown() const
+/*bool UCombatComponent::IsAttackCoolingDown() const
 {
 	return AttackElapsedTime < AttackInterval;
+}*/
+
+bool UCombatComponent::IsAttackCoolingDown() const
+{
+	WeaponType CurrentWeapon = WeaponType::NONE;
+
+	if (PlayerPtr != nullptr)
+	{
+		UEquipmentComponent* EquipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>();
+
+		if (EquipmentComponent != nullptr)
+		{
+			CurrentWeapon = EquipmentComponent->GetCurrentWeaponType();
+		}
+	}
+
+	switch (CurrentWeapon)
+	{
+	case WeaponType::NONE:
+		return RockElapsedTime < RockInterval;
+
+	case WeaponType::Sword:
+		return SwordElapsedTime < SwordInterval;
+
+	case WeaponType::Axe:
+		return AxeElapsedTime < AxeInterval;
+
+	case WeaponType::Bow:
+		return BowElapsedTime < BowInterval;
+
+	case WeaponType::Magic:
+		return MagicElapsedTime < MagicInterval;
+
+	default:
+		return false;
+	}
 }
 
+/*
 float UCombatComponent::GetAttackCooldownAlpha() const
 {
 	if (AttackInterval <= 0.0f)
@@ -50,6 +111,62 @@ float UCombatComponent::GetAttackCooldownAlpha() const
 	}
 
 	return min(max(AttackElapsedTime / AttackInterval, 0.0f), 1.0f);
+}
+*/
+float UCombatComponent::GetAttackCooldownAlpha() const
+{
+	WeaponType CurrentWeapon = WeaponType::NONE;
+
+	if (PlayerPtr != nullptr)
+	{
+		UEquipmentComponent* EquipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>();
+
+		if (EquipmentComponent != nullptr)
+		{
+			CurrentWeapon = EquipmentComponent->GetCurrentWeaponType();
+		}
+	}
+
+	float ElapsedTime = 0.0f;
+	float Interval = 1.0f;
+
+	switch (CurrentWeapon)
+	{
+	case WeaponType::NONE:
+		ElapsedTime = RockElapsedTime;
+		Interval = RockInterval;
+		break;
+
+	case WeaponType::Sword:
+		ElapsedTime = SwordElapsedTime;
+		Interval = SwordInterval;
+		break;
+
+	case WeaponType::Axe:
+		ElapsedTime = AxeElapsedTime;
+		Interval = AxeInterval;
+		break;
+
+	case WeaponType::Bow:
+		ElapsedTime = BowElapsedTime;
+		Interval = BowInterval;
+		break;
+
+	case WeaponType::Magic:
+		ElapsedTime = MagicElapsedTime;
+		Interval = MagicInterval;
+		break;
+
+	default:
+		return 1.0f;
+	}
+
+	if (Interval <= 0.0f)
+	{
+		return 1.0f;
+	}
+
+	return min(max(ElapsedTime / Interval, 0.0f), 1.0f);
 }
 
 void UCombatComponent::Attack()
@@ -225,8 +342,10 @@ void UCombatComponent::LaunchProjectile()
 			ProjectileAttack->Fire();
 		}
 			
-	ProjectileTotalTime = 0.0f;
-	ProjectileDelayTime = 0.5f;
+	/*ProjectileTotalTime = 0.0f;
+	ProjectileDelayTime = 0.5f;*/
+	float BowElapsedTime = 0.0f;
+	float BowInterval = 0.5f;
 }
 
 void UCombatComponent::MakeSwordRange()
@@ -413,8 +532,11 @@ void UCombatComponent::AttackEffectTimeAcc(float DeltaTime)
 
 void UCombatComponent::HandleAttackInput(float DeltaTime)
 {
-	AttackElapsedTime += DeltaTime;
-	ProjectileTotalTime += DeltaTime;
+	RockElapsedTime += DeltaTime;
+	SwordElapsedTime += DeltaTime;
+	AxeElapsedTime += DeltaTime;
+	BowElapsedTime += DeltaTime;
+	MagicElapsedTime += DeltaTime;
 	
 	AttackEffectTimeAcc(DeltaTime);
 
@@ -438,69 +560,74 @@ void UCombatComponent::HandleAttackInput(float DeltaTime)
 		}
 	}
 	
-	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::A) && (AttackElapsedTime >= AttackInterval))
+	UEquipmentComponent* EquipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>();
+		
+	if (EquipmentComponent == nullptr)
 	{
-		UEquipmentComponent* EquipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>();
-		
-		if (EquipmentComponent == nullptr)
-		{
-			return;
-		}
-		
-		WeaponType CurrentWeapon = EquipmentComponent->GetCurrentWeaponType();
-
+		return;
+	}
+	
+	WeaponType CurrentWeapon = EquipmentComponent->GetCurrentWeaponType();
+	
+	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::Z))
+	{
 		switch (CurrentWeapon)
 		{
 		case WeaponType::NONE:
 			{
-				if (!PlayerPtr->GetIsAttack())
+				if (RockElapsedTime >= RockInterval && !PlayerPtr->GetIsAttack())
 				{
 					MakeRockRange();
-					AttackElapsedTime = 0.0f;
+					RockElapsedTime = 0.0f;
 				}
 			}
 			break;
+
 		case WeaponType::Sword:
 			{
-				if (!PlayerPtr->GetIsAttack())
+				if (SwordElapsedTime >= SwordInterval && !PlayerPtr->GetIsAttack())
 				{
 					MakeSwordRange();
-					AttackElapsedTime = 0.0f;
+					SwordElapsedTime = 0.0f;
 				}
 			}
 			break;
 
 		case WeaponType::Axe:
 			{
-				if (!PlayerPtr->GetIsAttack())
+				if (AxeElapsedTime >= AxeInterval && !PlayerPtr->GetIsAttack())
 				{
 					MakeAxeRange();
-					AttackElapsedTime = 0.0f;
+					AxeElapsedTime = 0.0f;
 				}
 			}
 			break;
 
 		case WeaponType::Bow:
 			{
-				LaunchProjectile();
-				AttackElapsedTime = 0.0f;
+				if (BowElapsedTime >= BowInterval)
+				{
+					LaunchProjectile();
+					BowElapsedTime = 0.0f;
+				}
 			}
 			break;
+
 		case WeaponType::Magic:
 			{
-				MakeMagicRange();
-				AttackElapsedTime = 0.0f;
+				if (MagicElapsedTime >= MagicInterval && !PlayerPtr->GetIsAttack())
+				{
+					MakeMagicRange();
+					MagicElapsedTime = 0.0f;
+				}
 			}
 			break;
 
 		default:
-			{
-				
-			}
 			break;
 		}
 	}
-}	
+}
 
 /*if (!PlayerPtr->GetIsAttack())
 		{
