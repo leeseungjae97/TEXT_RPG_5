@@ -6,6 +6,13 @@
 
 class UComponent;
 
+enum class HitEffectType
+{
+	None,
+	Bow,
+	Magic
+};
+
 class AObject
 {
 public:
@@ -29,6 +36,9 @@ public:
 	bool ShouldShowDamageText() const { return DamageTextTime > 0.0f; }
 	int GetLastDamage() const { return LastDamage; }
 	void NotifyDamage(int Damage, float FlashDuration = 0.25f, float DamageTextDuration = 3.0f);
+	void NotifyHitEffect(HitEffectType Type, float Duration = 0.35f);
+	bool ShouldShowHitEffect() const { return HitEffectTime > 0.0f && HitEffect != HitEffectType::None; }
+	HitEffectType GetHitEffectType() const { return HitEffect; }
 	void NotifyLog(const wstring& Text, float Duration = 2.0f);
 	bool ShouldShowLogText() const { return LogTextTime > 0.0f && !LogText.empty(); }
 	const wstring& GetLogText() const { return LogText; }
@@ -105,6 +115,8 @@ protected:
 	bool bPositionCommitted;
 	int LastDamage;
 	float HitFlashTime;
+	HitEffectType HitEffect;
+	float HitEffectTime;
 	float DamageTextTime;
 	wstring LogText;
 	float LogTextTime;

@@ -139,6 +139,7 @@ void UMoveComponent::HandleMoveInput()
 	if (NextPosition.X < 1 || NextPosition.X >= MAP_MAX_X - 1 ||
 		NextPosition.Y < 1 || NextPosition.Y >= MAP_MAX_Y - 1)
 	{
+		SetFacingDirection(NextDirection);
 		return;
 	}
 
@@ -146,6 +147,7 @@ void UMoveComponent::HandleMoveInput()
 		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Wall)
 		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Shop))
 	{
+		SetFacingDirection(NextDirection);
 		return;
 	}
 

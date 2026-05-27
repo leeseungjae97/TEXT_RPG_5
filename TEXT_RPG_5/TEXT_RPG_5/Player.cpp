@@ -23,9 +23,6 @@ Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 	this->LevelComponentPtr = CreateDefaultComponent<LevelComponent>();
 
 	this->PrevPosition = this->Position;
-
-	//Position = Vector(2, 2);
-	//PrevPosition = Vector(2, 2);
 }
 
 Player::~Player()

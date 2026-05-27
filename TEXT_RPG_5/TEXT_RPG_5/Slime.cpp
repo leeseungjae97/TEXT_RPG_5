@@ -26,5 +26,18 @@ Slime::Slime(int playerLevel)
 	AttackInterval = 2.0f;
 	AttackElapsedtime = 0.0f;
 	
-	//TrySetShiny();
+	TrySetShiny();
+	
+}
+
+vector<FItemWeight> Slime::GetDropTable()
+{
+	return
+	{	
+		{ ItemId::SLIME_JELLY, 70 },
+		{ ItemId::HP_POTION,  25 },
+		{ ItemId::LONGSWORD, 25 },
+		{ ItemId::BOW, 10 },
+		{ ItemId::STAFF, 1},
+	};
 }

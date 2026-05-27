@@ -260,23 +260,43 @@ void InventoryUI::DrawHoverDialog(int Y, int X, const UItem* item)
 
 	FItemInfo itemInfo = item->GetItemInfo();
 	wstring itemName = Renderer->TrimTextToDisplayWidth(Renderer->ToWideString(itemInfo.Name), width - 4);
-	wstring typeText = L"Type: ";
+	wstring typeText = L"";
 	wstring amountContent = L"";
+	
 	switch (itemInfo.Type)
 	{
 	case ItemType::Equipment:
-		typeText += L"Equipment";
-		amountContent += L"체력 회복: +";
+		{
+			typeText += L"장비";
+			switch (itemInfo.EquipSlot)
+			{
+			case EquipmentType::Body:
+			case EquipmentType::Head:
+			case EquipmentType::Boots:
+				{
+					amountContent += L"MAX HP: +";		
+				}
+				break;
+			case EquipmentType::Weapon:
+				{
+					amountContent += L"POWER: +";		
+				}
+				break;
+			default:
+				break;
+			}
+			
+		}
 		break;
 	case ItemType::Usable:
-		typeText += L"Usable";
+		typeText += L"소모품";
 		amountContent += L"체력 회복: +";
 		break;
 	case ItemType::Misc:
-		typeText += L"Misc";
+		typeText += L"재료";
 		break;
 	default:
-		typeText += L"Unknown";
+		typeText += L"";
 		break;
 	}
 
@@ -284,7 +304,8 @@ void InventoryUI::DrawHoverDialog(int Y, int X, const UItem* item)
 	Renderer->AddRender(Y + 1, X + 4, itemName);
 	Renderer->AddRender(Y + 3, X + 2, typeText);
 	Renderer->AddRender(Y + 4, X + 2, L"Price: " + to_wstring(itemInfo.Price));
-	Renderer->AddRender(Y + 5, X + 2, amountContent + to_wstring(itemInfo.EffectAmount));
+	if (itemInfo.EffectAmount)
+		Renderer->AddRender(Y + 5, X + 2, amountContent + to_wstring(itemInfo.EffectAmount));
 }
 
 wchar_t InventoryUI::GetItemIcon(const UItem* item)

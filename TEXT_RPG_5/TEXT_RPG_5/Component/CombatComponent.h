@@ -26,6 +26,7 @@ public:
 	bool IsAttackVisible() const { return AttackVisibleTime > 0.0f; }
 	bool IsAttackCoolingDown() const;
 	float GetAttackCooldownAlpha() const;
+	float GetAttackAnimationAlpha() const;
 	// void SetAttackValue();
 	void Attack();
 	void TriggerCustomAttack(const vector<Vector>& CustomRange, int Damage);
@@ -51,12 +52,20 @@ private:
 	Player* PlayerPtr;
 	UMoveComponent* MoveComponentPtr;
 	WeaponType Weapon;
-	float AttackElapsedTime;
-	float AttackInterval;
 	float AttackVisibleTime;
 	float AttackVisibleDuration;
 	bool bAttackRequested;
 	
-	float ProjectileTotalTime;
-	float ProjectileDelayTime;
+	
+	float RockInterval;
+	float SwordInterval;
+	float AxeInterval;
+	float BowInterval;
+	float MagicInterval;
+
+	float RockElapsedTime;
+	float SwordElapsedTime;
+	float AxeElapsedTime;
+	float BowElapsedTime;
+	float MagicElapsedTime;
 };
