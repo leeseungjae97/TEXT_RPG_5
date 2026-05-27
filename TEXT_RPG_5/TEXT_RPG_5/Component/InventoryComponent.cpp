@@ -403,9 +403,10 @@ bool UInventoryComponent::BuyItem(UItem* Item)
 
 void UInventoryComponent::SellItem(UItem* Item)
 {
+    if (Item == nullptr) return;
     int Price = Item->GetItemInfo().Price;
     if (RemoveItem(Item))
-        AddGold(Price);
+        AddGold(Price / 2);
 }
 
 bool UInventoryComponent::SetOnShop(bool OnShop)
