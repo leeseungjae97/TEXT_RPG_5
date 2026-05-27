@@ -23,8 +23,6 @@ Player::Player(string str, int hp, int power) : TotalStat{ str, hp, power }
 	this->EquipmentComponent = CreateDefaultComponent<UEquipmentComponent>();
 	this->LevelComponentPtr = CreateDefaultComponent<LevelComponent>();
 
-	this->Position.Y = 2;
-	this->Position.X = 2;
 	this->PrevPosition = this->Position;
 
 	//Position = Vector(2, 2);

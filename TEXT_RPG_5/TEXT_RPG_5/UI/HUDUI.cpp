@@ -1,6 +1,7 @@
 #include "HUDUI.h"
 
 #include "../Component/CombatComponent.h"
+#include "../Component/EquipmentComponent.h"
 #include "../Component/InventoryComponent.h"
 #include "../Component/LevelComponent.h"
 #include "../Define.h"
@@ -46,14 +47,47 @@ void HUDUI::StatusRender()
 	int currentHealth = min(max(PlayerPtr->GetHP(), 0), maxHealth);
 	int maxExp = max(1, PlayerPtr->GetMax_Exp());
 	int currentExp = min(max(PlayerPtr->GetExp(), 0), maxExp);
+	int equipmentMaxHPBonus = 0;
+	int equipmentPowerBonus = 0;
+	if (UEquipmentComponent* equipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>())
+	{
+		if (equipmentComponent->GetItem({0,0}))
+			equipmentMaxHPBonus = equipmentComponent->GetItem({0,0})->GetItemInfo().EffectAmount;
+		if (equipmentComponent->GetItem({1,0}))
+			equipmentPowerBonus = equipmentComponent->GetItem({1,0})->GetItemInfo().EffectAmount;
+	}
+	auto drawColoredText = [&](int y, int x, const wstring& text, int color)
+		{
+			int drawX = x;
+			WORD attribute = Renderer->MakeConsoleAttribute(color);
+			for (wchar_t character : text)
+			{
+				int characterWidth = Renderer->GetCharacterDisplayWidth(character);
+				if (characterWidth == 2)
+				{
+					Renderer->PutCell(y, drawX, character, attribute | COMMON_LVB_LEADING_BYTE);
+					Renderer->PutCell(y, drawX + 1, L' ', attribute | COMMON_LVB_TRAILING_BYTE);
+					drawX += characterWidth;
+					continue;
+				}
+
+				Renderer->PutCell(y, drawX, character, attribute);
+				drawX += characterWidth;
+			}
+		};
 	if (PlayerPtr->ShouldShowLogText())
 	{
 		Vector isoPosition = ViewportManager::GetInstance()->GetISOPosition();
 		Renderer->AddRender(isoPosition.Y - 10, isoPosition.X, PlayerPtr->GetLogText());
 	}
 
+	
 	Renderer->AddRender(hudY, hudX, "LV : " + to_string(PlayerPtr->GetLevel()));
 	Renderer->AddRender(hudY + 2, hudX, "HP : " + to_string(PlayerPtr->GetHP()) + "/" + to_string(PlayerPtr->GetMax_HP()));
+	if (equipmentMaxHPBonus > 0)
+	{
+		drawColoredText(hudY + 2, hudX + 14, L'+' + to_wstring(equipmentMaxHPBonus), CC_YELLOW);
+	}
 	DrawStatusBar(hudY + 2, barX, barWidth, static_cast<float>(currentHealth) / static_cast<float>(maxHealth), CC_RED);
 
 	Renderer->AddRender(hudY + 4, hudX, "EXP : " + to_string(PlayerPtr->GetExp()) + "/" + to_string(PlayerPtr->GetMax_Exp()));
@@ -61,6 +95,10 @@ void HUDUI::StatusRender()
 
 	Renderer->AddRender(hudY + 6, hudX, "GOLD : " + to_string(PlayerPtr->GetGold()));
 	Renderer->AddRender(hudY + 8, hudX, "POWER " + to_string(PlayerPtr->GetPower()));
+	if (equipmentPowerBonus > 0)
+	{
+		drawColoredText(hudY + 8, hudX + 9 + static_cast<int>(to_string(PlayerPtr->GetPower()).length()), L'+' + to_wstring(equipmentPowerBonus), CC_YELLOW);
+	}
 
 	UCombatComponent* combatComponent = PlayerPtr->GetComponent<UCombatComponent>();
 	float attackDelayRatio = 1.0f;

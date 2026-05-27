@@ -51,9 +51,30 @@ void InventoryUI::InventoryRender()
 	const int equipmentY = inventoryY;
 
 	DrawBackground(1, 1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-	Renderer->AddRender(2, 3, L"(Z)적용/착용  (I)닫기");
+	Renderer->AddRender(2, 3, L"(Z)적용/착용  (I/ECS)닫기");
 	DrawInventoryPanel(inventoryY, inventoryX, container, L"인벤토리");
 	DrawEquipmentPanel(equipmentY, equipmentX);
+
+	Vector cursor = InventoryComponent->GetCursor();
+	const UItem* hoveredItem = nullptr;
+	int hoverY = inventoryY + 2;
+	int hoverX = inventoryX + static_cast<int>(container[0].size()) * 15 + 26;
+	if (InventoryComponent->GetOnEquipment())
+	{
+		if (UEquipmentComponent* equipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>())
+		{
+			hoveredItem = equipmentComponent->GetItem(cursor);
+		}
+		hoverY = equipmentY + 2 + cursor.Y * 6;
+		hoverX = equipmentX + 18;
+	}
+	else
+	{
+		hoveredItem = InventoryComponent->GetItem(cursor);
+		hoverY = inventoryY + 2 + cursor.Y * 6;
+		hoverX = inventoryX + cursor.X * 15 + 18;
+	}
+	DrawHoverDialog(hoverY, hoverX, hoveredItem);
 }
 
 void InventoryUI::QuickSlotRender()
@@ -221,6 +242,49 @@ void InventoryUI::DrawEquipmentPanel(int Y, int X)
 			Renderer->AddRender(slotY + slotHeight / 2, labelX, label);
 		}
 	}
+}
+
+void InventoryUI::DrawHoverDialog(int Y, int X, const UItem* item)
+{
+	if (item == nullptr)
+	{
+		return;
+	}
+
+	const int width = 28;
+	const int height = 8;
+	X = min(max(1, X), max(1, SCREEN_WIDTH - width - 1));
+	Y = min(max(1, Y), max(1, SCREEN_HEIGHT - height - 1));
+
+	DrawBackground(Y, X, width, height);
+
+	FItemInfo itemInfo = item->GetItemInfo();
+	wstring itemName = Renderer->TrimTextToDisplayWidth(Renderer->ToWideString(itemInfo.Name), width - 4);
+	wstring typeText = L"Type: ";
+	wstring amountContent = L"";
+	switch (itemInfo.Type)
+	{
+	case ItemType::Equipment:
+		typeText += L"Equipment";
+		amountContent += L"체력 회복: +";
+		break;
+	case ItemType::Usable:
+		typeText += L"Usable";
+		amountContent += L"체력 회복: +";
+		break;
+	case ItemType::Misc:
+		typeText += L"Misc";
+		break;
+	default:
+		typeText += L"Unknown";
+		break;
+	}
+
+	Renderer->PutCell(Y + 1, X + 2, GetItemIcon(item), Renderer->MakeConsoleAttribute(CC_YELLOW));
+	Renderer->AddRender(Y + 1, X + 4, itemName);
+	Renderer->AddRender(Y + 3, X + 2, typeText);
+	Renderer->AddRender(Y + 4, X + 2, L"Price: " + to_wstring(itemInfo.Price));
+	Renderer->AddRender(Y + 5, X + 2, amountContent + to_wstring(itemInfo.EffectAmount));
 }
 
 wchar_t InventoryUI::GetItemIcon(const UItem* item)

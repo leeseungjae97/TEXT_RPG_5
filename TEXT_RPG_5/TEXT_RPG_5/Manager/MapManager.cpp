@@ -37,14 +37,14 @@ void MapManager::UpdateMap()
 		
 		Map[PrevPos.Y][PrevPos.X] = {MapObjectType::Path, NO_ID};
 
-		if (Pos.Y < 1 
-			|| Pos.Y >= MAP_MAX_Y - 1 
-			|| Pos.X < 1 
-			|| Pos.X >= MAP_MAX_X - 1 
+		if (Pos.Y < 0
+			|| Pos.Y >= MAP_MAX_Y 
+			|| Pos.X < 0
+			|| Pos.X >= MAP_MAX_X 
 			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Wall
 			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Shop)
 		{
-			//Obj->SetPosition(PrevPos);
+			// Obj->SetPosition(PrevPos);
 			continue;
 		}
 
@@ -150,6 +150,14 @@ void MapManager::SetMapObjectType(int Y, int X, MapObjectType Type)
 		return;
 	
 	Map[Y][X].Type = Type;
+}
+
+void MapManager::SetMapObjectType(Vector Pos, MapObjectType Type)
+{
+	if (Pos.Y < 0 || Pos.Y > MAP_MAX_Y - 1 || Pos.X < 0 || Pos.X > MAP_MAX_X - 1)
+		return;
+	
+	Map[Pos.Y][Pos.X].Type = Type;
 }
 
 void MapManager::SetMapObjectID(int Y, int X, int InID)

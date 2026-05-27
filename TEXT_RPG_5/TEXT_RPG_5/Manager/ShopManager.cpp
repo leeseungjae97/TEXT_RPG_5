@@ -72,13 +72,13 @@ void ShopManager::RestoreShop()
 //테스트
 void ShopManager::BeginPlay()
 {
-    ShopPoses.resize(3);
-    
-    for (int i = 0 ; i < ShopPoses.size(); ++i)
-    {
-        ShopPoses[i].X = 5 + i * 2;
-        ShopPoses[i].Y = 5 + i * 2;
-    }
+    // ShopPoses.resize(3);
+    //
+    // for (int i = 0 ; i < ShopPoses.size(); ++i)
+    // {
+    //     ShopPoses[i].X = 5 + i * 2;
+    //     ShopPoses[i].Y = 5 + i * 2;
+    // }
 }
 
 

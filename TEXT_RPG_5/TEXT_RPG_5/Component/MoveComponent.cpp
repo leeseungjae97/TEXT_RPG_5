@@ -110,73 +110,66 @@ void UMoveComponent::OpenShop()
 
 void UMoveComponent::HandleMoveInput()
 {
+	int NextX = PlayerPtr->GetPosition().X;
+	int NextY = PlayerPtr->GetPosition().Y;
+	
 	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::UP))
 	{
-		int NextX = PlayerPtr->GetPosition().X;
-		int NextY = max(PlayerPtr->GetPosition().Y - 1, 0);
-
-		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
+		NextY = max(NextY - 1, 0);
+		if (!MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster)
+			&& !MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Wall))
 		{
 			SetFacingDirection(EDirection::UP);
 			MoveElapsedTime = 0.0f;
-			return;
+			PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
+			PlayerPtr->SetPosition({ NextX, NextY });
+			SetFacingDirection(EDirection::UP);
+			MoveElapsedTime = 0.0f;
 		}
-
-		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-		PlayerPtr->SetPosition({ NextX, NextY });
-		SetFacingDirection(EDirection::UP);
-		MoveElapsedTime = 0.0f;
 	}
 	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::DOWN))
 	{
-		int NextX = PlayerPtr->GetPosition().X;
-		int NextY = PlayerPtr->GetPosition().Y + 1;
+		NextY = min(NextY + 1, MAP_MAX_Y);
 
-		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
+		if (!MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster)
+			&& !MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Wall))
 		{
 			SetFacingDirection(EDirection::DOWN);
 			MoveElapsedTime = 0.0f;
-			return;
+			PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
+			PlayerPtr->SetPosition({ NextX, NextY });
+			SetFacingDirection(EDirection::DOWN);
+			MoveElapsedTime = 0.0f;
 		}
-
-		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-		PlayerPtr->SetPosition({ NextX, NextY });
-		SetFacingDirection(EDirection::DOWN);
-		MoveElapsedTime = 0.0f;
 	}
 	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::LEFT))
 	{
-		int NextX = max(PlayerPtr->GetPosition().X - 1, 0);
-		int NextY = PlayerPtr->GetPosition().Y;
+		NextX = max(NextX - 1, 0);
 
-		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
+		if (!MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster)
+			&& !MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Wall))
 		{
 			SetFacingDirection(EDirection::LEFT);
 			MoveElapsedTime = 0.0f;
-			return;
+			PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
+			PlayerPtr->SetPosition({ NextX, NextY });
+			SetFacingDirection(EDirection::LEFT);
+			MoveElapsedTime = 0.0f;
 		}
-
-		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-		PlayerPtr->SetPosition({ NextX, NextY });
-		SetFacingDirection(EDirection::LEFT);
-		MoveElapsedTime = 0.0f;
 	}
 	else if (InputManager::GetInstance()->IsKeyPressed(KeyCode::RIGHT))
 	{
-		int NextX = PlayerPtr->GetPosition().X + 1;
-		int NextY = PlayerPtr->GetPosition().Y;
-
-		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
+		NextX = min(NextX + 1, MAP_MAX_X);
+		if (!MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster)
+			&& !MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Wall))
 		{
 			SetFacingDirection(EDirection::RIGHT);
 			MoveElapsedTime = 0.0f;
-			return;
+			PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
+			PlayerPtr->SetPosition({ NextX, NextY });
+			SetFacingDirection(EDirection::RIGHT);
+			MoveElapsedTime = 0.0f;
 		}
-
-		PlayerPtr->SetPrevPosition(PlayerPtr->GetPosition());
-		PlayerPtr->SetPosition({ NextX, NextY });
-		SetFacingDirection(EDirection::RIGHT);
-		MoveElapsedTime = 0.0f;
 	}
 }
 
