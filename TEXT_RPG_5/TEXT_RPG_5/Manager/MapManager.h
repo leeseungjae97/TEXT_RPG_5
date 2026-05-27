@@ -19,9 +19,14 @@ public:
 
 private:
 	void UpdateMap();
+	bool IsValidPosition(Vector Pos) const;
+	bool CanPlaceObject(AObject* Object, Vector Pos) const;
+	Coordinate MakeCoordinate(AObject* Object) const;
 	
 public:
 	bool IsMapInitSize();
+	bool MoveObject(AObject* Object, Vector From, Vector To);
+	void ClearObject(AObject* Object);
 	bool IsTypeExist(int Y, int X, MapObjectType Type);
 	bool IsTypeExist(Vector Pos, MapObjectType Type);
 	int GetID(int Y, int X);

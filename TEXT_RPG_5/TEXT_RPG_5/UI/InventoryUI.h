@@ -1,7 +1,7 @@
 #pragma once
 #include "../pch.h"
 
-class RenderManager;
+class DisplayManager;
 class UItem;
 class Player;
 class UInventoryComponent;
@@ -26,5 +26,5 @@ private:
 private:
 	Player* PlayerPtr;
 	UInventoryComponent* InventoryComponent;
-	RenderManager* Renderer;
+	DisplayManager* Renderer;
 };

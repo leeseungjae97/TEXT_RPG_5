@@ -1,6 +1,6 @@
 #pragma once
 
-class RenderManager;
+class DisplayManager;
 class Player;
 class UItem;
 
@@ -20,7 +20,7 @@ private:
 
 private:
 	Player* PlayerPtr = nullptr;
-	RenderManager* Renderer = nullptr;
+	DisplayManager* Renderer = nullptr;
 	
 	int ShopColorIndex = 0;
 	float ColorChangeInterval = 0.8f;

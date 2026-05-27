@@ -1,9 +1,9 @@
-﻿#include "RenderManager.h"
+﻿#include "DisplayManager.h"
 
 #include "../Define.h"
 #include "../Item/Item.h"
 
-RenderManager::~RenderManager()
+DisplayManager::~DisplayManager()
 {
     delete[] screen;
     screen = nullptr;
@@ -18,7 +18,7 @@ RenderManager::~RenderManager()
     }
 }
 
-void RenderManager::BeginPlay()
+void DisplayManager::BeginPlay()
 {
     screen = new wchar_t[SCREEN_WIDTH * SCREEN_HEIGHT];
     attributes = new WORD[SCREEN_WIDTH * SCREEN_HEIGHT];
@@ -32,23 +32,23 @@ void RenderManager::BeginPlay()
     SetConsoleActiveScreenBuffer(hConsole);
 }
 
-void RenderManager::Render()
+void DisplayManager::Render()
 {    
     DrawScreen();
     ClearScreen();
 }
 
-void RenderManager::Destroy()
+void DisplayManager::Destroy()
 {
 
 }
 
-void RenderManager::AddRender(int Y, int X, string Content)
+void DisplayManager::AddRender(int Y, int X, string Content)
 {
 	AddRender(Y, X, ToWideString(Content));
 }
 
-void RenderManager::AddRender(int Y, int X, wstring Content)
+void DisplayManager::AddRender(int Y, int X, wstring Content)
 {
     int drawX = X;
 
@@ -72,7 +72,7 @@ void RenderManager::AddRender(int Y, int X, wstring Content)
 	}
 }
 
-void RenderManager::AddRender(int Y, int X, vector<vector<int>>& Map)
+void DisplayManager::AddRender(int Y, int X, vector<vector<int>>& Map)
 {
 	for (int y = 0; y < Map.size(); ++y)
 	{
@@ -92,7 +92,7 @@ void RenderManager::AddRender(int Y, int X, vector<vector<int>>& Map)
 	}
 }
 
-void RenderManager::DrawLine(int StartY, int StartX, int EndY, int EndX, wchar_t Character, int Color, int BgColor)
+void DisplayManager::DrawLine(int StartY, int StartX, int EndY, int EndX, wchar_t Character, int Color, int BgColor)
 {
 	int deltaX = abs(EndX - StartX);
 	int deltaY = abs(EndY - StartY);
@@ -125,7 +125,7 @@ void RenderManager::DrawLine(int StartY, int StartX, int EndY, int EndX, wchar_t
 	}
 }
 
-void RenderManager::DrawBox(int Y, int X, int Width, int Height)
+void DisplayManager::DrawBox(int Y, int X, int Width, int Height)
 {
 	if (Width < 2 || Height < 2)
 	{
@@ -143,7 +143,7 @@ void RenderManager::DrawBox(int Y, int X, int Width, int Height)
 	AddRender(Y + Height - 1, X + Width - 1, L"\x2518");
 }
 
-wstring RenderManager::ToWideString(const string& Text)
+wstring DisplayManager::ToWideString(const string& Text)
 {
 	if (Text.empty())
 	{
@@ -164,7 +164,7 @@ wstring RenderManager::ToWideString(const string& Text)
 
 
 
-void RenderManager::PutCell(int Y, int X, wchar_t Character, WORD Attribute)
+void DisplayManager::PutCell(int Y, int X, wchar_t Character, WORD Attribute)
 {
     if (X < 0 || X >= SCREEN_WIDTH || Y < 0 || Y >= SCREEN_HEIGHT)
     {
@@ -180,7 +180,7 @@ void RenderManager::PutCell(int Y, int X, wchar_t Character, WORD Attribute)
     }
 }
 
-void RenderManager::ClearScreen()
+void DisplayManager::ClearScreen()
 {
     for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; ++i)
     {
@@ -192,7 +192,7 @@ void RenderManager::ClearScreen()
     }
 }
 
-void RenderManager::DrawScreen()
+void DisplayManager::DrawScreen()
 {
     if (hConsole == INVALID_HANDLE_VALUE)
     {
@@ -220,7 +220,7 @@ void RenderManager::DrawScreen()
     WriteConsoleOutputW(hConsole, buffer.data(), bufferSize, bufferCoord, &writeRegion);
 }
 
-void RenderManager::SetColor(int Color, int BackgroundColor)
+void DisplayManager::SetColor(int Color, int BackgroundColor)
 {
     Color &= 0xf;
     BackgroundColor &= 0xf;
@@ -228,7 +228,7 @@ void RenderManager::SetColor(int Color, int BackgroundColor)
         (BackgroundColor << 4) | Color);
 }
 
-void RenderManager::SetFontColor(int Color)
+void DisplayManager::SetFontColor(int Color)
 {
     CONSOLE_SCREEN_BUFFER_INFO buff;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &buff);
@@ -236,7 +236,7 @@ void RenderManager::SetFontColor(int Color)
         (buff.wAttributes & 0xf0) | (Color & 0xf));
 }
 
-void RenderManager::SetBackgroundColor(int BackgroundColor)
+void DisplayManager::SetBackgroundColor(int BackgroundColor)
 {
     CONSOLE_SCREEN_BUFFER_INFO buff;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &buff);
@@ -244,26 +244,26 @@ void RenderManager::SetBackgroundColor(int BackgroundColor)
         ((BackgroundColor & 0xf) << 4) | (buff.wAttributes & 0xf));
 }
 
-int RenderManager::GetFontColor()
+int DisplayManager::GetFontColor()
 {
     CONSOLE_SCREEN_BUFFER_INFO buff;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &buff);
     return buff.wAttributes & 0xf;
 }
 
-int RenderManager::GetBackgroundColor()
+int DisplayManager::GetBackgroundColor()
 {
     CONSOLE_SCREEN_BUFFER_INFO buff;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &buff);
     return (buff.wAttributes & 0xf0) >> 4;
 }
 
-WORD RenderManager::MakeConsoleAttribute(int Color, int BackgroundColor)
+WORD DisplayManager::MakeConsoleAttribute(int Color, int BackgroundColor)
 {
 	return static_cast<WORD>(((BackgroundColor & 0xf) << 4) | (Color & 0xf));
 }
 
-bool RenderManager::IsWideCharacter(wchar_t Character)
+bool DisplayManager::IsWideCharacter(wchar_t Character)
 {
 	return
 		(Character >= 0x1100 && Character <= 0x11FF) ||
@@ -275,7 +275,7 @@ bool RenderManager::IsWideCharacter(wchar_t Character)
 		(Character >= 0xFFE0 && Character <= 0xFFE6);
 }
 
-int RenderManager::GetCharacterDisplayWidth(wchar_t Character)
+int DisplayManager::GetCharacterDisplayWidth(wchar_t Character)
 {
 	if (Character == L'\0')
 	{
@@ -285,7 +285,7 @@ int RenderManager::GetCharacterDisplayWidth(wchar_t Character)
 	return IsWideCharacter(Character) ? 2 : 1;
 }
 
-int RenderManager::GetTextDisplayWidth(const wstring& Text)
+int DisplayManager::GetTextDisplayWidth(const wstring& Text)
 {
 	int width = 0;
 	for (wchar_t character : Text)
@@ -296,7 +296,7 @@ int RenderManager::GetTextDisplayWidth(const wstring& Text)
 	return width;
 }
 
-wstring RenderManager::TrimTextToDisplayWidth(const wstring& Text, int MaxWidth)
+wstring DisplayManager::TrimTextToDisplayWidth(const wstring& Text, int MaxWidth)
 {
 	wstring result;
 	int width = 0;

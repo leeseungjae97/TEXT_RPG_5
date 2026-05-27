@@ -3,7 +3,7 @@
 #include "../Component/InventoryComponent.h"
 #include "../Define.h"
 #include "../Item/Item.h"
-#include "../Manager/RenderManager.h"
+#include "../Manager/DisplayManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/ShopManager.h"
 #include "../Player.h"
@@ -12,7 +12,7 @@ void ShopUI::Render()
 {
 	if (!Renderer)
 	{
-		Renderer = RenderManager::GetInstance();
+		Renderer = DisplayManager::GetInstance();
 		return;
 	}
 

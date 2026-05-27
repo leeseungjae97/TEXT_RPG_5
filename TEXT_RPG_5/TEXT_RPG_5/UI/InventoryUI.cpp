@@ -3,7 +3,7 @@
 #include "../Component/EquipmentComponent.h"
 #include "../Component/InventoryComponent.h"
 #include "../Define.h"
-#include "../Manager/RenderManager.h"
+#include "../Manager/DisplayManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Player.h"
 #include "../Item/Item.h"
@@ -86,7 +86,7 @@ void InventoryUI::DrawBackground(int Y, int X, int Width, int Height)
 {
 	if (!Renderer)
 	{
-		Renderer = RenderManager::GetInstance();
+		Renderer = DisplayManager::GetInstance();
 		return;
 	}
 
@@ -106,7 +106,7 @@ void InventoryUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem*
 {
 	if (!Renderer)
 	{
-		Renderer = RenderManager::GetInstance();
+		Renderer = DisplayManager::GetInstance();
 		return;
 	}
 	Renderer->DrawBox(Y, X, Width, Height);
@@ -165,7 +165,7 @@ void InventoryUI::DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>&
 {
 	if (!Renderer)
 	{
-		Renderer = RenderManager::GetInstance();
+		Renderer = DisplayManager::GetInstance();
 		return;
 	}
 	
@@ -204,7 +204,7 @@ void InventoryUI::DrawEquipmentPanel(int Y, int X)
 {
 	if (!Renderer)
 	{
-		Renderer = RenderManager::GetInstance();
+		Renderer = DisplayManager::GetInstance();
 		return;
 	}
 	

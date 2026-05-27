@@ -1,7 +1,7 @@
 ﻿#include "CombatComponent.h"
 #include "MoveComponent.h"
 #include "../Manager/InputManager.h"
-#include "../Manager/RenderManager.h"
+#include "../Manager/DisplayManager.h"
 #include "../Player.h"
 #include "../Monster.h"
 #include "../Manager/SceneManager.h"

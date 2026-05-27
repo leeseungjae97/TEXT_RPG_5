@@ -27,11 +27,11 @@ enum ConsoleColor {
 
 class UItem;
 
-class RenderManager : public Singleton<RenderManager>
+class DisplayManager : public Singleton<DisplayManager>
 {
 public:
-	RenderManager() {}
-	~RenderManager();
+	DisplayManager() {}
+	~DisplayManager();
 
 private:
 	void ClearScreen();
