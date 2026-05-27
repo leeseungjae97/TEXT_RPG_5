@@ -1404,7 +1404,7 @@
     <ClCompile Include="UI\InventoryUI.cpp" />
     <ClCompile Include="UI\ShopUI.cpp" />
     <ClCompile Include="UI\HUDUI.cpp" />
-    <ClCompile Include="Manager\RenderManager.cpp">
+    <ClCompile Include="Manager\DisplayManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <Optimization>Disabled</Optimization>
@@ -1789,7 +1789,7 @@
     <ClInclude Include="Manager\MapManager.h" />
     <ClInclude Include="Manager\ObjectPoolManager.h" />
     <ClInclude Include="Manager\ViewportManager.h" />
-    <ClInclude Include="Manager\RenderManager.h" />
+    <ClInclude Include="Manager\DisplayManager.h" />
     <ClInclude Include="Manager\SceneManager.h" />
     <ClInclude Include="Manager\ShopManager.h" />
     <ClInclude Include="Manager\TimeManager.h" />

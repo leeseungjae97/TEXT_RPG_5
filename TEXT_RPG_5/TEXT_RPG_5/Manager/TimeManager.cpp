@@ -1,6 +1,6 @@
 #include "TimeManager.h"
 
-#include "RenderManager.h"
+#include "DisplayManager.h"
 
 TimeManager::TimeManager()
 	: DeltaTime(0.f), StoreSecond(0.0f), FrameCount(0), LastFPS(0),
@@ -49,5 +49,5 @@ void TimeManager::CalcFPS()
 		StoreSecond = 0.0f;
 		FrameCount = 0;
 	}
-	RenderManager::GetInstance()->AddRender(1, 1, "FPS : " + to_string(LastFPS));
+	DisplayManager::GetInstance()->AddRender(1, 1, "FPS : " + to_string(LastFPS));
 }

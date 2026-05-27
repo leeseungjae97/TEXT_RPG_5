@@ -21,8 +21,9 @@ protected:
 public:
 	~UMoveComponent();
 
-	EDirection GetFacingDirection();
-	EDirection GetPreviousFacingDirection();
+	EDirection GetFacingDirection() { return FacingDirection; }
+	EDirection GetPreviousFacingDirection() { return PreviousFacingDirection; }
+	
 	void SetFacingDirection(EDirection Str);
 	float GetMoveAlpha() const;
 	float GetTurnAlpha() const;

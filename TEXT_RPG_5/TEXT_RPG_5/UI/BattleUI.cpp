@@ -3,7 +3,7 @@
 #include "../Define.h"
 #include "../Manager/BattleManager.h"
 #include "../Manager/InputManager.h"
-#include "../Manager/RenderManager.h"
+#include "../Manager/DisplayManager.h"
 
 void BattleUI::Open()
 {
@@ -37,7 +37,7 @@ void BattleUI::Render()
 
 	if (!Renderer)
 	{
-		Renderer = RenderManager::GetInstance();
+		Renderer = DisplayManager::GetInstance();
 		return;
 	}
 
