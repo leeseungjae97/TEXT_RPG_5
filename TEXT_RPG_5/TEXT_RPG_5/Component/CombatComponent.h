@@ -27,10 +27,13 @@ public:
 	bool IsAttackCoolingDown() const;
 	float GetAttackCooldownAlpha() const;
 	// void SetAttackValue();
-	void SwordAttack();
+	void Attack();
 	void HandleAttack();
 	void LaunchProjectile();
 	void MakeSwordRange();
+	void MakeAxeRange();
+	void MakeRockRange();
+	void MakeMagicRange();
 	void AttackEffectTimeAcc(float DeltaTime);
 	void HandleAttackInput(float DeltaTime);
 	
@@ -55,14 +58,4 @@ private:
 	
 	float ProjectileTotalTime;
 	float ProjectileDelayTime;
-	
-	// 무기 타입별 쿨타임 관리
-	float SwordElapsedTime;
-	float SwordInterval;
-
-	float SpearElapsedTime;
-	float SpearInterval;
-
-	float ProjectileElapsedTime;
-	float ProjectileInterval;
 };

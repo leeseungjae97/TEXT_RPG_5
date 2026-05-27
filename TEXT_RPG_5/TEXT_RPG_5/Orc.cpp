@@ -1,4 +1,5 @@
 #include "Orc.h"
+#include "Player.h"
 #include <cstdlib>
 
 Orc::Orc(int playerLevel)
@@ -27,4 +28,37 @@ Orc::Orc(int playerLevel)
 	AttackInterval = 1.6f;
 	AttackElapsedtime = 0.0f;
 	
+	//TrySetShiny();
 }
+	
+void Orc::Attackplayer(Player* player)
+{
+	if (player == nullptr)
+	{
+		return;
+	}
+	
+	AttackValue.clear();
+	
+	Vector playerPosition = player->GetPosition();
+	
+	for (int y = -1; y <= 1; ++y)
+	{
+		for (int x = -1; x <= 1; ++x)
+		{
+			AttackValue.push_back({ playerPosition.X + x, playerPosition.Y + y });
+		}
+	}
+	
+	AttackVisibleTime = AttackVisibleDuration;
+	
+	player->TakeDamage(Attack);
+	
+	AttackElapsedtime = 0.0f;
+	
+}
+	
+		
+	
+	
+
