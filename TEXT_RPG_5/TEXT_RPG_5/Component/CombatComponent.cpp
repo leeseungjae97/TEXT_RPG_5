@@ -42,7 +42,7 @@ UCombatComponent::UCombatComponent(AObject* InOwner)
 	SwordInterval = 1.3f;
 	AxeInterval = 2.0f;
 	BowInterval = 1.0f;
-	MagicInterval = 8.0f;
+	MagicInterval = 1.0f;
 
 	RockElapsedTime = RockInterval;
 	SwordElapsedTime = SwordInterval;
@@ -169,6 +169,45 @@ float UCombatComponent::GetAttackCooldownAlpha() const
 	return min(max(ElapsedTime / Interval, 0.0f), 1.0f);
 }
 
+void UCombatComponent::Attack()
+{
+	if (AttackValue.empty())
+		return;
+
+	if (!PlayerPtr)
+	{
+		PlayerPtr = dynamic_cast<Player*>(GetOwner());
+		return;
+	}
+
+	WeaponType CurrentWeapon = WeaponType::NONE;
+	if (UEquipmentComponent* EquipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>())
+	{
+		CurrentWeapon = EquipmentComponent->GetCurrentWeaponType();
+	}
+
+	for (const auto AttackPos : AttackValue)
+	{
+		if (AttackPos.Y < 0 || AttackPos.Y >= MAP_MAX_Y || AttackPos.X < 0 || AttackPos.X >= MAP_MAX_X)
+		{
+			continue;
+		}
+		
+		if (MapManager::GetInstance()->IsTypeExist(AttackPos.Y, AttackPos.X, MapObjectType::Monster))
+		{
+			const int ID = MapManager::GetInstance()->GetID(AttackPos.Y, AttackPos.X);
+			if (Monster* const Mon = dynamic_cast<Monster*>(ObjectPoolManager::GetInstance()->GetObjectByID(ID)))
+			{
+				Mon->TakeDamage(PlayerPtr->GetPower());
+				if (CurrentWeapon == WeaponType::Magic)
+				{
+					Mon->NotifyHitEffect(HitEffectType::Magic, 0.45f);
+				}
+			}
+		}
+	}
+}
+
 float UCombatComponent::GetAttackAnimationAlpha() const
 {
 	if (AttackVisibleDuration <= 0.0f || AttackVisibleTime <= 0.0f)
@@ -216,33 +255,6 @@ void UCombatComponent::ProjectileAttack()
 	NewProjectile->Fire();
 }
 
-/*void UCombatComponent::HandleAttack()
-{
-	if (!bAttackRequested)
-	{
-		return;
-	}
-
-	switch (Weapon)
-	{
-		case WeaponType::Sword:
-		{
-			SwordAttack();
-		}
-		break;
-		case WeaponType::Bow:
-		{
-			ProjectileAttack();
-		}
-		break;
-		default : 
-		{
-			
-		}
-	}
-
-	bAttackRequested = false;
-}*/
 void UCombatComponent::HandleAttack()
 {
 	if (!bAttackRequested)
@@ -325,8 +337,6 @@ void UCombatComponent::LaunchProjectile()
 			
 	/*ProjectileTotalTime = 0.0f;
 	ProjectileDelayTime = 0.5f;*/
-	float BowElapsedTime = 0.0f;
-	float BowInterval = 0.5f;
 }
 
 void UCombatComponent::MakeSwordRange()
@@ -588,6 +598,8 @@ void UCombatComponent::HandleAttackInput(float DeltaTime)
 			{
 				if (BowElapsedTime >= BowInterval)
 				{
+					PlayerPtr->SetIsAttack(true);
+					AttackVisibleTime = AttackVisibleDuration;
 					LaunchProjectile();
 					BowElapsedTime = 0.0f;
 				}

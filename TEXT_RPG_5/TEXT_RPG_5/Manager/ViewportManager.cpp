@@ -401,10 +401,7 @@ void ViewportManager::Render2DtoISO()
 				const int lift = bAttackAnimating ? static_cast<int>(returnAlpha * 2.0f + 0.5f) : 0;
 				weaponChar = L'|';
 				handY -= lift;
-				if (bAttackAnimating && lift > 0)
-				{
-					renderManager->PutCell(handY - 1, handX, L'*', MakeAttribute(CC_MAGENTA));
-				}
+				renderManager->PutCell(handY - 1, handX, L'*', MakeAttribute(CC_MAGENTA));
 			}
 
 			renderManager->PutCell(handY, handX, weaponChar, weaponAttribute);
@@ -539,6 +536,37 @@ void ViewportManager::Render2DtoISO()
 			drawStatusBar(iso.Y - 6, iso.X, static_cast<float>(currentHealth) / static_cast<float>(maxHealth), CC_RED);
 		};
 
+	auto drawObjectHitEffect = [&](Vector iso, AObject* object)
+		{
+			if (object == nullptr || !object->ShouldShowHitEffect())
+			{
+				return;
+			}
+
+			if (object->GetHitEffectType() == HitEffectType::Bow)
+			{
+				WORD attribute = MakeAttribute(CC_CYAN);
+				renderManager->PutCell(iso.Y - 5, iso.X - 2, L'X', attribute);
+				renderManager->PutCell(iso.Y - 5, iso.X + 2, L'X', attribute);
+				renderManager->PutCell(iso.Y - 4, iso.X, L'X', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X - 2, L'X', attribute);
+				renderManager->PutCell(iso.Y - 3, iso.X + 2, L'X', attribute);
+				return;
+			}
+
+			if (object->GetHitEffectType() == HitEffectType::Magic)
+			{
+				WORD fireAttribute = MakeAttribute(CC_RED);
+				WORD hotAttribute = MakeAttribute(CC_YELLOW);
+				renderManager->PutCell(iso.Y - 1, iso.X - 2, L'/', fireAttribute);
+				renderManager->PutCell(iso.Y - 2, iso.X - 1, L'^', hotAttribute);
+				renderManager->PutCell(iso.Y - 3, iso.X, L'W', hotAttribute);
+				renderManager->PutCell(iso.Y - 2, iso.X + 1, L'^', hotAttribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 2, L'\\', fireAttribute);
+				renderManager->PutCell(iso.Y - 4, iso.X, L'|', fireAttribute);
+			}
+		};
+
 	auto drawPlayerBars = [&](Vector iso, Player* player)
 		{
 			if (player == nullptr)
@@ -616,7 +644,47 @@ void ViewportManager::Render2DtoISO()
 
 	auto drawAttackPositions = [&]()
 		{
-			auto drawAttackTile = [&](const Vector& attackPosition, int color)
+			auto drawSlashTile = [&](Vector iso, int color, WeaponType weaponType)
+				{
+					WORD attribute = MakeAttribute(color);
+					if (weaponType == WeaponType::Axe)
+					{
+						renderManager->PutCell(iso.Y - 1, iso.X - 1, L'\\', attribute);
+						renderManager->PutCell(iso.Y, iso.X, L'=', attribute);
+						renderManager->PutCell(iso.Y + 1, iso.X + 1, L'/', attribute);
+						return;
+					}
+
+					renderManager->PutCell(iso.Y - 1, iso.X + 1, L'/', attribute);
+					renderManager->PutCell(iso.Y, iso.X, L'-', attribute);
+					renderManager->PutCell(iso.Y + 1, iso.X - 1, L'\\', attribute);
+				};
+
+			auto drawFireTile = [&](Vector iso, bool centerFire)
+				{
+					WORD baseAttribute = MakeAttribute(CC_RED);
+					WORD hotAttribute = MakeAttribute(CC_YELLOW);
+					renderManager->PutCell(iso.Y, iso.X, L'^', hotAttribute);
+					renderManager->PutCell(iso.Y - 1, iso.X - 1, L'/', baseAttribute);
+					renderManager->PutCell(iso.Y - 1, iso.X, centerFire ? L'W' : L'v', hotAttribute);
+					renderManager->PutCell(iso.Y - 1, iso.X + 1, L'\\', baseAttribute);
+					if (centerFire)
+					{
+						renderManager->PutCell(iso.Y - 2, iso.X, L'^', hotAttribute);
+						renderManager->PutCell(iso.Y - 3, iso.X, L'|', baseAttribute);
+					}
+				};
+
+			auto drawDefaultAttackTile = [&](Vector iso, int color)
+				{
+					WORD attribute = MakeAttribute(color);
+					renderManager->PutCell(iso.Y - 1, iso.X, L'*', attribute);
+					renderManager->PutCell(iso.Y, iso.X - 1, L'<', attribute);
+					renderManager->PutCell(iso.Y, iso.X, L'X', attribute);
+					renderManager->PutCell(iso.Y, iso.X + 1, L'>', attribute);
+				};
+
+			auto drawAttackTile = [&](const Vector& attackPosition, int color, WeaponType weaponType)
 				{
 					if (fabsf(static_cast<float>(attackPosition.X) - cameraPosition.X) > viewRadiusX ||
 						fabsf(static_cast<float>(attackPosition.Y) - cameraPosition.Y) > viewRadiusY)
@@ -631,11 +699,19 @@ void ViewportManager::Render2DtoISO()
 						originY
 					);
 
-					WORD attribute = MakeAttribute(color);
-					renderManager->PutCell(iso.Y - 1, iso.X, L'*', attribute);
-					renderManager->PutCell(iso.Y, iso.X - 1, L'<', attribute);
-					renderManager->PutCell(iso.Y, iso.X, L'X', attribute);
-					renderManager->PutCell(iso.Y, iso.X + 1, L'>', attribute);
+					if (weaponType == WeaponType::Sword || weaponType == WeaponType::Axe)
+					{
+						drawSlashTile(iso, color, weaponType);
+					}
+					else if (weaponType == WeaponType::Magic)
+					{
+						const bool centerFire = MapManager::GetInstance()->IsTypeExist(attackPosition, MapObjectType::Monster);
+						drawFireTile(iso, centerFire);
+					}
+					else
+					{
+						drawDefaultAttackTile(iso, color);
+					}
 				};
 
 			Player* player = SceneManager::GetInstance()->GetPlayer();
@@ -644,9 +720,15 @@ void ViewportManager::Render2DtoISO()
 				UCombatComponent* combatComponent = player->GetComponent<UCombatComponent>();
 				if (combatComponent != nullptr && combatComponent->IsAttackVisible())
 				{
+					WeaponType weaponType = WeaponType::NONE;
+					if (UEquipmentComponent* equipmentComponent = player->GetComponent<UEquipmentComponent>())
+					{
+						weaponType = equipmentComponent->GetCurrentWeaponType();
+					}
+
 					for (const Vector& attackPosition : combatComponent->GetAttackValue())
 					{
-						drawAttackTile(attackPosition, CC_RED);
+						drawAttackTile(attackPosition, CC_RED, weaponType);
 					}
 				}
 			}
@@ -662,7 +744,7 @@ void ViewportManager::Render2DtoISO()
 
 				for (const Vector& attackPosition : monster->GetAttackValue())
 				{
-					drawAttackTile(attackPosition, CC_MAGENTA);
+					drawAttackTile(attackPosition, CC_MAGENTA, WeaponType::NONE);
 				}
 			}
 		};
@@ -819,6 +901,7 @@ void ViewportManager::Render2DtoISO()
 		drawPlayerBars(iso, playerForBars);
 		drawLevelUpEffect(iso, playerForBars);
 		drawMonsterHpBar(iso, monsterForHpBar);
+		drawObjectHitEffect(iso, object);
 		if (dynamic_cast<Player*>(object) == nullptr && object->ShouldShowDamageText())
 		{
 			renderManager->AddRender(iso.Y - 8, iso.X - 1, L"-" + to_wstring(object->GetLastDamage()));

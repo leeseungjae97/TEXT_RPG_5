@@ -51,7 +51,7 @@ void SceneManager::BeginPlay()
 	ObjectPoolManager::GetInstance()->Preload<Orc>(10, 1);
 	ObjectPoolManager::GetInstance()->Preload<Slime>(10, 1);
 	ObjectPoolManager::GetInstance()->Preload<Projectile>(10);
-	CurrentPlayer = SpawnObject<Player>("player", 100, 60);
+	CurrentPlayer = SpawnObject<Player>("player", 100, 10);
 	CurrentPlayer->SetPosition(20, 20);
 	for (int i = 1; i <= 3; ++i)
 	{

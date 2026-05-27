@@ -10,6 +10,8 @@ AObject::AObject()
 	, bPositionCommitted(false)
 	, LastDamage(0)
 	, HitFlashTime(0.0f)
+	, HitEffect(HitEffectType::None)
+	, HitEffectTime(0.0f)
 	, DamageTextTime(0.0f)
 	, LogTextTime(0.0f)
 	, SlowTime(0.0f)
@@ -32,6 +34,16 @@ void AObject::TimeAdd(float DeltaTime)
 		if (HitFlashTime < 0.0f)
 		{
 			HitFlashTime = 0.0f;
+		}
+	}
+
+	if (HitEffectTime > 0.0f)
+	{
+		HitEffectTime -= DeltaTime;
+		if (HitEffectTime < 0.0f)
+		{
+			HitEffectTime = 0.0f;
+			HitEffect = HitEffectType::None;
 		}
 	}
 
@@ -167,6 +179,12 @@ void AObject::NotifyDamage(int Damage, float FlashDuration, float DamageTextDura
 	NotifyLog(L"-" + to_wstring(Damage), DamageTextDuration);
 }
 
+void AObject::NotifyHitEffect(HitEffectType Type, float Duration)
+{
+	HitEffect = Type;
+	HitEffectTime = Duration;
+}
+
 void AObject::NotifyLog(const wstring& Text, float Duration)
 {
 	LogText = Text;
@@ -181,6 +199,8 @@ void AObject::OnSpawnFromPool()
 	bPositionCommitted = false;
 	LastDamage = 0;
 	HitFlashTime = 0.0f;
+	HitEffect = HitEffectType::None;
+	HitEffectTime = 0.0f;
 	DamageTextTime = 0.0f;
 	LogText.clear();
 	LogTextTime = 0.0f;
@@ -200,6 +220,8 @@ void AObject::OnReturnToPool()
 	bPositionCommitted = false;
 	LastDamage = 0;
 	HitFlashTime = 0.0f;
+	HitEffect = HitEffectType::None;
+	HitEffectTime = 0.0f;
 	DamageTextTime = 0.0f;
 	LogText.clear();
 	LogTextTime = 0.0f;
