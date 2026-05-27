@@ -2,7 +2,8 @@
 
 enum class WeaponType
 {
-	Melee,
+	Sword,
+	Spear,
 	Projectile,
 	
 	MAX

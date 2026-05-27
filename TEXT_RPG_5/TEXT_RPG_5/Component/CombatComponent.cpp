@@ -12,7 +12,7 @@
 #include "../Struct/ProjectileInfo.h"
 
 UCombatComponent::UCombatComponent(AObject* InOwner)
-	: UComponent(InOwner), Weapon(WeaponType::Melee)
+	: UComponent(InOwner), Weapon(WeaponType::Sword)
 {
 	PlayerPtr = dynamic_cast<Player*>(InOwner);
 	MoveComponentPtr = PlayerPtr != nullptr ? PlayerPtr->GetComponent<UMoveComponent>() : nullptr;
@@ -23,6 +23,16 @@ UCombatComponent::UCombatComponent(AObject* InOwner)
 	bAttackRequested = false;
 	ProjectileTotalTime = 0.0f;
 	ProjectileDelayTime = 0.0f;
+	
+	
+	SwordElapsedTime = 999.0f;
+	SwordInterval = 2.0f;
+
+	SpearElapsedTime = 999.0f;
+	SpearInterval = 2.0f;
+
+	ProjectileElapsedTime = 999.0f;
+	ProjectileInterval = 0.5f;
 }
 
 UCombatComponent::~UCombatComponent()
@@ -125,7 +135,7 @@ void UCombatComponent::HandleAttack()
 
 	switch (Weapon)
 	{
-		case WeaponType::Melee:
+		case WeaponType::Sword:
 		{
 			SwordAttack();
 		}
