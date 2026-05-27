@@ -44,12 +44,15 @@ public:
 	void Destroy();
 
 	void AddRender(int Y, int X, string Content);
+	void AddRender(int Y, int X, string Content, int Color, int BackgroundColor = CC_BLACK);
 	void AddRender(int Y, int X, vector<vector<int>>& Map);
 	void AddRender(int Y, int X, wstring Content);
+	void AddRender(int Y, int X, wstring Content, int Color, int BackgroundColor = CC_BLACK);
 
 public:
 	void DrawLine(int StartY, int StartX, int EndY, int EndX, wchar_t Character = L'*', int Color = CC_GRAY, int BgColor = CC_BLACK);
 	void DrawBox(int Y, int X, int Width, int Height);
+	// Use AddRender for text. PutCell is for single-width glyphs and raw buffer drawing.
 	void PutCell(int Y, int X, wchar_t Character, WORD Attribute);
 
 public:

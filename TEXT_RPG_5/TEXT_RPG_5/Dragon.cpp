@@ -9,7 +9,8 @@ if (PlayerLevel <= 0)
     PlayerLevel = 1;
 }
 
-    Name = "Dragon";
+    Name = L"드래곤";
+    Level = PlayerLevel;
     Health = PlayerLevel * 80 + rand() % (PlayerLevel * 30 + 1);
     MaxHealth = Health;
     Attack = PlayerLevel * 12 + rand() % (PlayerLevel * 8 + 1);

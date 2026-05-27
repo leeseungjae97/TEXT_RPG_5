@@ -10,7 +10,8 @@ class Player;
 class Monster : public AObject
 {
 protected:
-	string Name;
+	wstring Name;
+	int Level;
 	int Health;
 	int MaxHealth;
 	int Attack;
@@ -39,6 +40,8 @@ public:
 	virtual ~Monster();
 
 	string GetName();
+	const wstring& GetDisplayName() const { return Name; }
+	int GetLevel() const { return Level; }
 	int GetHealth();
 	int GetMaxHealth();
 	int GetAttack();

@@ -56,25 +56,6 @@ void HUDUI::StatusRender()
 		if (equipmentComponent->GetItem({1,0}))
 			equipmentPowerBonus = equipmentComponent->GetItem({1,0})->GetItemInfo().EffectAmount;
 	}
-	auto drawColoredText = [&](int y, int x, const wstring& text, int color)
-		{
-			int drawX = x;
-			WORD attribute = Renderer->MakeConsoleAttribute(color);
-			for (wchar_t character : text)
-			{
-				int characterWidth = Renderer->GetCharacterDisplayWidth(character);
-				if (characterWidth == 2)
-				{
-					Renderer->PutCell(y, drawX, character, attribute | COMMON_LVB_LEADING_BYTE);
-					Renderer->PutCell(y, drawX + 1, L' ', attribute | COMMON_LVB_TRAILING_BYTE);
-					drawX += characterWidth;
-					continue;
-				}
-
-				Renderer->PutCell(y, drawX, character, attribute);
-				drawX += characterWidth;
-			}
-		};
 	if (PlayerPtr->ShouldShowLogText())
 	{
 		Vector isoPosition = ViewportManager::GetInstance()->GetISOPosition();
@@ -86,7 +67,7 @@ void HUDUI::StatusRender()
 	Renderer->AddRender(hudY + 2, hudX, "HP : " + to_string(PlayerPtr->GetHP()) + "/" + to_string(PlayerPtr->GetMax_HP()));
 	if (equipmentMaxHPBonus > 0)
 	{
-		drawColoredText(hudY + 2, hudX + 14, L'+' + to_wstring(equipmentMaxHPBonus), CC_YELLOW);
+		Renderer->AddRender(hudY + 2, hudX + 14, L'+' + to_wstring(equipmentMaxHPBonus), CC_YELLOW);
 	}
 	DrawStatusBar(hudY + 2, barX, barWidth, static_cast<float>(currentHealth) / static_cast<float>(maxHealth), CC_RED);
 
@@ -97,7 +78,7 @@ void HUDUI::StatusRender()
 	Renderer->AddRender(hudY + 8, hudX, "POWER " + to_string(PlayerPtr->GetPower()));
 	if (equipmentPowerBonus > 0)
 	{
-		drawColoredText(hudY + 8, hudX + 9 + static_cast<int>(to_string(PlayerPtr->GetPower()).length()), L'+' + to_wstring(equipmentPowerBonus), CC_YELLOW);
+		Renderer->AddRender(hudY + 8, hudX + 9 + static_cast<int>(to_string(PlayerPtr->GetPower()).length()), L'+' + to_wstring(equipmentPowerBonus), CC_YELLOW);
 	}
 
 	UCombatComponent* combatComponent = PlayerPtr->GetComponent<UCombatComponent>();
@@ -226,6 +207,8 @@ wchar_t HUDUI::GetMapIcon(int MapY, int MapX)
 			if (name == "Goblin") return L'G';
 			if (name == "Slime")  return L'S';
 			if (name == "Orc")    return L'O';
+			if (name == "Dragon") return L'D';
+			if (name == "Spider") return L'A';
 		}
 		return L'M';
 	case MapObjectType::Projectile:
@@ -277,12 +260,9 @@ int HUDUI::GetMapIconColor(int MapY, int MapX)
 	case MapObjectType::Monster:
 		if (Monster* monster = dynamic_cast<Monster*>(MapManager::GetInstance()->GetMapObject(MapY, MapX, MapObjectType::Monster)))
 		{
-			string name = monster->GetName();
-			if (name == "Goblin") return CC_GREEN;
-			if (name == "Slime")  return CC_CYAN;
-			if (name == "Orc")    return CC_DARKYELLOW;
+			if (monster->IsShiny()) return CC_RED;
 		}
-		return CC_MAGENTA;
+		return CC_WHITE;
 	case MapObjectType::Projectile:
 		return CC_CYAN;
 	case MapObjectType::Path:

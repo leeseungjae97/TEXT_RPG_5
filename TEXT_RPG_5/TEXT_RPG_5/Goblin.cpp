@@ -8,7 +8,8 @@ Goblin::Goblin(int playerLevel)
 		playerLevel = 1;
 	}
 
-	Name = "Goblin";
+	Name = L"고블린";
+	Level = playerLevel;
 	Health = playerLevel * 20 + rand() % (playerLevel * 10 + 1);
 	MaxHealth = Health;
 	Attack = playerLevel * 4 + rand() % (playerLevel * 4 + 1);

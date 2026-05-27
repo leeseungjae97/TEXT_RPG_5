@@ -16,7 +16,8 @@
 
 Monster::Monster()
 {
-	Name = "Monster";
+	Name = L"Monster";
+	Level = 1;
 	Health = 100;
 	MaxHealth = Health;
 	Attack = 10;
@@ -46,7 +47,13 @@ Monster::~Monster()
 
 string Monster::GetName()
 {
-	return Name;
+	if (Name.find(L"고블린") != wstring::npos) return "Goblin";
+	if (Name.find(L"슬라임") != wstring::npos) return "Slime";
+	if (Name.find(L"오크") != wstring::npos) return "Orc";
+	if (Name.find(L"드래곤") != wstring::npos) return "Dragon";
+	if (Name.find(L"거미") != wstring::npos) return "Spider";
+	if (Name.find(L"Troll") != wstring::npos) return "Troll";
+	return "Monster";
 }
 
 int Monster::GetHealth()
@@ -169,7 +176,7 @@ void Monster::Tick(float DeltaTime)
 
 void Monster::Destroy()
 {
-	BattleManager::GetInstance()->RegisterKilledMonster(Name);
+	BattleManager::GetInstance()->RegisterKilledMonster(GetName());
 	if (Player* PlayerPtr = SceneManager::GetInstance()->GetPlayer())
 	{
 		if (LevelComponent* LevelComp = PlayerPtr->GetComponent<LevelComponent>())
@@ -552,7 +559,7 @@ void Monster::TrySetShiny()
 		
 		//임시
 		
-		Name = "Shiny" + Name;
+		Name = L"강한 " + Name;
 		
 		MaxHealth += 100;
 		Health = MaxHealth;

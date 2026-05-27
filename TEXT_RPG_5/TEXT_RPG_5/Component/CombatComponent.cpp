@@ -228,6 +228,8 @@ void UCombatComponent::TriggerCustomAttack(const vector<Vector>& CustomRange, in
 			}
 		}
 	}
+}
+
 float UCombatComponent::GetAttackAnimationAlpha() const
 {
 	if (AttackVisibleDuration <= 0.0f || AttackVisibleTime <= 0.0f)
