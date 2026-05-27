@@ -56,4 +56,13 @@ private:
 	float ProjectileTotalTime;
 	float ProjectileDelayTime;
 	
+	// 무기 타입별 쿨타임 관리
+	float SwordElapsedTime;
+	float SwordInterval;
+
+	float SpearElapsedTime;
+	float SpearInterval;
+
+	float ProjectileElapsedTime;
+	float ProjectileInterval;
 };

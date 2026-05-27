@@ -7,6 +7,7 @@
 #include "../Player.h"
 #include  "../Monster.h"
 #include "../Struct/Coordinate.h"
+#include "InventoryComponent.h"
 
 UMoveComponent::UMoveComponent(AObject* InOwner)
 	: UComponent(InOwner)
@@ -73,6 +74,15 @@ void UMoveComponent::Tick(float DeltaTime)
 	{
 		return;
 	}
+	
+	// 인벤 토리가 열려있는지 확인
+	if (UInventoryComponent* Inventory = PlayerPtr->GetComponent<UInventoryComponent>())
+	{
+		if (Inventory->GetOpenedInventory())
+		{
+			return;
+		}
+	}
 
 	MoveElapsedTime += DeltaTime;
 	TurnElapsedTime += DeltaTime;
@@ -82,7 +92,7 @@ void UMoveComponent::Tick(float DeltaTime)
 		return;
 	}
 
-	// 다음 위치에 몬스터가 있는지 확인하는 함수
+	// 다음 위치에 몬스터가 있는지 확인
 	auto IsMonsterAtPosition = [](int X, int Y) -> bool
 	{
 		vector<AObject*>& Objects = SceneManager::GetInstance()->GetObjects();
@@ -207,6 +217,7 @@ bool UMoveComponent::IsMonsterAtPosition(int X, int Y)
 	return false;
 }
 
+// 몬스터 박치기 x 버전
 /*void UMoveComponent::Tick(float DeltaTime)
 {
 	if(nullptr == PlayerPtr)
