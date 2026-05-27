@@ -69,7 +69,7 @@ void ShopManager::RestoreShop()
         }
     }
 }
-
+//테스트
 void ShopManager::BeginPlay()
 {
     ShopPoses.resize(3);

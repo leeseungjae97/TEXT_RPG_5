@@ -17,7 +17,7 @@ Slime::Slime(int playerLevel)
 
 	DetectionRange = 3;
 
-	Position = Vector(3, 3);
+	//Position = Vector(3, 3);
 	PrevPosition = Position;
 	
 	bUseBfs = true;
