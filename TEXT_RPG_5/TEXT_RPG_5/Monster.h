@@ -27,6 +27,9 @@ protected:
 	int AttackRange;
 	float AttackElapsedtime;
 	float AttackInterval;
+	float AttackVisibleTime;
+	float AttackVisibleDuration;
+	vector<Vector> AttackValue;
 
 	
 public:
@@ -38,6 +41,8 @@ public:
 	int GetMaxHealth();
 	int GetAttack();
 	float GetMoveAlpha() const;
+	bool IsAttackVisible() const { return AttackVisibleTime > 0.0f; }
+	const vector<Vector>& GetAttackValue() const { return AttackValue; }
 
 	void TakeDamage(int damage);
 	bool IsDead();

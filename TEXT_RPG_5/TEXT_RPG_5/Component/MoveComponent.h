@@ -2,6 +2,7 @@
 #include "Component.h"
 #include "../Enum/ComponentTypeEnum.h"
 #include "../Enum/Direction.h"
+#include "../Item/AllItems.h"
 
 class Player;
 
@@ -25,8 +26,10 @@ public:
 	float GetMoveAlpha() const;
 	float GetTurnAlpha() const;
 	
-	bool IsMonsterAtPosition(int X, int Y);
-	
+public:
+	void OpenShop();
+	void HandleMoveInput();
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
@@ -38,5 +41,6 @@ private:
 	float MoveInterval = 0.12f;
 	float TurnElapsedTime = 0.0f;
 	float TurnDuration = 0.18f;
+	bool bWasOnShop = false;
 };
 

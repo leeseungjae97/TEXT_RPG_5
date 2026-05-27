@@ -1314,7 +1314,10 @@
     </ClCompile>
     <ClCompile Include="Manager\ObjectPoolManager.cpp" />
     <ClCompile Include="Manager\ViewportManager.cpp" />
+    <ClCompile Include="UI\BattleUI.cpp" />
+    <ClCompile Include="UI\DialogUI.cpp" />
     <ClCompile Include="UI\InventoryUI.cpp" />
+    <ClCompile Include="UI\ShopUI.cpp" />
     <ClCompile Include="UI\HUDUI.cpp" />
     <ClCompile Include="Manager\RenderManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1684,7 +1687,7 @@
     <ClInclude Include="Enum\ComponentTypeEnum.h" />
     <ClInclude Include="Enum\Direction.h" />
     <ClInclude Include="Enum\ItemTypeEnum.h" />
-    <ClInclude Include="Enum\ObjectTypeEnum.h" />
+    <ClInclude Include="Enum\MapObjectTypeEnum.h" />
     <ClInclude Include="Enum\WeaponType.h" />
     <ClInclude Include="Item\AllItems.h" />
     <ClInclude Include="Item\EquipmentItem.h" />
@@ -1721,7 +1724,10 @@
     <ClInclude Include="Struct\ProjectileInfo.h" />
     <ClInclude Include="Struct\Vector.h" />
     <ClInclude Include="Troll.h" />
+    <ClInclude Include="UI\BattleUI.h" />
+    <ClInclude Include="UI\DialogUI.h" />
     <ClInclude Include="UI\InventoryUI.h" />
+    <ClInclude Include="UI\ShopUI.h" />
     <ClInclude Include="UI\HUDUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

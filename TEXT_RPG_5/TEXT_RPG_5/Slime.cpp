@@ -15,7 +15,6 @@ Slime::Slime(int playerLevel)
 	
 	MoveInterval = 1.1f;
 
-	
 	DetectionRange = 3;
 
 	Position = Vector(3, 3);

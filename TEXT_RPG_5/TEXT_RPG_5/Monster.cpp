@@ -8,6 +8,7 @@
 
 #include "Define.h"
 #include "Component/LevelComponent.h"
+#include "Manager/BattleManager.h"
 #include "Manager/MapManager.h"
 
 Monster::Monster()
@@ -31,6 +32,8 @@ Monster::Monster()
 	AttackRange = 1;
 	AttackElapsedtime = 0.0f;
 	AttackInterval = 1.5f;
+	AttackVisibleTime = 0.0f;
+	AttackVisibleDuration = 0.18f;
 }
 
 Monster::~Monster()
@@ -96,6 +99,15 @@ void Monster::Tick(float DeltaTime)
 
 	MoveElapsedtime += DeltaTime * GetSlowRatio();
 	AttackElapsedtime += DeltaTime * GetSlowRatio();
+	if (AttackVisibleTime > 0.0f)
+	{
+		AttackVisibleTime -= DeltaTime;
+		if (AttackVisibleTime <= 0.0f)
+		{
+			AttackVisibleTime = 0.0f;
+			AttackValue.clear();
+		}
+	}
 	
 	Player* player = SceneManager::GetInstance()->GetPlayer();
 	//Player* player = FindPlayer();
@@ -144,6 +156,7 @@ void Monster::Tick(float DeltaTime)
 
 void Monster::Destroy()
 {
+	BattleManager::GetInstance()->RegisterKilledMonster(Name);
 	if (Player* PlayerPtr = SceneManager::GetInstance()->GetPlayer())
 	{
 		if (LevelComponent* LevelComp = PlayerPtr->GetComponent<LevelComponent>())
@@ -151,8 +164,7 @@ void Monster::Destroy()
 			LevelComp->AddExp(50);
 		}
 	}
-	MapManager::GetInstance()->GetMap()[Position.Y][Position.X].Type = ObjectType::Path;
-	MapManager::GetInstance()->GetMap()[Position.Y][Position.X].ID = NO_ID;
+	MapManager::GetInstance()->SetMapObjectCoordinate(Position.Y, Position.X, {MapObjectType::Path, NO_ID});
 	bIsDestroy = true;
 }
 
@@ -274,8 +286,6 @@ void Monster::MoveTowardPlayerBfs()
 	Vector Start = Position;
 	Vector Target = player->GetPosition();
 	
-	vector<vector<Coordinate>>& WorldMap = MapManager::GetInstance()->GetMap();
-	
 	queue<Vector> Q;
 	bool visited[MAP_MAX_Y][MAP_MAX_X] = {};
 	Vector Parent[MAP_MAX_Y][MAP_MAX_X];
@@ -321,11 +331,11 @@ void Monster::MoveTowardPlayerBfs()
 				continue;
 			}
 			
-			if (WorldMap[Go.Y][Go.X].Type == ObjectType::Wall)
+			if (MapManager::GetInstance()->IsTypeExist(Go, MapObjectType::Wall))
 			{
 				continue;
 			}
-			if (WorldMap[Go.Y][Go.X].Type == ObjectType::Monster)
+			if (MapManager::GetInstance()->IsTypeExist(Go, MapObjectType::Monster))
 			{
 				continue;
 			}
@@ -413,6 +423,15 @@ void Monster::Attackplayer(Player* player)
 	{
 		return;
 	}
+
+	AttackValue.clear();
+	Vector playerPosition = player->GetPosition();
+	AttackValue.push_back(playerPosition);
+	AttackValue.push_back({ playerPosition.X - 1, playerPosition.Y });
+	AttackValue.push_back({ playerPosition.X + 1, playerPosition.Y });
+	AttackValue.push_back({ playerPosition.X, playerPosition.Y - 1 });
+	AttackValue.push_back({ playerPosition.X, playerPosition.Y + 1 });
+	AttackVisibleTime = AttackVisibleDuration;
 	
 	player -> TakeDamage(Attack);
 	

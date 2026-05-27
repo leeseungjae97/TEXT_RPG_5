@@ -8,7 +8,9 @@
 #include "../Manager/InputManager.h"
 #include "../Manager/ShopManager.h"
 #include "../Manager/ItemManager.h"
+#include "../Manager/ViewportManager.h"
 #include "../Player.h"
+#include "../Item/UsableItem.h"
 
 
 UInventoryComponent::UInventoryComponent(AObject* InOwner)
@@ -18,6 +20,14 @@ UInventoryComponent::UInventoryComponent(AObject* InOwner)
 
     Container.resize(MaxRow, vector<UItem*>(MaxColumn, nullptr));
     QuickSlot.resize(4, nullptr);
+    
+    
+    AddItem(new UsableItem(ItemDB::HP_POTION));
+    AddItem(new UsableItem(ItemDB::STRENGTH_POTION));
+    AddItem(new UsableItem(ItemDB::LONGSWORD));
+    AddItem(new UsableItem(ItemDB::GOBLIN_LEATHER));
+    AddItem(new UsableItem(ItemDB::HP_POTION));
+    AddItem(new UsableItem(ItemDB::HP_POTION));
 }
 
 UInventoryComponent::~UInventoryComponent()
@@ -30,7 +40,6 @@ UInventoryComponent::~UInventoryComponent()
             Container[y][x] = nullptr;
         }
     }
-
     Container.clear();
 }
 
@@ -182,6 +191,7 @@ bool UInventoryComponent::UseItem(UItem* Item)
     
     if (Item->GetItemInfo().Type == ItemType::Usable)
     {
+        FItemInfo ItemInfo = Item->GetItemInfo();
         ItemId UsedId = Item->GetItemInfo().Id;
 
         int QuickSlotIndex = -1;
@@ -195,6 +205,12 @@ bool UInventoryComponent::UseItem(UItem* Item)
         }
 
         Item->Use(PlayerPtr);
+        if (PlayerPtr != nullptr)
+        {
+            wstring ItemName = RenderManager::GetInstance()->ToWideString(ItemInfo.Name);
+            PlayerPtr->NotifyLog(L"ITEM: " + ItemName);
+            ViewportManager::GetInstance()->ShowMessageDialog(ItemName + L" 사용", 1.5f);
+        }
         RemoveItem(Item);
 
         if (QuickSlotIndex != -1)
@@ -315,6 +331,8 @@ Vector UInventoryComponent::CursorRight()
 
 void UInventoryComponent::RegisterOnQuickSlot(int Number)
 {
+    if (Number < 0 || Number >= (int)QuickSlot.size()) return;
+
     UItem* Item = GetItem(GetCursor());
     if (Item == nullptr) return;
     if (Item->GetItemInfo().Type != ItemType::Usable) return;
@@ -443,10 +461,15 @@ void UInventoryComponent::Tick(float DeltaTime)
     
     
     //누르면 샵 진입 or 퇴장 토글
-    if (Input->IsKeyTap(KeyCode::X))
+    // if (Input->IsKeyTap(KeyCode::X))
+    // {
+    //     if (ToggleOnShop())
+    //         ShopManager::GetInstance()->SetPlayerInventory(this);
+    // }
+
+    if (bOnShop && Input->IsKeyTap(KeyCode::E))
     {
-        if (ToggleOnShop())
-            ShopManager::GetInstance()->SetPlayerInventory(this);
+        ShopManager::GetInstance()->ToggleSellMode();
     }
     
     //샵에 진입했을 때, 이걸 누르면 SellMode 활성화.

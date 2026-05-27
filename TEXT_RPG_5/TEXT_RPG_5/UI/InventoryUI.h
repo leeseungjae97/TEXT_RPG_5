@@ -16,9 +16,10 @@ public:
 private:
 	void InventoryRender();
 	void QuickSlotRender();
+	void DrawBackground(int Y, int X, int Width, int Height);
 	void DrawItemSlot(int Y, int X, int Width, int Height, const UItem* item, bool bSelected = false);
-	void DrawInventoryPanel(int Y, int X, vector<vector<UItem*>>& Items);
-	void DrawEquipmentPanel(int Y, int X, const vector<UItem*>& Items, int Columns, int Rows);
+	void DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title);
+	void DrawEquipmentPanel(int Y, int X);
 	wchar_t GetItemIcon(const UItem* item);
 	
 private:

@@ -1,13 +1,13 @@
 #include "MoveComponent.h"
-#include "../Manager/RenderManager.h"
+
+#include "InventoryComponent.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/MapManager.h"
-#include "../Manager/SceneManager.h"
+#include "../Manager/ShopManager.h"
 #include "../Object.h"
 #include "../Player.h"
-#include  "../Monster.h"
 #include "../Struct/Coordinate.h"
-#include "InventoryComponent.h"
+#include "../Define.h"
 
 UMoveComponent::UMoveComponent(AObject* InOwner)
 	: UComponent(InOwner)
@@ -65,69 +65,57 @@ float UMoveComponent::GetTurnAlpha() const
 	return Alpha * Alpha * (3.0f - 2.0f * Alpha);
 }
 
-void UMoveComponent::Tick(float DeltaTime)
+void UMoveComponent::OpenShop()
 {
-	if(nullptr == PlayerPtr)
-		PlayerPtr = dynamic_cast<Player*>(GetOwner());
-
-	if (PlayerPtr == nullptr)
-	{
-		return;
-	}
-	
-	// 인벤 토리가 열려있는지 확인
-	if (UInventoryComponent* Inventory = PlayerPtr->GetComponent<UInventoryComponent>())
-	{
-		if (Inventory->GetOpenedInventory())
-		{
-			return;
-		}
-	}
-
-	MoveElapsedTime += DeltaTime;
-	TurnElapsedTime += DeltaTime;
-
-	if (MoveElapsedTime < MoveInterval)
-	{
-		return;
-	}
-
-	// 다음 위치에 몬스터가 있는지 확인
-	auto IsMonsterAtPosition = [](int X, int Y) -> bool
-	{
-		vector<AObject*>& Objects = SceneManager::GetInstance()->GetObjects();
-
-		for (AObject* Obj : Objects)
-		{
-			if (Obj == nullptr || Obj->IsDestroy())
-			{
-				continue;
-			}
-
-			Monster* Mon = dynamic_cast<Monster*>(Obj);
-
-			if (Mon == nullptr)
-			{
-				continue;
-			}
-
-			Vector MonPosition = Mon->GetPosition();
-
-			if (MonPosition.X == X && MonPosition.Y == Y)
-			{
-				return true;
-			}
-		}
-
-		return false;
+	Vector Vec = PlayerPtr->GetPosition();
+	const Vector checkPositions[] = {
+		{ Vec.X, Vec.Y - 1 },
+		{ Vec.X, Vec.Y + 1 },
+		{ Vec.X - 1, Vec.Y },
+		{ Vec.X + 1, Vec.Y }
 	};
-	
+
+	bool bNearShop = false;
+	for (const Vector& checkPosition : checkPositions)
+	{
+		if (checkPosition.X < 0 || checkPosition.X >= MAP_MAX_X || checkPosition.Y < 0 || checkPosition.Y >= MAP_MAX_Y)
+		{
+			continue;
+		}
+
+		if (MapManager::GetInstance()->GetType(checkPosition) == MapObjectType::Shop)
+		{
+			bNearShop = true;
+			break;
+		}
+	}
+
+	if (!bNearShop)
+	{
+		bWasOnShop = false;
+		return;
+	}
+
+	if (!bWasOnShop)
+	{
+		if (UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>())
+		{
+			ShopManager::GetInstance()->SetPlayerInventory(InventoryComponent);
+			InventoryComponent->OpenShop();
+		}
+	}
+
+	bWasOnShop = true;
+}
+
+void UMoveComponent::HandleMoveInput()
+{
 	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::UP))
 	{
 		int NextX = PlayerPtr->GetPosition().X;
 		int NextY = max(PlayerPtr->GetPosition().Y - 1, 0);
 
-		if (IsMonsterAtPosition(NextX, NextY))
+		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
 		{
 			SetFacingDirection(EDirection::UP);
 			MoveElapsedTime = 0.0f;
@@ -144,7 +132,7 @@ void UMoveComponent::Tick(float DeltaTime)
 		int NextX = PlayerPtr->GetPosition().X;
 		int NextY = PlayerPtr->GetPosition().Y + 1;
 
-		if (IsMonsterAtPosition(NextX, NextY))
+		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
 		{
 			SetFacingDirection(EDirection::DOWN);
 			MoveElapsedTime = 0.0f;
@@ -161,7 +149,7 @@ void UMoveComponent::Tick(float DeltaTime)
 		int NextX = max(PlayerPtr->GetPosition().X - 1, 0);
 		int NextY = PlayerPtr->GetPosition().Y;
 
-		if (IsMonsterAtPosition(NextX, NextY))
+		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
 		{
 			SetFacingDirection(EDirection::LEFT);
 			MoveElapsedTime = 0.0f;
@@ -178,7 +166,7 @@ void UMoveComponent::Tick(float DeltaTime)
 		int NextX = PlayerPtr->GetPosition().X + 1;
 		int NextY = PlayerPtr->GetPosition().Y;
 
-		if (IsMonsterAtPosition(NextX, NextY))
+		if (MapManager::GetInstance()->IsTypeExist(NextX, NextY, MapObjectType::Monster))
 		{
 			SetFacingDirection(EDirection::RIGHT);
 			MoveElapsedTime = 0.0f;
@@ -192,32 +180,35 @@ void UMoveComponent::Tick(float DeltaTime)
 	}
 }
 
-bool UMoveComponent::IsMonsterAtPosition(int X, int Y)
+void UMoveComponent::Tick(float DeltaTime)
 {
-	vector<AObject*>& Objects = SceneManager::GetInstance()->GetObjects();
+	if(nullptr == PlayerPtr)
+		PlayerPtr = dynamic_cast<Player*>(GetOwner());
 
-	for (AObject* Obj : Objects)
+	if (PlayerPtr == nullptr)
 	{
-		if (Obj == nullptr || Obj->IsDestroy())
-		{
-			continue;
-		}
-
-		if (Monster* Mon = dynamic_cast<Monster*>(Obj))
-		{
-			Vector MonPos = Mon->GetPosition();
-
-			if (MonPos.X == X && MonPos.Y == Y)
-			{
-				return true;
-			}
-		}
+		return;
 	}
 
-	return false;
+	MoveElapsedTime += DeltaTime;
+	TurnElapsedTime += DeltaTime;
+
+	if (MoveElapsedTime < MoveInterval)
+	{
+		return;
+	}
+	
+	OpenShop();
+	if (UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>())
+	{
+		if (InventoryComponent->GetOpenedInventory())
+		{
+			return;
+		}
+	}
+	HandleMoveInput();
 }
 
-// 몬스터 박치기 x 버전
 /*void UMoveComponent::Tick(float DeltaTime)
 {
 	if(nullptr == PlayerPtr)

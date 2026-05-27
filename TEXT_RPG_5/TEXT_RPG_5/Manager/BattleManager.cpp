@@ -17,3 +17,17 @@ void BattleManager::BeginPlay()
 {
 	
 }
+
+void BattleManager::RegisterKilledMonster(const string& MonsterName)
+{
+	for (pair<string, int>& killedMonster : KilledMonsters)
+	{
+		if (killedMonster.first == MonsterName)
+		{
+			++killedMonster.second;
+			return;
+		}
+	}
+
+	KilledMonsters.push_back({ MonsterName, 1 });
+}

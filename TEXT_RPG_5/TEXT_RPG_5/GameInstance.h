@@ -12,8 +12,13 @@ public:
 	void BeginPlay();
 	void Render();
 	void Destroy();
+	void RequestQuit() { bQuitRequested = true; }
+	bool IsQuitRequested() const { return bQuitRequested; }
 
 public:
 	GameInstance();
 	~GameInstance();
+
+private:
+	bool bQuitRequested = false;
 };

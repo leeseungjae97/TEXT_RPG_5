@@ -1,12 +1,14 @@
 ﻿#pragma once
 
-enum class ObjectType
+enum class MapObjectType
 {
 	Wall,
 	Path,
+	Shop,
 	Player,
 	Monster,
 	Projectile,
+	None,
 	
 	MAX
 };

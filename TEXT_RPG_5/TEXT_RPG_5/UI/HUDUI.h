@@ -21,4 +21,8 @@ private:
 private:
 	Player* PlayerPtr = nullptr;
 	RenderManager* Renderer = nullptr;
+	
+	int ShopColorIndex = 0;
+	float ColorChangeInterval = 0.8f;
+	float ColorChangeDuration = 0.0f;
 };

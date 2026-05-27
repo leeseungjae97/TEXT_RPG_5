@@ -64,16 +64,10 @@ void UCombatComponent::SwordAttack()
 {
 	if (AttackValue.empty())
 		return;
-	
+
 	if (!PlayerPtr)
 	{
 		PlayerPtr = dynamic_cast<Player*>(GetOwner());
-		return;
-	}
-	
-	const vector<vector<Coordinate>>& Map = MapManager::GetInstance()->GetMap();
-	if (Map.empty() || Map[0].empty())
-	{
 		return;
 	}
 
@@ -83,10 +77,10 @@ void UCombatComponent::SwordAttack()
 		{
 			continue;
 		}
-
-		if (Map[AttackPos.Y][AttackPos.X].Type == ObjectType::Monster)
+		
+		if (MapManager::GetInstance()->IsTypeExist(AttackPos.Y, AttackPos.X, MapObjectType::Monster))
 		{
-			const int ID = Map[AttackPos.Y][AttackPos.X].ID;
+			const int ID = MapManager::GetInstance()->GetID(AttackPos.Y, AttackPos.X);
 			if (Monster* const Mon = dynamic_cast<Monster*>(ObjectPoolManager::GetInstance()->GetObjectByID(ID)))
 			{
 				Mon->TakeDamage(PlayerPtr->GetPower());
@@ -146,7 +140,6 @@ void UCombatComponent::HandleAttack()
 			SwordAttack();
 		}
 		break;
-		// 프로젝타일 추가
 		case WeaponType::Projectile:
 		{
 			ProjectileAttack();

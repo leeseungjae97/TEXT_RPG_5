@@ -2,6 +2,7 @@
 #include "../Define.h"
 #include "RenderManager.h"
 #include "SceneManager.h"
+#include "ShopManager.h"
 #include "../Object.h"
 #include "../Monster.h"
 #include "../Player.h"
@@ -9,12 +10,12 @@
 
 MapManager::MapManager()
 {
-	map<Vector, Vector> m;
+	
 }
 
 MapManager::~MapManager()
 {
-
+	
 }
 
 void MapManager::Tick(float DeltaTime)
@@ -25,7 +26,7 @@ void MapManager::Tick(float DeltaTime)
 void MapManager::UpdateMap()
 {
 	vector<AObject*> Objects = SceneManager::GetInstance()->GetObjects();
-
+	
 	for (AObject* Obj : Objects)
 	{
 		if (nullptr == Obj || Obj->IsDestroy())
@@ -34,13 +35,14 @@ void MapManager::UpdateMap()
 		Vector PrevPos = Obj->GetPrevPosition();
 		Vector Pos = Obj->GetPosition();
 		
-		Map[PrevPos.Y][PrevPos.X] = {ObjectType::Path, NO_ID};
+		Map[PrevPos.Y][PrevPos.X] = {MapObjectType::Path, NO_ID};
 
 		if (Pos.Y < 1 
 			|| Pos.Y >= MAP_MAX_Y - 1 
 			|| Pos.X < 1 
 			|| Pos.X >= MAP_MAX_X - 1 
-			|| Map[Pos.Y][Pos.X].Type == ObjectType::Wall)
+			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Wall
+			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Shop)
 		{
 			Obj->SetPosition(PrevPos);
 			continue;
@@ -48,41 +50,159 @@ void MapManager::UpdateMap()
 
 		if (Monster* monster = dynamic_cast<Monster*>(Obj))
 		{
-			Map[Pos.Y][Pos.X] = {ObjectType::Monster, monster->GetID()};
+			Map[Pos.Y][Pos.X] = {MapObjectType::Monster, monster->GetID()};
 		}
 		
 		else if (Player* player = dynamic_cast<Player*>(Obj))
 		{
-			Map[Pos.Y][Pos.X] = {ObjectType::Player, player->GetID()};
+			Map[Pos.Y][Pos.X] = {MapObjectType::Player, player->GetID()};
 		}
 
 		else if (Projectile* projectile = dynamic_cast<Projectile*>(Obj))
 		{
-			Map[Pos.Y][Pos.X] = {ObjectType::Projectile, projectile->GetID()};
+			Map[Pos.Y][Pos.X] = {MapObjectType::Projectile, projectile->GetID()};
 		}
 	}
 }
 
 void MapManager::BeginPlay()
 {
-	Map.resize(MAP_MAX_Y, vector<Coordinate>(MAP_MAX_X, {ObjectType::Path, NO_ID}));
+	Map.resize(MAP_MAX_Y, vector<Coordinate>(MAP_MAX_X, {MapObjectType::Path, NO_ID}));
+	vector<Vector>& ShopPoses = ShopManager::GetInstance()->GetShopPoses();
 	
 	for (int i = 0 ; i < MAP_MAX_Y; ++i)
 	{
 		for (int j = 0 ; j < MAP_MAX_X; ++j)
 		{
 			if (i == 0 || j == 0 || i == MAP_MAX_Y - 1 || j == MAP_MAX_X - 1)
-				Map[i][j] = {ObjectType::Wall, NO_ID};
+				Map[i][j] = {MapObjectType::Wall, NO_ID};
 			else 
-				Map[i][j] = {ObjectType::Path, NO_ID};
+				Map[i][j] = {MapObjectType::Path, NO_ID};
 		}
 	}
 	
-	for (int i = 0; i < 30; ++i)
+	for (int i = 0 ; i < ShopPoses.size(); ++i)
 	{
-		int ry = rand() % (MAP_MAX_Y - 2) + 1;
-		int rx = rand() % (MAP_MAX_X - 2) + 1;
-		
-		Map[ry][rx] = {ObjectType::Wall, NO_ID};;
+		Vector Pos = ShopPoses[i];
+		Map[Pos.Y][Pos.X] = {MapObjectType::Shop, NO_ID};
 	}
+	
+	// for (int i = 0; i < 30; ++i)
+	// {
+	// 	int ry = rand() % (MAP_MAX_Y - 2) + 1;
+	// 	int rx = rand() % (MAP_MAX_X - 2) + 1;
+	// 	
+	// 	Map[ry][rx] = {MapObjectType::Wall, NO_ID};;
+	// }
+}
+
+bool MapManager::IsTypeExist(Vector Pos, MapObjectType Type)
+{
+	if (Pos.Y < 0 || Pos.Y > MAP_MAX_Y - 1 || Pos.X < 0 || Pos.X > MAP_MAX_X - 1)
+		return false;
+	
+	if (Map[Pos.Y][Pos.X].Type == Type)
+	{
+		return true;
+	}
+	
+	return false;
+}
+bool MapManager::IsTypeExist(int Y, int X, MapObjectType Type)
+{
+	if (Y < 0 || Y > MAP_MAX_Y - 1 || X < 0 || X > MAP_MAX_X - 1)
+		return false;
+	
+	if (Map[Y][X].Type == Type)
+	{
+		return true;
+	}
+	return false;	
+}
+
+int MapManager::GetID(int Y, int X)
+{
+	if (Y < 0 || Y > MAP_MAX_Y - 1 || X < 0 || X > MAP_MAX_X - 1)
+		return NO_ID;
+	
+	return Map[Y][X].ID;
+}
+
+int MapManager::GetID(Vector Pos)
+{
+	if (Pos.Y < 0 || Pos.Y > MAP_MAX_Y - 1 || Pos.X < 0 || Pos.X > MAP_MAX_X - 1)
+		return NO_ID;
+	
+	return Map[Pos.Y][Pos.X].ID;
+}
+
+void MapManager::SetMapObjectCoordinate(int Y, int X, Coordinate InCoordinate)
+{
+	if (Y < 0 || Y > MAP_MAX_Y - 1 || X < 0 || X > MAP_MAX_X - 1)
+		return;
+	
+	Map[Y][X] = {MapObjectType::Path, NO_ID};
+}
+
+void MapManager::SetMapObjectType(int Y, int X, MapObjectType Type)
+{
+	if (Y < 0 || Y > MAP_MAX_Y - 1 || X < 0 || X > MAP_MAX_X - 1)
+		return;
+	
+	Map[Y][X].Type = Type;
+}
+
+void MapManager::SetMapObjectID(int Y, int X, int InID)
+{
+	if (Y < 0 || Y > MAP_MAX_Y - 1 || X < 0 || X > MAP_MAX_X - 1)
+		return;
+	
+	Map[Y][X].ID = InID;
+}
+MapObjectType MapManager::GetType(Vector Pos)
+{
+	if (Pos.Y < 0 || Pos.Y > MAP_MAX_Y - 1 || Pos.X < 0 || Pos.X > MAP_MAX_X - 1)
+		return MapObjectType::None;
+	
+	return Map[Pos.Y][Pos.X].Type;
+}
+MapObjectType MapManager::GetType(int Y, int X)
+{
+	if (Y < 0 || Y > MAP_MAX_Y - 1 || X < 0 || X > MAP_MAX_X - 1)
+		return MapObjectType::None;
+	
+	return Map[Y][X].Type;
+}
+
+AObject* MapManager::GetMapObject(int Y, int X, MapObjectType Type)
+{
+	if (Y < 0 || Y > MAP_MAX_Y - 1 || X < 0 || X > MAP_MAX_X - 1)
+		return nullptr;
+	
+	if (IsTypeExist(Y, X,  Type))
+	{
+		int ObjectID = GetID(Y, X);
+		return ObjectPoolManager::GetInstance()->GetObjectByID(ObjectID);
+	}
+	return nullptr;
+}
+
+AObject* MapManager::GetMapObject(Vector Pos, MapObjectType Type)
+{
+	if (Pos.Y < 0 || Pos.Y > MAP_MAX_Y - 1 || Pos.X < 0 || Pos.X > MAP_MAX_X - 1)
+		return nullptr;
+	
+	if (IsTypeExist(Pos,  Type))
+	{
+		int ObjectID = GetID(Pos);
+		return ObjectPoolManager::GetInstance()->GetObjectByID(ObjectID);
+	}
+	return nullptr;
+}
+
+bool MapManager::IsMapInitSize()
+{
+	if (Map.empty() || Map[0].empty())
+		return false;
+	return true;
 }

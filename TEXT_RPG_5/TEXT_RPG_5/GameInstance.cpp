@@ -7,14 +7,15 @@
 #include "Manager/SceneManager.h"
 #include "Manager/InputManager.h"
 #include "Manager/ObjectPoolManager.h"
+#include "Manager/ShopManager.h"
 
 void GameInstance::BeginPlay()
 {
 	InputManager::GetInstance()->BeginPlay();
 	RenderManager::GetInstance()->BeginPlay();
 	TimeManager::GetInstance()->BeginPlay();
-
 	SceneManager::GetInstance()->BeginPlay();
+	ShopManager::GetInstance()->BeginPlay();
 	MapManager::GetInstance()->BeginPlay();
 	BattleManager::GetInstance()->BeginPlay();
 }

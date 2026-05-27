@@ -11,6 +11,7 @@ class AObject
 public:
 	AObject();
 	virtual ~AObject();
+	void TimeAdd(float DeltaTime);
 
 protected:
 	bool bIsDestroy;
@@ -28,6 +29,9 @@ public:
 	bool ShouldShowDamageText() const { return DamageTextTime > 0.0f; }
 	int GetLastDamage() const { return LastDamage; }
 	void NotifyDamage(int Damage, float FlashDuration = 0.25f, float DamageTextDuration = 3.0f);
+	void NotifyLog(const wstring& Text, float Duration = 2.0f);
+	bool ShouldShowLogText() const { return LogTextTime > 0.0f && !LogText.empty(); }
+	const wstring& GetLogText() const { return LogText; }
 	bool IsSlowed() const { return SlowTime > 0.0f; }
 	float GetSlowRatio() const { return IsSlowed() ? SlowRatio : 1.0f; }
 
@@ -88,6 +92,8 @@ protected:
 	int LastDamage;
 	float HitFlashTime;
 	float DamageTextTime;
+	wstring LogText;
+	float LogTextTime;
 	float SlowTime;
 	float SlowRatio;
 
