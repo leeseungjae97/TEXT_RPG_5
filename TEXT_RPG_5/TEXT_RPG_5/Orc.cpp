@@ -28,9 +28,9 @@ Orc::Orc(int playerLevel)
 	AttackInterval = 1.6f;
 	AttackElapsedtime = 0.0f;
 	
-	//TrySetShiny();
+	TrySetShiny();
 }
-	
+
 void Orc::Attackplayer(Player* player)
 {
 	if (player == nullptr)
@@ -57,8 +57,17 @@ void Orc::Attackplayer(Player* player)
 	AttackElapsedtime = 0.0f;
 	
 }
-	
-		
-	
-	
 
+vector<FItemWeight> Orc::GetDropTable()
+{
+	return
+	{
+		{ ItemId::ORC_TUSK, 60},
+		{ ItemId::STRENGTH_POTION, 20},
+		{ ItemId::PLATE_HELMET, 3},
+		{ ItemId::PLATE_ARMOR, 3},
+		{ ItemId::PLATE_BOOTS, 3},
+		{ ItemId::AXE, 30}
+		
+		};
+}
