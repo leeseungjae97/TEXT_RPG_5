@@ -44,7 +44,7 @@ void MapManager::UpdateMap()
 			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Wall
 			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Shop)
 		{
-			Obj->SetPosition(PrevPos);
+			//Obj->SetPosition(PrevPos);
 			continue;
 		}
 

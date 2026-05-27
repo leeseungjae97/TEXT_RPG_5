@@ -52,11 +52,20 @@ void SceneManager::BeginPlay()
 	ObjectPoolManager::GetInstance()->Preload<Slime>(10, 1);
 	ObjectPoolManager::GetInstance()->Preload<Projectile>(10);
 	CurrentPlayer = SpawnObject<Player>("player", 100, 60);
-	for (int i = 0; i < 3; ++i)
+	CurrentPlayer->SetPosition(20, 20);
+	for (int i = 1; i <= 3; ++i)
 	{
-		SpawnObject<Goblin>(1);
-		SpawnObject<Orc>(1);
-		SpawnObject<Slime>(1);
+		Goblin* Gob = SpawnObject<Goblin>(1);
+		Gob->SetPosition(i, i);
+		Gob->SetPrevPosition(i, i);
+		
+		Orc* Or = SpawnObject<Orc>(1);
+		Or->SetPosition(i * 2, i * 2);
+		Or->SetPrevPosition(i * 2, i * 2);
+		
+		Slime* Sli = SpawnObject<Slime>(1);
+		Sli->SetPosition(i * 2 + 1, i * 2 + 1);
+		Sli->SetPrevPosition(i * 2 + 1, i * 2 + 1);
 	}
 }
 

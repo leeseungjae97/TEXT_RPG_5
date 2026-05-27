@@ -18,7 +18,7 @@ Monster::Monster()
 	MaxHealth = Health;
 	Attack = 10;
 	
-	Position = Vector(4, 4);
+	//Position = Vector(4, 4);
 	PrevPosition = Position;
 	
 	MoveElapsedtime = 0.0f;
@@ -143,10 +143,10 @@ void Monster::Tick(float DeltaTime)
 		{
 			MoveTowardPlayerBfs();
 		}
-		else
-		{
-			MoveTowardPlayer(player);
-		}
+		//else
+		//{
+			//MoveTowardPlayer(player);
+		//}
 	}
 	else
 	{
@@ -244,35 +244,44 @@ void Monster::MoveTowardPlayer(Player* player)
 
 void Monster::MoveRandom()
 {
-	PrevPosition = Position;
+	int Random = rand() % 4;
 	
-	int RandDir = rand() % 4;
-
-	switch (RandDir)
+	Vector Move[4]
 	{
-	case 0:
-		
-		Position.Y--;
-		break;
-
-	case 1:
-		
-		Position.Y++;
-		break;
-
-	case 2:
-		
-		Position.X--;
-		break;
-
-	case 3:
-		
-		Position.X++;
-		break;
-
-
+		{0, 1},
+		{0, -1},
+		{1, 0},
+		{-1, 0},
+	};
+	
+	Vector NextPosition;
+	NextPosition.X = Position.X + Move[Random].X;
+	NextPosition.Y = Position.Y + Move[Random].Y;
+	
+	if (NextPosition.X < 1 || NextPosition.X >= MAP_MAX_X - 1 || NextPosition.Y < 1 || NextPosition.Y >= MAP_MAX_Y - 1)
+	{
+		return;
 	}
+	
+	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Wall))
+	{
+		return;
+	}
+	
+	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Monster))
+	{
+		return;
+	}
+	
+	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Player))
+	{
+		return;
+	}
+	
+	PrevPosition = Position;
+	Position = NextPosition;
 }
+	
 
 void Monster::MoveTowardPlayerBfs()
 {
@@ -286,10 +295,47 @@ void Monster::MoveTowardPlayerBfs()
 	Vector Start = Position;
 	Vector Target = player->GetPosition();
 	
-	queue<Vector> Q;
-	bool visited[MAP_MAX_Y][MAP_MAX_X] = {};
-	Vector Parent[MAP_MAX_Y][MAP_MAX_X];
+	const int MaxBFSRange = 15;
 	
+	const int LocalBFSSzie = MaxBFSRange * 2 + 1;
+	
+	int Range = DetectionRange;
+	if (Range > MaxBFSRange)
+	{
+		Range = MaxBFSRange;
+	}
+	
+	int VisitedRange = Range * 2 + 1;
+	int VisitedMonster = VisitedRange / 2;
+	
+	int LocalMapX = Start.X - Range;
+	int LocalMapY = Start.Y - Range;
+	
+	Vector LocalTarget;
+	LocalTarget.X = Target.X - LocalMapX;
+	LocalTarget.Y = Target.Y - LocalMapY;
+	
+	if (LocalTarget.X < 0 || LocalTarget.X >= VisitedRange || LocalTarget.Y < 0 || LocalTarget.Y >= VisitedRange)
+	{
+		MoveRandom();
+		return;
+	}
+	
+	queue<Vector> Q;
+	bool visited[LocalBFSSzie][LocalBFSSzie] = {};
+	Vector Parent[LocalBFSSzie][LocalBFSSzie];
+	
+	for (int Y = 0; Y < LocalBFSSzie; ++Y)
+	{
+		for (int X = 0; X < LocalBFSSzie; ++X)
+		{
+			Parent[Y][X] = Vector(-1, -1);
+		}
+	}
+	
+	Vector LocalStart;
+	LocalStart.X = VisitedMonster;
+	LocalStart.Y = VisitedMonster;
 	
 	Vector Move[4]
 	{
@@ -299,8 +345,9 @@ void Monster::MoveTowardPlayerBfs()
 		{-1,0},
 	};
 	
-	Q.push(Start);
-	visited[Start.Y][Start.X] = true;
+	visited[VisitedMonster][VisitedMonster] = true;
+	Q.push(LocalStart);
+	
 	
 	bool found = false;
 	
@@ -309,7 +356,7 @@ void Monster::MoveTowardPlayerBfs()
 		Vector Current = Q.front();
 		Q.pop();
 		
-		if (Current.X == Target.X && Current.Y == Target.Y)
+		if (Current.X == LocalTarget.X && Current.Y == LocalTarget.Y)
 		{
 			found = true;
 			break;
@@ -321,7 +368,7 @@ void Monster::MoveTowardPlayerBfs()
 			Go.X = Current.X + Move[i].X;
 			Go.Y = Current.Y + Move[i].Y;
 			
-			if (Go.X < 0 || Go.X >= MAP_MAX_X || Go.Y < 0 || Go.Y >= MAP_MAX_Y)
+			if (Go.X < 0 || Go.X >= VisitedRange || Go.Y < 0 || Go.Y >= VisitedRange)
 			{
 				continue;
 			}
@@ -331,11 +378,20 @@ void Monster::MoveTowardPlayerBfs()
 				continue;
 			}
 			
-			if (MapManager::GetInstance()->IsTypeExist(Go, MapObjectType::Wall))
+			Vector WorldGo;
+			WorldGo.X = Go.X + LocalMapX;
+			WorldGo.Y = Go.Y + LocalMapY;
+			
+			if (WorldGo.X < 0 || WorldGo.X >= MAP_MAX_X || WorldGo.Y < 0 || WorldGo.Y >= MAP_MAX_Y)
 			{
 				continue;
 			}
-			if (MapManager::GetInstance()->IsTypeExist(Go, MapObjectType::Monster))
+			
+			if (MapManager::GetInstance()->IsTypeExist(WorldGo, MapObjectType::Wall))
+			{
+				continue;
+			}
+			if (MapManager::GetInstance()->IsTypeExist(WorldGo, MapObjectType::Monster))
 			{
 				continue;
 			}
@@ -353,9 +409,9 @@ void Monster::MoveTowardPlayerBfs()
 	
 	vector<Vector> Moving;
 	
-	Vector Current = Target;
+	Vector Current = LocalTarget;
 	
-	while (!(Current.X == Start.X && Current.Y == Start.Y))
+	while (!(Current.X == LocalStart.X && Current.Y == LocalStart.Y))
 	{
 		Moving.push_back(Current);
 		
@@ -369,7 +425,7 @@ void Monster::MoveTowardPlayerBfs()
 		Current = Before;
 	}
 	
-	Moving.push_back(Start);
+	Moving.push_back(LocalStart);
 	
 	reverse(Moving.begin(), Moving.end());
 	
@@ -378,13 +434,27 @@ void Monster::MoveTowardPlayerBfs()
 		return;
 	}
 	
-	Vector NextPosition = Moving[1];
+	Vector LocalNextPosition = Moving[1];
+	
+	Vector NextPosition;
+	NextPosition.X = LocalNextPosition.X + LocalMapX;
+	NextPosition.Y = LocalNextPosition.Y + LocalMapY;
 	
 	if (NextPosition.X == Target.X && NextPosition.Y == Target.Y)
 	{
 		return;
 	}
 
+	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Monster))
+	{
+		return;
+	}
+	
+	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Player))
+	{
+		return;
+	}
+	
 	PrevPosition = Position;
 	
 	Position = NextPosition;

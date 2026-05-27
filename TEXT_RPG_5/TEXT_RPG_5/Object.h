@@ -40,6 +40,10 @@ public:
 
 	Vector GetPrevPosition() const { return PrevPosition; }
 	void SetPrevPosition(Vector InPosition) { PrevPosition = InPosition; }
+	
+	//테스트
+	void SetPosition(int Y, int X) { Position = {Y, X}; }
+	void SetPrevPosition(int Y, int X) { PrevPosition = {Y, X}; }
 
 	template <typename T>
 	T* CreateDefaultComponent()
