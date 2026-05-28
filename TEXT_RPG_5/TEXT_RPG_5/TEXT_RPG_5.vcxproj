@@ -1401,6 +1401,8 @@
     </ClCompile>
     <ClCompile Include="Manager\ObjectPoolManager.cpp" />
     <ClCompile Include="Manager\ViewportManager.cpp" />
+    <ClCompile Include="Network\R2AsyncLoader.cpp" />
+    <ClCompile Include="Network\R2Connector.cpp" />
     <ClCompile Include="Mimic.cpp" />
     <ClCompile Include="OrcMage.cpp" />
     <ClCompile Include="Spider.cpp" />
@@ -1810,6 +1812,8 @@
     <ClInclude Include="Manager\StageManager.h" />
     <ClInclude Include="Manager\TimeManager.h" />
     <ClInclude Include="Map\Map.h" />
+    <ClInclude Include="Network\R2AsyncLoader.h" />
+    <ClInclude Include="Network\R2Connector.h" />
     <ClInclude Include="Mimic.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="Object.h" />
@@ -1829,6 +1833,8 @@
     <ClInclude Include="Struct\ItemWeight.h" />
     <ClInclude Include="Struct\Recipe.h" />
     <ClInclude Include="Struct\Buff.h" />
+    <ClInclude Include="Struct\R2Config.h" />
+    <ClInclude Include="Struct\R2Result.h" />
     <ClInclude Include="Troll.h" />
     <ClInclude Include="Struct\Coordinate.h" />
     <ClInclude Include="Struct\ItemData.h" />

@@ -15,7 +15,7 @@ static string StringMap[4][MAP_MAX_Y] =
 	// T : Monster 스폰 위치
 	// C : Cinema -> 보스 연출이 나오는 트리거 위치
 	// 주문서 맵 함정...
-	// B : Boss {1, 2, 3, Dragon}
+	// B : Boss {킹슬라임, 오크메이지, 킹스파이더, 드래곤}
 	// STAGE 1
 	{
 		"########################################",
