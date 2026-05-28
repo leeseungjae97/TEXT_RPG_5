@@ -625,10 +625,33 @@ void Monster::ExecutePendingAttack(Player* player)
 	{
 		if (AttackPosition.X == PlayerPosition.X && AttackPosition.Y == PlayerPosition.Y)
 		{
-			player->TakeDamage(Attack);
+			int Damage = GetRandomAttackDamage();
+			player->TakeDamage(Damage);
 			return;
 		}
 	}
+}
+
+int Monster::GetRandomAttackDamage() const
+{
+	// 몬스터 공격력의 80% ~ 120% 사이로 랜덤 대미지 계산
+	int MinDamage = static_cast<int>(Attack * 1.0f);
+	int MaxDamage = static_cast<int>(Attack * 1.2f);
+
+	// 최소 대미지는 1 보장
+	if (MinDamage < 1)
+	{
+		MinDamage = 1;
+	}
+
+	if (MaxDamage < MinDamage)
+	{
+		MaxDamage = MinDamage;
+	}
+
+	int DamageRange = MaxDamage - MinDamage + 1;
+
+	return MinDamage + rand() % DamageRange;
 }
 
 bool Monster::IsShiny() const
