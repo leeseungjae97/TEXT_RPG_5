@@ -17,6 +17,7 @@
 #include "../Mimic.h"
 #include "../Player.h"
 #include "../Projectile.h"
+#include "../Map/Map.h"
 
 namespace
 {
@@ -272,6 +273,11 @@ void ViewportManager::Render2DtoISO()
 		cameraPosition = InterpolatePosition(currentPlayer->GetPrevPosition(), GetRenderTargetPosition(currentPlayer), moveAlpha);
 		cameraPosition.X -= 0.5f;
 		cameraPosition.Y -= 0.5f;
+	}
+
+	if (bUseCinematicCamera)
+	{
+		cameraPosition = CinematicCameraPosition;
 	}
 
 	auto drawIsoDiamond = [&](Vector iso, WORD attribute)
@@ -1575,6 +1581,334 @@ Vector ViewportManager::GetISOPosition()
 	);
 }
 
+Monster* ViewportManager::FindStageBoss()
+{
+	vector<AObject*>& objects = SceneManager::GetInstance()->GetObjects();
+	for (AObject* object : objects)
+	{
+		Monster* monster = dynamic_cast<Monster*>(object);
+		if (monster != nullptr && monster->IsBoss() && !monster->IsDestroy() && !monster->IsDead())
+		{
+			return monster;
+		}
+	}
+
+	return nullptr;
+}
+
+bool ViewportManager::StartBossIntro(Monster* BossMonster)
+{
+	if (BossMonster == nullptr || IsBossIntroPlaying())
+	{
+		return false;
+	}
+
+	BossIntroTarget = BossMonster;
+	PreviousRenderMode = RenderMode;
+	RenderMode = ViewportRenderMode::ISO;
+	BossIntroStateValue = BossIntroState::FadeOutStart;
+	BossIntroElapsed = 0.0f;
+	bHideHUD = true;
+	bUseCinematicCamera = false;
+	bBossHpBarEnabled = false;
+	StartFadeOut(0.7f);
+	return true;
+}
+
+float ViewportManager::GetBossIntroStateDuration() const
+{
+	switch (BossIntroStateValue)
+	{
+	case BossIntroState::CameraMoveToBoss:
+		return 1.0f;
+	case BossIntroState::BossReveal3D:
+		return 2.0f;
+	case BossIntroState::BossNameHold:
+		return 1.2f;
+	case BossIntroState::BossNameHide:
+		return 0.7f;
+	default:
+		return 0.0f;
+	}
+}
+
+void ViewportManager::AdvanceBossIntroState(BossIntroState NextState)
+{
+	BossIntroStateValue = NextState;
+	BossIntroElapsed = 0.0f;
+}
+
+void ViewportManager::TickBossIntro(float DeltaTime)
+{
+	if (!IsBossIntroPlaying())
+	{
+		return;
+	}
+
+	if (BossIntroTarget == nullptr || BossIntroTarget->IsDestroy() || BossIntroTarget->IsDead())
+	{
+		BossIntroTarget = FindStageBoss();
+		if (BossIntroTarget == nullptr)
+		{
+			BossIntroStateValue = BossIntroState::None;
+			bHideHUD = false;
+			bUseCinematicCamera = false;
+			RenderMode = PreviousRenderMode;
+			return;
+		}
+	}
+
+	Player* player = SceneManager::GetInstance()->GetPlayer();
+	const Vector bossPosition = BossIntroTarget->GetPosition();
+	const FVector bossCameraPosition = {
+		static_cast<float>(bossPosition.X),
+		static_cast<float>(bossPosition.Y)
+	};
+
+	switch (BossIntroStateValue)
+	{
+	case BossIntroState::FadeOutStart:
+		TickFade(DeltaTime);
+		if (IsFadeFinished())
+		{
+			StartFadeIn(0.7f);
+			AdvanceBossIntroState(BossIntroState::FadeInStart);
+		}
+		break;
+
+	case BossIntroState::FadeInStart:
+		TickFade(DeltaTime);
+		if (IsFadeFinished())
+		{
+			FVector playerCameraPosition = bossCameraPosition;
+			if (player != nullptr)
+			{
+				Vector playerPosition = player->GetPosition();
+				playerCameraPosition = {
+					static_cast<float>(playerPosition.X),
+					static_cast<float>(playerPosition.Y)
+				};
+			}
+
+			BossIntroCameraStart = playerCameraPosition;
+			BossIntroCameraEnd = bossCameraPosition;
+			CinematicCameraPosition = BossIntroCameraStart;
+			bUseCinematicCamera = true;
+			RenderMode = ViewportRenderMode::ISO;
+			AdvanceBossIntroState(BossIntroState::CameraMoveToBoss);
+		}
+		break;
+
+	case BossIntroState::CameraMoveToBoss:
+		{
+			BossIntroElapsed += DeltaTime;
+			const float alpha = Clamp01(BossIntroElapsed / GetBossIntroStateDuration());
+			const float smoothAlpha = alpha * alpha * (3.0f - 2.0f * alpha);
+			CinematicCameraPosition = {
+				BossIntroCameraStart.X + (BossIntroCameraEnd.X - BossIntroCameraStart.X) * smoothAlpha,
+				BossIntroCameraStart.Y + (BossIntroCameraEnd.Y - BossIntroCameraStart.Y) * smoothAlpha
+			};
+
+			if (alpha >= 1.0f)
+			{
+				RenderMode = ViewportRenderMode::ThreeD;
+				CinematicCameraPosition = {
+					static_cast<float>(bossPosition.X) + 0.5f,
+					min(static_cast<float>(MAP_MAX_Y - 2), static_cast<float>(bossPosition.Y) + 5.5f)
+				};
+				CinematicCameraAngle = PI;
+				AdvanceBossIntroState(BossIntroState::BossReveal3D);
+			}
+		}
+		break;
+
+	case BossIntroState::BossReveal3D:
+		BossIntroElapsed += DeltaTime;
+		if (BossIntroElapsed >= GetBossIntroStateDuration())
+		{
+			AdvanceBossIntroState(BossIntroState::BossNameHold);
+		}
+		break;
+
+	case BossIntroState::BossNameHold:
+		BossIntroElapsed += DeltaTime;
+		if (BossIntroElapsed >= GetBossIntroStateDuration())
+		{
+			AdvanceBossIntroState(BossIntroState::BossNameHide);
+		}
+		break;
+
+	case BossIntroState::BossNameHide:
+		BossIntroElapsed += DeltaTime;
+		if (BossIntroElapsed >= GetBossIntroStateDuration())
+		{
+			RenderMode = ViewportRenderMode::ISO;
+			StartFadeOut(0.7f);
+			AdvanceBossIntroState(BossIntroState::FadeOutReturn);
+		}
+		break;
+
+	case BossIntroState::FadeOutReturn:
+		TickFade(DeltaTime);
+		if (IsFadeFinished())
+		{
+			bUseCinematicCamera = false;
+			RenderMode = ViewportRenderMode::ISO;
+			StartFadeIn(0.7f);
+			AdvanceBossIntroState(BossIntroState::FadeInReturn);
+		}
+		break;
+
+	case BossIntroState::FadeInReturn:
+		TickFade(DeltaTime);
+		if (IsFadeFinished())
+		{
+			bHideHUD = false;
+			bBossHpBarEnabled = true;
+			bUseCinematicCamera = false;
+			RenderMode = ViewportRenderMode::ISO;
+			BossIntroStateValue = BossIntroState::None;
+			BossIntroElapsed = 0.0f;
+		}
+		break;
+
+	case BossIntroState::None:
+	default:
+		break;
+	}
+}
+
+void ViewportManager::TryStartBossIntroFromTrigger()
+{
+	if (PlayerPtr == nullptr || IsBossIntroPlaying() || !StageManager::GetInstance()->CanStartBossIntro())
+	{
+		return;
+	}
+
+	const int stage = StageManager::GetInstance()->GetCurrentStage();
+	const Vector position = PlayerPtr->GetPosition();
+	if (position.Y < 0 || position.Y >= MAP_MAX_Y || position.X < 0 || position.X >= MAP_MAX_X)
+	{
+		return;
+	}
+
+	if (StringMap[stage][position.Y][position.X] != 'C')
+	{
+		return;
+	}
+
+	Monster* boss = FindStageBoss();
+	if (StartBossIntro(boss))
+	{
+		StageManager::GetInstance()->MarkBossIntroPlayed();
+	}
+}
+
+void ViewportManager::RenderBossIntroOverlay()
+{
+	if (!IsBossIntroPlaying() || BossIntroTarget == nullptr)
+	{
+		return;
+	}
+
+	DisplayManager* renderer = DisplayManager::GetInstance();
+
+	if (BossIntroStateValue == BossIntroState::BossReveal3D)
+	{
+		const float revealAlpha = Clamp01(BossIntroElapsed / GetBossIntroStateDuration());
+		const int hiddenRows = static_cast<int>((1.0f - revealAlpha) * static_cast<float>(SCREEN_HEIGHT));
+		const WORD backgroundAttribute = renderer->MakeConsoleAttribute(CC_BLACK, CC_BLACK);
+		for (int y = 0; y < hiddenRows; ++y)
+		{
+			for (int x = 0; x < SCREEN_WIDTH; ++x)
+			{
+				renderer->PutCell(y, x, L' ', backgroundAttribute);
+			}
+		}
+	}
+
+	if (BossIntroStateValue != BossIntroState::BossReveal3D &&
+		BossIntroStateValue != BossIntroState::BossNameHold &&
+		BossIntroStateValue != BossIntroState::BossNameHide)
+	{
+		return;
+	}
+
+	wstring bossName = L"LV." + to_wstring(BossIntroTarget->GetLevel()) + L" " + BossIntroTarget->GetDisplayName();
+	const int nameWidth = renderer->GetTextDisplayWidth(bossName);
+	const int x = max(2, SCREEN_WIDTH - nameWidth - 8);
+	const int y = max(2, SCREEN_HEIGHT - 10);
+	const int color = BossIntroStateValue == BossIntroState::BossNameHide ? CC_DARKGRAY : CC_RED;
+
+	renderer->AddRender(y, x, bossName, color);
+
+	const int underlineWidth = min(max(nameWidth, 18), SCREEN_WIDTH - x - 2);
+	for (int i = 0; i < underlineWidth; ++i)
+	{
+		renderer->PutCell(y + 1, x + i, L'=', renderer->MakeConsoleAttribute(color));
+	}
+}
+
+void ViewportManager::RenderBossHpBar()
+{
+	if (!bBossHpBarEnabled && !StageManager::GetInstance()->HasBossIntroPlayed())
+	{
+		return;
+	}
+
+	Monster* boss = BossIntroTarget;
+	if (boss == nullptr || boss->IsDestroy() || boss->IsDead())
+	{
+		boss = FindStageBoss();
+		BossIntroTarget = boss;
+	}
+
+	if (boss == nullptr)
+	{
+		return;
+	}
+
+	DisplayManager* renderer = DisplayManager::GetInstance();
+	const int barWidth = min(70, SCREEN_WIDTH - 10);
+	const int x = max(2, (SCREEN_WIDTH - barWidth) / 2);
+	const int y = 1;
+	const int maxHealth = max(1, boss->GetMaxHealth());
+	const int health = max(0, boss->GetHealth());
+	const float healthRatio = Clamp01(static_cast<float>(health) / static_cast<float>(maxHealth));
+
+	wstring bossName = L"LV." + to_wstring(boss->GetLevel()) + L" " + boss->GetDisplayName();
+	const int nameWidth = renderer->GetTextDisplayWidth(bossName);
+	renderer->AddRender(y, x + max(0, (barWidth - nameWidth) / 2), bossName, CC_RED);
+	renderer->DrawBox(y + 1, x - 1, barWidth + 2, 3);
+
+	const int filledWidth = static_cast<int>(static_cast<float>(barWidth) * healthRatio);
+	for (int i = 0; i < barWidth; ++i)
+	{
+		const bool filled = i < filledWidth;
+		renderer->PutCell(y + 2, x + i, filled ? L' ' : L'.',
+			renderer->MakeConsoleAttribute(filled ? CC_BLACK : CC_DARKGRAY, filled ? CC_RED : CC_BLACK));
+	}
+}
+
+void ViewportManager::SwitchRenderMode()
+{
+	if (IsBossIntroPlaying())
+	{
+		return;
+	}
+
+	const int StageCount = StageManager::GetInstance()->GetCurrentStage();
+	Vector Pos = PlayerPtr->GetPosition();
+	if (StringMap[StageCount][Pos.Y][Pos.X] == '3')
+	{
+		RenderMode = ViewportRenderMode::ThreeD;
+	}
+	else if (StringMap[StageCount][Pos.Y][Pos.X] == 'I')
+	{
+		RenderMode = ViewportRenderMode::ISO;
+	}
+}
+
 void ViewportManager::Tick(float DeltaTime)
 {
 	if (!PlayerPtr)
@@ -1583,6 +1917,12 @@ void ViewportManager::Tick(float DeltaTime)
 	}
 	if (!inventoryComponent)
 		inventoryComponent = PlayerPtr != nullptr ? PlayerPtr->GetComponent<UInventoryComponent>() : nullptr;
+
+	if (IsBossIntroPlaying())
+	{
+		TickBossIntro(DeltaTime);
+		return;
+	}
 
 	ItemLog.Tick(DeltaTime);
 
@@ -1622,10 +1962,12 @@ void ViewportManager::Tick(float DeltaTime)
 		bIsInvenOpen = true;
 		return;
 	}
-
-	if (InputManager::GetInstance()->IsKeyTap(KeyCode::N))
+	
+	SwitchRenderMode();
+	TryStartBossIntroFromTrigger();
+	if (IsBossIntroPlaying())
 	{
-		RenderMode = Is3DMode() ? ViewportRenderMode::ISO : ViewportRenderMode::ThreeD;
+		return;
 	}
 
 	OpenBattleUI();
@@ -1656,6 +1998,12 @@ void ViewportManager::RenderObject()
 
 void ViewportManager::RenderUI()
 {
+	if (bHideHUD)
+	{
+		RenderBossIntroOverlay();
+		return;
+	}
+
 	PlayerStatus.Render();
 	if (inventoryComponent != nullptr)
 	{
@@ -1686,6 +2034,8 @@ void ViewportManager::RenderUI()
 	Dialog.Render();
 	EnterShop.Render();
 	Chest.Render();
+	RenderBossHpBar();
+	RenderBossIntroOverlay();
 }
 
 void ViewportManager::ResetRuntimeCache()
@@ -1695,6 +2045,17 @@ void ViewportManager::ResetRuntimeCache()
 	combatComponent = nullptr;
 	inventoryComponent = nullptr;
 	bIsInvenOpen = false;
+	PreviousRenderMode = ViewportRenderMode::ISO;
+	BossIntroStateValue = BossIntroState::None;
+	BossIntroTarget = nullptr;
+	bHideHUD = false;
+	bUseCinematicCamera = false;
+	bBossHpBarEnabled = false;
+	BossIntroElapsed = 0.0f;
+	CinematicCameraPosition = { 0.0f, 0.0f };
+	BossIntroCameraStart = { 0.0f, 0.0f };
+	BossIntroCameraEnd = { 0.0f, 0.0f };
+	CinematicCameraAngle = 0.0f;
 
 	PlayerStatus.ResetCache();
 	Inventory.ResetCache();
@@ -1743,8 +2104,15 @@ void ViewportManager::Render2Dto3D()
 			playerA = InterpolateAngle(previousAngle, currentAngle, moveComponent->GetTurnAlpha());
 		}
 	}
+
+	if (bUseCinematicCamera)
+	{
+		playerX = CinematicCameraPosition.X;
+		playerY = CinematicCameraPosition.Y;
+		playerA = CinematicCameraAngle;
+	}
 	
-	float fov = PI / 8.0f;
+	float fov = PI / 3.0f;
 	float depth = 36.0f;
 
 	vector<float> wallDepths(SCREEN_WIDTH, depth);

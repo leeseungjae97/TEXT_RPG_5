@@ -179,6 +179,16 @@ void GameInstance::Run()
 
 	case GameFlowState::Game:
 	default:
+		if (ViewportManager::GetInstance()->IsBossIntroPlaying())
+		{
+			ViewportManager::GetInstance()->Tick(DeltaTime);
+			ViewportManager::GetInstance()->Render();
+			ViewportManager::GetInstance()->RenderFade();
+			DisplayManager::GetInstance()->Render();
+			Destroy();
+			return;
+		}
+
 		StageManager::GetInstance()->Tick(DeltaTime);
 		if (StageManager::GetInstance()->ShouldStartGameClear())
 		{
@@ -218,6 +228,10 @@ void GameInstance::Run()
 		}
 		ViewportManager::GetInstance()->Tick(DeltaTime);
 		ViewportManager::GetInstance()->Render();
+		if (ViewportManager::GetInstance()->IsBossIntroPlaying())
+		{
+			ViewportManager::GetInstance()->RenderFade();
+		}
 		DisplayManager::GetInstance()->Render();
 		break;
 	}

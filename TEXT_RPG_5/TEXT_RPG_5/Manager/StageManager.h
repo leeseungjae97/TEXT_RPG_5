@@ -12,14 +12,18 @@ public:
 	void Tick(float DeltaTime);
 
 	int GetCurrentStage() const { return CurrentStage; }
-	int GetStageCount() const { return StageCount; }
+	void SetCurrentStage(int InCurrentStage) { CurrentStage = InCurrentStage;}
+	int GetMaxStageCount() const { return MaxStageCount; }
 	Vector GetCrystalPosition() const { return CrystalPosition; }
 	bool IsBossDefeated() const { return bBossDefeated; }
 	bool HasCrystal() const { return bHasCrystal; }
 	bool IsPromptOpen() const { return bPromptOpen; }
-	bool IsLastStage() const { return CurrentStage >= StageCount - 1; }
+	bool IsLastStage() const { return CurrentStage >= MaxStageCount; }
 	bool ShouldStartGameClear() const { return bGameClearRequested; }
 	void ClearGameClearRequest() { bGameClearRequested = false; }
+	bool HasBossIntroPlayed() const { return bBossIntroPlayed; }
+	bool CanStartBossIntro() const { return !bBossIntroPlayed && !bBossDefeated; }
+	void MarkBossIntroPlayed() { bBossIntroPlayed = true; }
 	int GetCrystalColor() const;
 
 	void OnBossKilled(Vector BossPosition);
@@ -28,13 +32,14 @@ public:
 	bool AdvanceStage();
 
 private:
-	static constexpr int StageCount = 4;
+	static constexpr int MaxStageCount = 3;
 	int CurrentStage = 0;
 	bool bBossDefeated = false;
 	bool bHasCrystal = false;
 	bool bPromptOpen = false;
 	bool bPromptDismissedUntilLeave = false;
 	bool bGameClearRequested = false;
+	bool bBossIntroPlayed = false;
 	Vector CrystalPosition = { 0, 0 };
 	float CrystalColorElapsed = 0.0f;
 	int CrystalColorIndex = 0;
