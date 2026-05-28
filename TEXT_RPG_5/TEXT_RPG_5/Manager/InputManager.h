@@ -6,7 +6,7 @@ enum class KeyCode
 {
 	_1, _2, _3, _4,
 	Z, X, C, V, B, N, M, I, E, A,
-	UP, DOWN, LEFT, RIGHT, ESCAPE, END
+	UP, DOWN, LEFT, RIGHT, ESCAPE, TAB, END
 };
 
 enum class KeyState
