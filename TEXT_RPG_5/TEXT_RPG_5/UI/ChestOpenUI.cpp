@@ -1,30 +1,28 @@
-﻿#include "EnterShopUI.h"
+﻿#include "ChestOpenUI.h"
 
 #include "../Player.h"
 #include "../Component/InventoryComponent.h"
-#include "../Component/MoveComponent.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/StageManager.h"
 #include "../Manager/DisplayManager.h"
 
-void EnterShopUI::Close()
+void ChestOpenUI::Close()
 {
 	bOpen = false;
 }
 
-void EnterShopUI::Tick(float DeltaTime)
+void ChestOpenUI::Tick(float DeltaTime)
 {
 	if (!bOpen)
 		return;
 
 	Player* PlayerPtr = SceneManager::GetInstance()->GetPlayer();
-	UMoveComponent* MoveComponent = PlayerPtr != nullptr
-		? PlayerPtr->GetComponent<UMoveComponent>()
+	UInventoryComponent* InventoryComponent = PlayerPtr != nullptr
+		? PlayerPtr->GetComponent<UInventoryComponent>()
 		: nullptr;
 
-	Vector ShopPosition;
-	if (MoveComponent == nullptr || !MoveComponent->GetAdjacentShop(ShopPosition))
+	if (InventoryComponent == nullptr || !InventoryComponent->IsChestAdjust())
 	{
 		Close();
 		return;
@@ -33,21 +31,17 @@ void EnterShopUI::Tick(float DeltaTime)
 	InputManager* input = InputManager::GetInstance();
 	if (input->IsKeyTap(KeyCode::Z))
 	{
-		if (UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>())
-		{
-			InventoryComponent->OpenShop(StageManager::GetInstance()->GetStageCount());
-			Close();
-		}
-		
+		InventoryComponent->OpenChest();
+		Close();
 	}
 	if (input->IsKeyTap(KeyCode::X) || input->IsKeyTap(KeyCode::ESCAPE))
 	{
-		MoveComponent->DismissShopPrompt();
+		InventoryComponent->DismissChestPrompt();
 		Close();
 	}
 }
 
-void EnterShopUI::Render()
+void ChestOpenUI::Render()
 {
 	if (!bOpen)
 	{
@@ -74,11 +68,11 @@ void EnterShopUI::Render()
 	}
 	Renderer->DrawBox(y, x, width, height);
 	
-	Renderer->AddRender(y + 2, x + 10, L"상점 입장");
-	Renderer->AddRender(y + 5, x + 7, L"(Z) 입장        (ESC/X) 취소");
+	Renderer->AddRender(y + 2, x + 10, L"상자 열기");
+	Renderer->AddRender(y + 5, x + 7, L"(Z) 확인       (ESC/X) 취소");
 }
 
-void EnterShopUI::Open()
+void ChestOpenUI::Open()
 {
 	bOpen = true;
 }

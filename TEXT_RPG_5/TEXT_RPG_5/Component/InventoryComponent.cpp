@@ -63,6 +63,20 @@ void UInventoryComponent::OpenShop(int ShopId)
     SetOnShop(true);
 }
 
+bool UInventoryComponent::IsChestAdjust()
+{
+    if (PlayerPtr == nullptr)
+        return false;
+
+    Vector Pos = PlayerPtr->GetPosition();
+    MapManager* Map = MapManager::GetInstance();
+    if (Map->GetType(Pos.Y, Pos.X + 1) == MapObjectType::Chest) { return true; }
+    if (Map->GetType(Pos.Y, Pos.X - 1) == MapObjectType::Chest) { return true; }
+    if (Map->GetType(Pos.Y + 1, Pos.X) == MapObjectType::Chest) { return true; }
+    if (Map->GetType(Pos.Y - 1, Pos.X) == MapObjectType::Chest) { return true; }
+    return false;
+}
+
 bool UInventoryComponent::OpenChest()
 {
     Vector ChestPos;
@@ -80,6 +94,8 @@ bool UInventoryComponent::OpenChest()
     bOnEnhancement = false;
     bOnChest = true;
     bChestPanel = false;
+    bChestPromptDismissed = false;
+    DismissedChestPosition = { -1, -1 };
     ResetCursor();
     return true;
 }
@@ -112,6 +128,17 @@ void UInventoryComponent::CloseInventory()
         ShopManager::GetInstance()->SetSellMode(false);
     }
     ResetCursor();
+}
+
+void UInventoryComponent::DismissChestPrompt()
+{
+    Vector ChestPos;
+    if (GetAdjacentChest(ChestPos))
+    {
+        bChestPromptDismissed = true;
+        DismissedChestPosition = ChestPos;
+        bWasOnChest = true;
+    }
 }
 
 
@@ -667,6 +694,38 @@ void UInventoryComponent::ToggleEnhancement()
     }
 }
 
+void UInventoryComponent::ChestOpenWithUI()
+{
+    Vector ChestPos;
+    const bool bNearChest = GetAdjacentChest(ChestPos);
+    if (!bNearChest)
+    {
+        ViewportManager::GetInstance()->CloseChest();
+        bWasOnChest = false;
+        bChestPromptDismissed = false;
+        DismissedChestPosition = { -1, -1 };
+        return;
+    }
+
+    const bool bDismissedSameChest =
+        bChestPromptDismissed &&
+        DismissedChestPosition.X == ChestPos.X &&
+        DismissedChestPosition.Y == ChestPos.Y;
+
+    if (bDismissedSameChest)
+    {
+        ViewportManager::GetInstance()->CloseChest();
+        bWasOnChest = true;
+        return;
+    }
+
+    if (!bWasOnChest && !ViewportManager::GetInstance()->IsChestUIOpen())
+    {
+        ViewportManager::GetInstance()->OpenChest();   
+    }
+    bWasOnChest = true;
+}
+
 void UInventoryComponent::Tick(float DeltaTime)
 {
     if (nullptr == PlayerPtr)
@@ -685,11 +744,12 @@ void UInventoryComponent::Tick(float DeltaTime)
         if (Input->IsKeyTap(KeyCode::_3)) UseQuickSlot(2);
         if (Input->IsKeyTap(KeyCode::_4)) UseQuickSlot(3);
         if (Input->IsKeyTap(KeyCode::I)) OpenInventory();
-        if (Input->IsKeyTap(KeyCode::E))
-        {
-            // 상자가 인접하면 상자 열기, 아니면 상점 열기
-            OpenChest();
-        }
+        // if (!IsChestAdjust() && ViewportManager::GetInstance()->IsChestUIOpen())
+        // {
+        //     ViewportManager::GetInstance()->CloseChest();
+        // }
+        ChestOpenWithUI();
+        
         return;
     }
 

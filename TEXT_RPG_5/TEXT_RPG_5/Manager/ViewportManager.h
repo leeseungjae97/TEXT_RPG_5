@@ -8,6 +8,7 @@
 #include "../UI/BattleUI.h"
 #include "../UI/ItemLogUI.h"
 #include "../UI/EnterShopUI.h"
+#include "../UI/ChestOpenUI.h"
 
 struct Vector;
 class UCombatComponent;
@@ -48,6 +49,11 @@ public:
 	void OpenExitDialog();
 	void OpenBattleUI();
 	void OpenEnterShop();
+	void CloseEnterShop();
+	bool IsEnterShopUIOpen();
+	void OpenChest();
+	void CloseChest();
+	bool IsChestUIOpen();
 	void ShowMessageDialog(const wstring& Message, float Duration = 1.5f);
 	void AddItemLog(const UItem* Item);
 	void ResetRuntimeCache();
@@ -58,6 +64,7 @@ public:
 	bool IsFadeFinished() const { return FadeState == ViewportFadeState::None; }
 	bool Is3DMode() const { return RenderMode == ViewportRenderMode::ThreeD; }
 	ViewportRenderMode GetRenderMode() const { return RenderMode; }
+	void SetRenderMode(ViewportRenderMode InRenderMode){ RenderMode = InRenderMode;}
 
 	Vector WorldToIso(float WorldX, float WorldY, int OriginX, int OriginY);
 	Vector GetISOPosition();
@@ -71,6 +78,7 @@ private:
 	InventoryUI Inventory;
 	ShopUI Shop;
 	EnterShopUI EnterShop;
+	ChestOpenUI Chest;
 	CraftingUI Crafting;
 	DialogUI Dialog;
 	BattleUI Battle;

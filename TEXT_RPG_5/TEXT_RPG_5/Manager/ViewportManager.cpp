@@ -1360,6 +1360,34 @@ void ViewportManager::OpenEnterShop()
 	}
 }
 
+void ViewportManager::CloseEnterShop()
+{
+	EnterShop.Close();
+}
+
+bool ViewportManager::IsEnterShopUIOpen()
+{
+	return EnterShop.IsOpen();
+}
+
+void ViewportManager::OpenChest()
+{
+	if (!Chest.IsOpen())
+	{
+		Chest.Open();
+	}
+}
+
+void ViewportManager::CloseChest()
+{
+	Chest.Close();
+}
+
+bool ViewportManager::IsChestUIOpen()
+{
+	return Chest.IsOpen();
+}
+
 void ViewportManager::ShowMessageDialog(const wstring& Message, float Duration)
 {
 	Dialog.OpenMessage(Message, Duration);
@@ -1512,6 +1540,11 @@ void ViewportManager::Tick(float DeltaTime)
 		EnterShop.Tick(DeltaTime);
 		return;
 	}
+	if (Chest.IsOpen())
+	{
+		Chest.Tick(DeltaTime);
+		return;
+	}
 
 	if (inventoryComponent != nullptr && inventoryComponent->GetOpenedInventory() && InputManager::GetInstance()->IsKeyTap(KeyCode::ESCAPE))
 	{
@@ -1585,6 +1618,7 @@ void ViewportManager::RenderUI()
 	Battle.Render();
 	Dialog.Render();
 	EnterShop.Render();
+	Chest.Render();
 }
 
 void ViewportManager::ResetRuntimeCache()

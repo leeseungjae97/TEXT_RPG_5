@@ -46,6 +46,8 @@ private:
 	float TurnElapsedTime = 0.0f;
 	float TurnDuration = 0.18f;
 	bool bWasOnShop = false;
+	bool bShopPromptDismissed = false;
+	Vector DismissedShopPosition = { -1, -1 };
 	
 	
 public:
@@ -55,6 +57,8 @@ public:
 	Vector GetTeleportTargetPosition();
 	float GetMoveIntervalByPlayerSpeed() const;
 	
+	bool GetAdjacentShop(Vector& OutPosition);
+	void DismissShopPrompt();
 	bool IsNearShop(Vector Position);
 	
 private:

@@ -5,6 +5,7 @@
 #include "ShopManager.h"
 #include "ChestManager.h"
 #include "StageManager.h"
+#include "ViewportManager.h"
 #include "../Object.h"
 #include "../Monster.h"
 #include "../Goblin.h"
@@ -137,6 +138,16 @@ void MapManager::MapParsing(int CurrentStage)
 						M->SetPrevPosition(CurrentPos);
 						M->SetNextPosition(CurrentPos);
 					}
+				}
+				break;
+			case '3': // ISO -> 3D
+				{
+					// ViewportManager::GetInstance()->SetRenderMode(ViewportRenderMode::ThreeD);
+				}
+				break;
+			case 'I': // 3D -> ISO
+				{
+					// ViewportManager::GetInstance()->SetRenderMode(ViewportRenderMode::ISO);
 				}
 				break;
 			case 'C': // 보스 연출 트리거
@@ -308,7 +319,7 @@ void MapManager::BeginPlay()
 	Map.resize(MAP_MAX_Y, vector<Coordinate>(MAP_MAX_X, {MapObjectType::Path, NO_ID}));
 	// vector<Vector>& ShopPoses = ShopManager::GetInstance()->GetShopPoses();
 
-	MapParsing(StageManager::GetInstance()->GetCurrentStage());
+	// MapParsing(StageManager::GetInstance()->GetCurrentStage());
 	
 	
 	// for (int i = 0 ; i < MAP_MAX_Y; ++i)

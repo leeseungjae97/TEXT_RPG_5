@@ -279,6 +279,8 @@ wchar_t HUDUI::GetMapIcon(int MapY, int MapX)
 		return L'P';
 	case MapObjectType::Shop:
 		return L'S';
+	case MapObjectType::Chest:
+		return L'T';
 	case MapObjectType::Crystal:
 		return L'C';
 	case MapObjectType::Monster:
@@ -290,6 +292,7 @@ wchar_t HUDUI::GetMapIcon(int MapY, int MapX)
 			if (name == "Orc")    return L'O';
 			if (name == "Dragon") return L'D';
 			if (name == "Spider") return L'A';
+			if (name == "Mimic") return L'T';
 		}
 		return L'M';
 	case MapObjectType::Projectile:
@@ -343,11 +346,11 @@ int HUDUI::GetMapIconColor(int MapY, int MapX)
 	case MapObjectType::Monster:
 		if (Monster* monster = dynamic_cast<Monster*>(MapManager::GetInstance()->GetMapObject(MapY, MapX, MapObjectType::Monster)))
 		{
-			if (monster->IsShiny()) return CC_RED;
+			if (monster->IsShiny()) return CC_BLUE;
 		}
-		return CC_WHITE;
+		return CC_RED;
 	case MapObjectType::Projectile:
-		return CC_CYAN;
+		return CC_DARKGREEN;
 	case MapObjectType::Path:
 	default:
 		return CC_DARKGRAY;

@@ -321,7 +321,8 @@ void Monster::MoveTowardPlayer(Player* player)
 	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Wall)
 		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Shop)
 		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Monster)
-		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Player))
+		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Player)
+		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Chest))
 	{
 		return;
 	}
