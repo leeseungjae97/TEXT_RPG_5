@@ -18,7 +18,6 @@ public:
 	void Tick(float DeltaTime);
 
 private:
-	void UpdateMap();
 	bool IsValidPosition(Vector Pos) const;
 	bool CanPlaceObject(AObject* Object, Vector Pos) const;
 	Coordinate MakeCoordinate(AObject* Object) const;

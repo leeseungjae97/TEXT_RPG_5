@@ -4,11 +4,7 @@
 #include "../pch.h"
 #include "../Struct/R2Config.h"
 #include "../Struct/R2Result.h"
-
-namespace Aws::S3
-{
-	class S3Client;
-}
+#include <aws/s3/S3Client.h>
 
 class R2AsyncLoader
 {

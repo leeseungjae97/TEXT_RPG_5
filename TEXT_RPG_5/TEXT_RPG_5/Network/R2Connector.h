@@ -2,11 +2,7 @@
 #include "../Singleton.h"
 #include "../pch.h"
 #include "../Struct/R2Config.h"
-
-namespace Aws::S3
-{
-	class S3Client;
-}
+#include <aws/s3/S3Client.h>
 
 class R2Connector : public Singleton<R2Connector>
 {

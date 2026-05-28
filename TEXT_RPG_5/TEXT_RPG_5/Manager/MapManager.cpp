@@ -21,6 +21,7 @@ MapManager::~MapManager()
 
 void MapManager::Tick(float DeltaTime)
 {
+	
 }
 
 bool MapManager::IsValidPosition(Vector Pos) const
@@ -112,49 +113,6 @@ void MapManager::ClearObject(AObject* Object)
 	if (Map[Pos.Y][Pos.X].ID == Object->GetID())
 	{
 		Map[Pos.Y][Pos.X] = {MapObjectType::Path, NO_ID};
-	}
-}
-
-void MapManager::UpdateMap()
-{
-	vector<AObject*> Objects = SceneManager::GetInstance()->GetObjects();
-	
-	for (AObject* Obj : Objects)
-	{
-		if (nullptr == Obj || Obj->IsDestroy())
-			continue;
-		
-		Vector PrevPos = Obj->GetPrevPosition();
-		Vector Pos = Obj->GetPosition();
-		
-		Map[PrevPos.Y][PrevPos.X] = {MapObjectType::Path, NO_ID};
-
-		if (Pos.Y < 0
-			|| Pos.Y >= MAP_MAX_Y 
-			|| Pos.X < 0
-			|| Pos.X >= MAP_MAX_X 
-			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Wall
-			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Shop
-			|| Map[Pos.Y][Pos.X].Type == MapObjectType::Crystal)
-		{
-			// Obj->SetPosition(PrevPos);
-			continue;
-		}
-
-		if (Monster* monster = dynamic_cast<Monster*>(Obj))
-		{
-			Map[Pos.Y][Pos.X] = {MapObjectType::Monster, monster->GetID()};
-		}
-		
-		else if (Player* player = dynamic_cast<Player*>(Obj))
-		{
-			Map[Pos.Y][Pos.X] = {MapObjectType::Player, player->GetID()};
-		}
-
-		else if (Projectile* projectile = dynamic_cast<Projectile*>(Obj))
-		{
-			Map[Pos.Y][Pos.X] = {MapObjectType::Projectile, projectile->GetID()};
-		}
 	}
 }
 
