@@ -24,11 +24,12 @@ KingSlime::KingSlime (int PlayerLevel)
 
     bUseBfs = true;
 
-    AttackRange = 2;
+    AttackRange = 4;
     AttackInterval = 3.0f;
     AttackElapsedtime = 0.0f;
 
     TrySetShiny();
+    RenderScale = 3;
 }
 
 void KingSlime::BuildAttackValue(Player* player)
@@ -66,9 +67,9 @@ void KingSlime::GroundAttack(Player* player)
     
     bool bHitPlayer = false;
     
-    for (int y = -2; y <= 2; y++)
+    for (int y = -3; y <= 3; y++)
     {
-        for (int x = -2; x <= 2; x++)
+        for (int x = -3; x <= 3; x++)
         {
             Vector AttackPosition;
             AttackPosition.X = Position.X + x;
@@ -148,7 +149,8 @@ vector<FItemWeight> KingSlime::GetDropTable()
 {
     return {
             { ItemId::SLIME_JELLY, 60 },
-            { ItemId::HP_POTION,   30 },
-            { ItemId::STAFF,       10 },
+            { ItemId::STRENGTH_POTION, 10},
+            { ItemId::STAFF,       20 },
+            { ItemId::LONGSWORD, 30}
         };
 }

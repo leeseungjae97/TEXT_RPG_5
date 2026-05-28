@@ -1401,6 +1401,8 @@
     </ClCompile>
     <ClCompile Include="Manager\ObjectPoolManager.cpp" />
     <ClCompile Include="Manager\ViewportManager.cpp" />
+    <ClCompile Include="Mimic.cpp" />
+    <ClCompile Include="OrcMage.cpp" />
     <ClCompile Include="Spider.cpp" />
     <ClCompile Include="UI\BattleUI.cpp" />
     <ClCompile Include="UI\DialogUI.cpp" />
@@ -1809,8 +1811,10 @@
     <ClInclude Include="Manager\StageManager.h" />
     <ClInclude Include="Manager\TimeManager.h" />
     <ClInclude Include="Map\Map.h" />
+    <ClInclude Include="Mimic.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="OrcMage.h" />
     <ClInclude Include="PlayerStat.h" />
     <ClInclude Include="GameInstance.h" />
     <ClInclude Include="Goblin.h" />
