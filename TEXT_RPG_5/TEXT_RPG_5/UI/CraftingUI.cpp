@@ -7,8 +7,10 @@
 #include "../Manager/DisplayManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/CraftingManager.h"
+#include "../Manager/EnhancementManager.h"
 #include "../Struct/Recipe.h"
 #include "../Player.h"
+#include "RarityColor.h"
 
 void CraftingUI::ResetCache()
 {
@@ -36,12 +38,15 @@ void CraftingUI::Render()
 		return;
 	}
 
-	if (!InventoryComponent->GetOnCrafting())
+	const bool bEnhancement = InventoryComponent->GetOnEnhancement();
+	if (!InventoryComponent->GetOnCrafting() && !bEnhancement)
 	{
 		return;
 	}
 
-	const vector<vector<UItem*>>& items = CraftingManager::GetInstance()->GetContainerRef();
+	const vector<vector<UItem*>>& items = bEnhancement
+		? EnhancementManager::GetInstance()->GetContainerRef()
+		: CraftingManager::GetInstance()->GetContainerRef();
 
 	const int slotWidth = 16;
 	const int slotHeight = 7;
@@ -53,12 +58,21 @@ void CraftingUI::Render()
 	const int y = max(1, (SCREEN_HEIGHT - panelHeight) / 2 - 3);
 
 	DrawBackground(y - 2, x - 3, panelWidth + 6, panelHeight + 6);
-	DrawItemPanel(y, x, items, L"Crafting");
+	DrawItemPanel(y, x, items, bEnhancement ? L"강화 재료" : L"Crafting");
 
-	UItem* hovered = CraftingManager::GetInstance()->GetItem(InventoryComponent->GetCursor());
-	DrawRecipeInfo(y, x + panelWidth + 4, hovered);
+	UItem* hovered = bEnhancement
+		? EnhancementManager::GetInstance()->GetItem(InventoryComponent->GetCursor())
+		: CraftingManager::GetInstance()->GetItem(InventoryComponent->GetCursor());
+	if (bEnhancement)
+	{
+		DrawEnhancementInfo(y, x + panelWidth + 4, hovered);
+	}
+	else
+	{
+		DrawRecipeInfo(y, x + panelWidth + 4, hovered);
+	}
 
-	Renderer->AddRender(y - 1, x, L"(Z)제작  (A/ESC)닫기");
+	Renderer->AddRender(y - 1, x, bEnhancement ? L"(Z)강화  (C/A/ESC)닫기" : L"(Z)제작  (A/ESC)닫기");
 }
 
 void CraftingUI::DrawBackground(int Y, int X, int Width, int Height)
@@ -104,7 +118,20 @@ void CraftingUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem* 
 	int iconColor = itemInfo.Type == ItemType::Usable ? CC_GREEN : CC_WHITE;
 	Renderer->PutCell(Y + 2, X + Width / 2, GetItemIcon(Item), Renderer->MakeConsoleAttribute(iconColor));
 
-	wstring itemName = Renderer->ToWideString(itemInfo.Name);
+	if (itemInfo.Type == ItemType::Equipment)
+	{
+		wstring rarityName = GetRarityName(itemInfo.Rarity);
+		int maxRarityWidth = max(1, Width - 2);
+		if (Renderer->GetTextDisplayWidth(rarityName) > maxRarityWidth)
+		{
+			rarityName = Renderer->TrimTextToDisplayWidth(rarityName, maxRarityWidth);
+		}
+
+		int rarityX = X + 1 + max(0, (maxRarityWidth - Renderer->GetTextDisplayWidth(rarityName)) / 2);
+		Renderer->AddRender(Y + 1, rarityX, rarityName, GetRarityColor(itemInfo.Rarity));
+	}
+
+	wstring itemName = GetDisplayItemName(Item);
 	int maxNameWidth = max(1, Width - 2);
 	if (Renderer->GetTextDisplayWidth(itemName) > maxNameWidth)
 	{
@@ -112,7 +139,7 @@ void CraftingUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem* 
 	}
 
 	int nameX = X + 1 + max(0, (maxNameWidth - Renderer->GetTextDisplayWidth(itemName)) / 2);
-	Renderer->AddRender(Y + Height - 2, nameX, itemName);
+	Renderer->AddRender(Y + Height - 2, nameX, itemName, itemInfo.Type == ItemType::Equipment ? GetRarityColor(itemInfo.Rarity) : CC_WHITE);
 }
 
 void CraftingUI::DrawItemPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title)
@@ -199,6 +226,82 @@ void CraftingUI::DrawRecipeInfo(int Y, int X, const UItem* Result)
 		int color = owned >= required ? CC_GREEN : CC_RED;
 		Renderer->AddRender(Y + 3 + i, X + 2, name + L" " + to_wstring(owned) + L"/" + to_wstring(required), color);
 	}
+}
+
+void CraftingUI::DrawEnhancementInfo(int Y, int X, const UItem* Material)
+{
+	EnhancementManager* Enhancement = EnhancementManager::GetInstance();
+	const UItem* Target = Enhancement->GetEnhancementTarget();
+	if (Target == nullptr)
+	{
+		return;
+	}
+
+	const int width = 34;
+	const int height = 11;
+	X = min(max(1, X), max(1, SCREEN_WIDTH - width - 1));
+	Y = min(max(1, Y), max(1, SCREEN_HEIGHT - height - 1));
+
+	DrawBackground(Y, X, width, height);
+
+	const FItemInfo& targetInfo = Target->GetItemInfo();
+	wstring targetName = Renderer->TrimTextToDisplayWidth(GetDisplayItemName(Target), width - 4);
+	Renderer->AddRender(Y + 1, X + 2, L"강화 대상");
+	Renderer->AddRender(Y + 2, X + 2, targetName);
+	Renderer->AddRender(Y + 3, X + 2, L"강화: +" + to_wstring(Target->GetEnhancementCount()));
+	Renderer->AddRender(Y + 4, X + 2, L"Price: " + to_wstring(Target->GetPrice()));
+
+	if (targetInfo.EffectAmount)
+	{
+		int shownAmount = static_cast<int>(round(targetInfo.EffectAmount * GetRarityStatMultiplier(targetInfo.Rarity)));
+		Renderer->AddRender(Y + 5, X + 2, L"Effect: +" + to_wstring(shownAmount));
+	}
+
+	if (Material == nullptr)
+	{
+		Renderer->AddRender(Y + 7, X + 2, L"재료를 선택하세요", CC_DARKGRAY);
+		return;
+	}
+
+	wstring materialName = Renderer->TrimTextToDisplayWidth(GetDisplayItemName(Material), width - 8);
+	const double chance = Enhancement->GetEnhancementChancePercent(Material);
+	wstringstream chanceStream;
+	if (fabs(chance - round(chance)) < 0.01)
+	{
+		chanceStream << fixed << setprecision(0) << chance;
+	}
+	else
+	{
+		chanceStream << fixed << setprecision(1) << chance;
+	}
+	Renderer->AddRender(Y + 7, X + 2, L"재료: " + materialName);
+	Renderer->AddRender(Y + 8, X + 2, L"성공 확률: " + chanceStream.str() + L"%");
+
+	if (Material->GetEnhancementCount() > Target->GetEnhancementCount())
+	{
+		Renderer->AddRender(Y + 9, X + 2, L"성공 시 +" + to_wstring(Material->GetEnhancementCount()) + L"로 동기화", CC_GREEN);
+	}
+	else
+	{
+		Renderer->AddRender(Y + 9, X + 2, L"성공 시 강화 +1", CC_GREEN);
+	}
+}
+
+wstring CraftingUI::GetDisplayItemName(const UItem* Item)
+{
+	if (Item == nullptr)
+	{
+		return L"";
+	}
+
+	const FItemInfo& itemInfo = Item->GetItemInfo();
+	wstring itemName = Renderer->ToWideString(itemInfo.Name);
+	if (itemInfo.Type == ItemType::Equipment && Item->GetEnhancementCount() > 0)
+	{
+		itemName += L" +" + to_wstring(Item->GetEnhancementCount());
+	}
+
+	return itemName;
 }
 
 wchar_t CraftingUI::GetItemIcon(const UItem* Item)

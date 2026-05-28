@@ -9,7 +9,7 @@ class UItem
 {
 protected:
 	FItemInfo ItemInfo;
-	
+	int EnhancementCount = 0;
 	
 	
 public:
@@ -20,6 +20,21 @@ public:
 
 	ERarity GetRarity() const { return ItemInfo.Rarity; }
 	void SetRarity(ERarity Rarity) { ItemInfo.Rarity = Rarity; }
+
+	int GetEnhancementCount() const { return EnhancementCount; }
+	void ApplyEnhancementSuccess()
+	{
+		++EnhancementCount;
+		ItemInfo.EffectAmount = static_cast<int>(ceil(ItemInfo.EffectAmount * 1.2f));
+		ItemInfo.Price = static_cast<int>(ceil(ItemInfo.Price * 1.2f));
+	}
+	void MatchEnhancementCount(int TargetCount)
+	{
+		while (EnhancementCount < TargetCount)
+		{
+			ApplyEnhancementSuccess();
+		}
+	}
 
 	// 등급이 반영된 실제 가격 (구매/판매에서 사용)
 	int GetPrice() const { return static_cast<int>(round(ItemInfo.Price * GetRarityPriceMultiplier(ItemInfo.Rarity))); }

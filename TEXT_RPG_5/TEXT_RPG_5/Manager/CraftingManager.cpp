@@ -34,7 +34,7 @@ void CraftingManager::ClearContainer()
 {
     for (int y = 0; y < (int)Container.size(); ++y)
     {
-        for (int x = 0; x < MaxColumn; ++x)
+        for (int x = 0; x < (int)Container[y].size(); ++x)
         {
             delete Container[y][x];
             Container[y][x] = nullptr;
@@ -106,7 +106,6 @@ bool CraftingManager::HasIngredients(const FRecipe& Recipe)
 
     return true;
 }
-
 
 bool CraftingManager::OpenCraftingFor(ItemId Material)
 {

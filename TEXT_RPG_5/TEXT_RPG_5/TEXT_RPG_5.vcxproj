@@ -1147,6 +1147,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Manager\CraftingManager.cpp" />
+    <ClCompile Include="Manager\EnhancementManager.cpp" />
     <ClCompile Include="Manager\ChestManager.cpp" />
     <ClCompile Include="Manager\InputManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1806,6 +1807,7 @@
     <ClInclude Include="KingSlime.h" />
     <ClInclude Include="Manager\BattleManager.h" />
     <ClInclude Include="Manager\CraftingManager.h" />
+    <ClInclude Include="Manager\EnhancementManager.h" />
     <ClInclude Include="Manager\ChestManager.h" />
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\ItemManager.h" />

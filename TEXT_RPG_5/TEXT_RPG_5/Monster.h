@@ -62,6 +62,7 @@ public:
 	int GetHealth();
 	int GetMaxHealth();
 	int GetAttack();
+	int GetRenderScale() const { return RenderScale > 0 ? RenderScale : 1; }
 	float GetMoveAlpha() const;
 	bool IsAttackVisible() const { return AttackVisibleTime > 0.0f; }
 	bool IsAttackTelegraphActive() const { return bAttackTelegraphActive; }

@@ -55,28 +55,42 @@ void InventoryUI::InventoryRender()
 	
 	const int inventoryX = 3;
 	const int inventoryY = 3;
-	const int equipmentX = inventoryX + static_cast<int>(container[0].size()) * 15 + 8;
-	const int equipmentY = inventoryY;
-
 	const bool bChest = InventoryComponent->GetOnChest();
-
-	DrawBackground(1, 1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-	Renderer->AddRender(2, 3, bChest ? L"(Z)교환  (TAB/ECS)닫기" : L"(Z)적용/착용  (I/ECS)닫기");
-	DrawInventoryPanel(inventoryY, inventoryX, container, L"인벤토리");
+	const int slotWidth = 16;
+	const int slotHeight = 7;
+	const int slotStepX = slotWidth - 1;
+	const int slotStepY = slotHeight - 1;
+	const int inventoryColumns = static_cast<int>(container[0].size());
+	const int inventoryPanelWidth = inventoryColumns * slotStepX + 1;
+	const int equipmentX = inventoryX + inventoryPanelWidth + 8;
+	const int equipmentY = inventoryY;
+	int backgroundWidth = SCREEN_WIDTH / 2;
 	if (bChest)
-		DrawChestPanel(equipmentY, equipmentX);
+	{
+		const vector<vector<UItem*>>& chestItems = ChestManager::GetInstance()->GetContainerRef();
+		const int chestRows = static_cast<int>(chestItems.size());
+		const int chestColumns = chestRows > 0 ? static_cast<int>(chestItems[0].size()) : 0;
+		const int chestPanelWidth = max(1, chestColumns) * slotStepX + 1;
+		backgroundWidth = min(SCREEN_WIDTH - 2, max(backgroundWidth, equipmentX + chestPanelWidth + 3));
+	}
+
+	DrawBackground(1, 1, backgroundWidth, SCREEN_HEIGHT / 2);
+	Renderer->AddRender(2, 3, bChest ? L"(Z)교환  (TAB/ESC)닫기" : L"(Z)적용/착용  (A)조합  (C)강화  (I/ESC)닫기");
+	DrawInventoryPanel(inventoryY, inventoryX, container, L"인벤토리", slotWidth, slotHeight);
+	if (bChest)
+		DrawChestPanel(equipmentY, equipmentX, slotWidth, slotHeight);
 	else
 		DrawEquipmentPanel(equipmentY, equipmentX);
 
 	Vector cursor = InventoryComponent->GetCursor();
 	const UItem* hoveredItem = nullptr;
 	int hoverY = inventoryY + 2;
-	int hoverX = inventoryX + static_cast<int>(container[0].size()) * 15 + 26;
+	int hoverX = equipmentX + 18;
 	if (bChest && InventoryComponent->GetOnChestPanel())
 	{
 		hoveredItem = ChestManager::GetInstance()->GetItem(cursor);
-		hoverY = equipmentY + 2 + cursor.Y * 6;
-		hoverX = equipmentX + 18;
+		hoverY = equipmentY + 2 + cursor.Y * slotStepY;
+		hoverX = equipmentX + cursor.X * slotStepX + slotWidth + 2;
 	}
 	else if (!bChest && InventoryComponent->GetOnEquipment())
 	{
@@ -90,8 +104,8 @@ void InventoryUI::InventoryRender()
 	else
 	{
 		hoveredItem = InventoryComponent->GetItem(cursor);
-		hoverY = inventoryY + 2 + cursor.Y * 6;
-		hoverX = inventoryX + cursor.X * 15 + 18;
+		hoverY = inventoryY + 2 + cursor.Y * slotStepY;
+		hoverX = inventoryX + cursor.X * slotStepX + slotWidth + 2;
 	}
 	DrawHoverDialog(hoverY, hoverX, hoveredItem);
 }
@@ -170,6 +184,10 @@ void InventoryUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem*
 	Renderer->PutCell(Y + 2, X + Width / 2, icon, iconAttribute);
 	
 	wstring itemName = Renderer->ToWideString(ItemInfo.Name);
+	if (ItemInfo.Type == ItemType::Equipment && item->GetEnhancementCount() > 0)
+	{
+	    itemName += L" +" + to_wstring(item->GetEnhancementCount());
+	}
 	int maxNameWidth = max(1, Width - 2);
 	if (Renderer->GetTextDisplayWidth(itemName) > maxNameWidth)
 	{
@@ -180,7 +198,7 @@ void InventoryUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem*
 	Renderer->AddRender(Y + Height - 2, nameX, itemName, GetRarityColor(ItemInfo.Rarity));
 }
 
-void InventoryUI::DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title)
+void InventoryUI::DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title, int SlotWidth, int SlotHeight)
 {
 	if (!Renderer)
 	{
@@ -189,8 +207,6 @@ void InventoryUI::DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>&
 	}
 	
 	Vector Cursor = InventoryComponent->GetCursor();
-	const int slotWidth = 16;
-	const int slotHeight = 7;
 	int rows = static_cast<int>(Items.size());
 	int columns = rows > 0 ? static_cast<int>(Items[0].size()) : 0;
 	int capacity = rows * columns;
@@ -214,7 +230,7 @@ void InventoryUI::DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>&
 		for (int col = 0; col < static_cast<int>(Items[row].size()); ++col)
 		{
 			bool bSelected = !InventoryComponent->GetOnEquipment() && !InventoryComponent->GetOnChestPanel() && Cursor.X == col && Cursor.Y == row;
-			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, Items[row][col], bSelected);
+			DrawItemSlot(Y + 2 + row * (SlotHeight - 1), X + col * (SlotWidth - 1), SlotWidth, SlotHeight, Items[row][col], bSelected);
 		}
 	}
 }
@@ -263,7 +279,7 @@ void InventoryUI::DrawEquipmentPanel(int Y, int X)
 	}
 }
 
-void InventoryUI::DrawChestPanel(int Y, int X)
+void InventoryUI::DrawChestPanel(int Y, int X, int SlotWidth, int SlotHeight)
 {
 	if (!Renderer)
 	{
@@ -273,8 +289,6 @@ void InventoryUI::DrawChestPanel(int Y, int X)
 
 	const vector<vector<UItem*>>& items = ChestManager::GetInstance()->GetContainerRef();
 	Vector cursor = InventoryComponent->GetCursor();
-	const int slotWidth = 16;
-	const int slotHeight = 7;
 	const int rows = static_cast<int>(items.size());
 	const int columns = rows > 0 ? static_cast<int>(items[0].size()) : 0;
 	int capacity = rows * columns;
@@ -292,7 +306,7 @@ void InventoryUI::DrawChestPanel(int Y, int X)
 		for (int col = 0; col < static_cast<int>(items[row].size()); ++col)
 		{
 			bool bSelected = InventoryComponent->GetOnChestPanel() && cursor.X == col && cursor.Y == row;
-			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, items[row][col], bSelected);
+			DrawItemSlot(Y + 2 + row * (SlotHeight - 1), X + col * (SlotWidth - 1), SlotWidth, SlotHeight, items[row][col], bSelected);
 		}
 	}
 }
@@ -312,7 +326,12 @@ void InventoryUI::DrawHoverDialog(int Y, int X, const UItem* item)
 	DrawBackground(Y, X, width, height);
 
 	FItemInfo itemInfo = item->GetItemInfo();
-	wstring itemName = Renderer->TrimTextToDisplayWidth(Renderer->ToWideString(itemInfo.Name), width - 4);
+	wstring itemName = Renderer->ToWideString(itemInfo.Name);
+	if (itemInfo.Type == ItemType::Equipment && item->GetEnhancementCount() > 0)
+	{
+		itemName += L" +" + to_wstring(item->GetEnhancementCount());
+	}
+	itemName = Renderer->TrimTextToDisplayWidth(itemName, width - 4);
 	wstring typeText = L"";
 	wstring amountContent = L"";
 	
@@ -364,7 +383,7 @@ void InventoryUI::DrawHoverDialog(int Y, int X, const UItem* item)
 		int shownAmount = static_cast<int>(round(itemInfo.EffectAmount * GetRarityStatMultiplier(itemInfo.Rarity)));
 		Renderer->AddRender(Y + 5, X + 2, amountContent + to_wstring(shownAmount));
 	}
-	Renderer->AddRender(Y + 6, X + 2, L"(A) 조합하기");
+	Renderer->AddRender(Y + 6, X + 2, itemInfo.Type == ItemType::Equipment ? L"(A) 조합  (C) 강화" : L"(A) 조합하기");
 }
 
 wchar_t InventoryUI::GetItemIcon(const UItem* item)
