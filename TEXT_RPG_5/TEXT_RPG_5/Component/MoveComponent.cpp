@@ -255,9 +255,7 @@ void UMoveComponent::HandleMoveInput()
 			return;
 		}
 
-		if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Monster)
-			|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Wall)
-			|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Shop))
+		if (!MapManager::GetInstance()->CanMoveObjectTo(PlayerPtr, NextPosition))
 		{
 			return;
 		}
@@ -305,9 +303,7 @@ void UMoveComponent::HandleMoveInput()
 		return;
 	}
 
-	if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Monster)
-		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Wall)
-		|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Shop))
+	if (!MapManager::GetInstance()->CanMoveObjectTo(PlayerPtr, NextPosition))
 	{
 		SetFacingDirection(NextDirection);
 		return;
@@ -373,13 +369,7 @@ bool UMoveComponent::CanTeleportPosition(Vector Position)
 	{
 		return false;
 	}
-	// 벽 X
-	if (MapManager::GetInstance()->IsTypeExist(Position, MapObjectType::Wall))
-	{
-		return false;
-	}
-	// 몬스터 X
-	if (MapManager::GetInstance()->IsTypeExist(Position, MapObjectType::Monster))
+	if (!MapManager::GetInstance()->CanMoveObjectTo(PlayerPtr, Position))
 	{
 		return false;
 	}

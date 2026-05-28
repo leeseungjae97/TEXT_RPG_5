@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿/*
+#pragma once
 #include "../Singleton.h"
 #include "../pch.h"
 #include "../Struct/R2Config.h"
@@ -45,3 +46,4 @@ private:
 	// R2 Bucket 안에 저장될 파일 이름
 	const string ObjectKey = "text-rpg-leaderboard.txt";
 };
+*/

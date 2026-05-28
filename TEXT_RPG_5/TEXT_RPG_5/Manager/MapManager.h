@@ -28,6 +28,7 @@ private:
 
 public:
 	bool IsMapInitSize();
+	bool CanMoveObjectTo(AObject* Object, Vector Pos) const;
 	bool MoveObject(AObject* Object, Vector From, Vector To);
 	void ClearObject(AObject* Object);
 	bool IsTypeExist(int Y, int X, MapObjectType Type);

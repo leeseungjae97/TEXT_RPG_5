@@ -1,4 +1,5 @@
-﻿#include "R2Connector.h"
+﻿/*
+#include "R2Connector.h"
 
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentials.h>
@@ -383,4 +384,5 @@ bool R2Connector::WriteOrUpdateIniOnR2(
         objectKey,
         newText);
 }
+*/
 
