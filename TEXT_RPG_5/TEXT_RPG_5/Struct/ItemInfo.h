@@ -8,6 +8,7 @@
 #include "../Enum/StatType.h"
 #include "../Enum/EquipmentTypeEnum.h"
 #include "../Enum/WeaponType.h"
+#include "../Enum/RarityEnum.h"
 
 
 struct FItemInfo
@@ -20,4 +21,5 @@ struct FItemInfo
     StatType EffectType = StatType::None;
     EquipmentType EquipSlot = EquipmentType::NONE;
     WeaponType AttackType = WeaponType::NONE;
+    ERarity Rarity = ERarity::Common;
 };

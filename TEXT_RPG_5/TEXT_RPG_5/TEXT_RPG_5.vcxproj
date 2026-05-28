@@ -1147,6 +1147,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Manager\CraftingManager.cpp" />
+    <ClCompile Include="Manager\ChestManager.cpp" />
     <ClCompile Include="Manager\InputManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1795,6 +1796,7 @@
     <ClInclude Include="Enum\MapObjectTypeEnum.h" />
     <ClInclude Include="Enum\WeaponType.h" />
     <ClInclude Include="Enum\BuffType.h" />
+    <ClInclude Include="Enum\RarityEnum.h" />
     <ClInclude Include="Item\AllItems.h" />
     <ClInclude Include="Item\EquipmentItem.h" />
     <ClInclude Include="Item\Item.h" />
@@ -1804,6 +1806,7 @@
     <ClInclude Include="KingSlime.h" />
     <ClInclude Include="Manager\BattleManager.h" />
     <ClInclude Include="Manager\CraftingManager.h" />
+    <ClInclude Include="Manager\ChestManager.h" />
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\ItemManager.h" />
     <ClInclude Include="Manager\MapManager.h" />
@@ -1856,6 +1859,7 @@
     <ClInclude Include="UI\NameInputUI.h" />
       <ClInclude Include="UI\ShopUI.h" />
       <ClInclude Include="UI\CraftingUI.h" />
+      <ClInclude Include="UI\RarityColor.h" />
       <ClInclude Include="UI\HUDUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

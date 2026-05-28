@@ -6,6 +6,7 @@ enum class MapObjectType
 	Path,
 	Shop,
 	Crystal,
+	Chest,
 	Player,
 	Monster,
 	Projectile,

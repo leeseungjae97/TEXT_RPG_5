@@ -91,11 +91,12 @@ void UEquipmentComponent::ApplyEquipEffect(UItem* Item)
     if (PlayerPtr == nullptr) return;
 
     const FItemInfo& Info = Item->GetItemInfo();
+    const int Amount = static_cast<int>(round(Info.EffectAmount * GetRarityStatMultiplier(Info.Rarity)));
     switch (Info.EffectType)
     {
-    case StatType::HP:    PlayerPtr->SetHP(PlayerPtr->GetHP() + Info.EffectAmount);          break;
-    case StatType::MaxHP: PlayerPtr->SetMax_HP(PlayerPtr->GetMax_HP() + Info.EffectAmount);  break;
-    case StatType::Power: PlayerPtr->SetPower(PlayerPtr->GetPower() + Info.EffectAmount);    break;
+    case StatType::HP:    PlayerPtr->SetHP(PlayerPtr->GetHP() + Amount);          break;
+    case StatType::MaxHP: PlayerPtr->SetMax_HP(PlayerPtr->GetMax_HP() + Amount);  break;
+    case StatType::Power: PlayerPtr->SetPower(PlayerPtr->GetPower() + Amount);    break;
     default: break;
     }
 }
@@ -105,11 +106,12 @@ void UEquipmentComponent::RemoveEquipEffect(UItem* Item)
     if (PlayerPtr == nullptr) return;
 
     const FItemInfo& Info = Item->GetItemInfo();
+    const int Amount = static_cast<int>(round(Info.EffectAmount * GetRarityStatMultiplier(Info.Rarity)));
     switch (Info.EffectType)
     {
-    case StatType::HP:    PlayerPtr->SetHP(PlayerPtr->GetHP() - Info.EffectAmount);          break;
-    case StatType::MaxHP: PlayerPtr->SetMax_HP(PlayerPtr->GetMax_HP() - Info.EffectAmount);  break;
-    case StatType::Power: PlayerPtr->SetPower(PlayerPtr->GetPower() - Info.EffectAmount);    break;
+    case StatType::HP:    PlayerPtr->SetHP(PlayerPtr->GetHP() - Amount);          break;
+    case StatType::MaxHP: PlayerPtr->SetMax_HP(PlayerPtr->GetMax_HP() - Amount);  break;
+    case StatType::Power: PlayerPtr->SetPower(PlayerPtr->GetPower() - Amount);    break;
     default: break;
     }
 }

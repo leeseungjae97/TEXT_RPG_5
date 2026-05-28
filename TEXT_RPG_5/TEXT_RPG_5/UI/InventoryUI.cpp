@@ -5,11 +5,13 @@
 #include "../Define.h"
 #include "../Manager/DisplayManager.h"
 #include "../Manager/SceneManager.h"
+#include "../Manager/ChestManager.h"
 #include "../Player.h"
 #include "../Item/Item.h"
+#include "RarityColor.h"
 
 
-InventoryUI::InventoryUI() 
+InventoryUI::InventoryUI()
 	: PlayerPtr(nullptr), InventoryComponent(nullptr), Renderer(nullptr)
 {
 }
@@ -56,16 +58,27 @@ void InventoryUI::InventoryRender()
 	const int equipmentX = inventoryX + static_cast<int>(container[0].size()) * 15 + 8;
 	const int equipmentY = inventoryY;
 
+	const bool bChest = InventoryComponent->GetOnChest();
+
 	DrawBackground(1, 1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-	Renderer->AddRender(2, 3, L"(Z)적용/착용  (I/ECS)닫기");
+	Renderer->AddRender(2, 3, bChest ? L"(Z)교환  (TAB/ECS)닫기" : L"(Z)적용/착용  (I/ECS)닫기");
 	DrawInventoryPanel(inventoryY, inventoryX, container, L"인벤토리");
-	DrawEquipmentPanel(equipmentY, equipmentX);
+	if (bChest)
+		DrawChestPanel(equipmentY, equipmentX);
+	else
+		DrawEquipmentPanel(equipmentY, equipmentX);
 
 	Vector cursor = InventoryComponent->GetCursor();
 	const UItem* hoveredItem = nullptr;
 	int hoverY = inventoryY + 2;
 	int hoverX = inventoryX + static_cast<int>(container[0].size()) * 15 + 26;
-	if (InventoryComponent->GetOnEquipment())
+	if (bChest && InventoryComponent->GetOnChestPanel())
+	{
+		hoveredItem = ChestManager::GetInstance()->GetItem(cursor);
+		hoverY = equipmentY + 2 + cursor.Y * 6;
+		hoverX = equipmentX + 18;
+	}
+	else if (!bChest && InventoryComponent->GetOnEquipment())
 	{
 		if (UEquipmentComponent* equipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>())
 		{
@@ -164,7 +177,7 @@ void InventoryUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem*
 	}
 	
 	int nameX = X + 1 + max(0, (maxNameWidth - Renderer->GetTextDisplayWidth(itemName)) / 2);
-	Renderer->AddRender(Y + Height - 2, nameX, itemName);
+	Renderer->AddRender(Y + Height - 2, nameX, itemName, GetRarityColor(ItemInfo.Rarity));
 }
 
 void InventoryUI::DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title)
@@ -200,7 +213,7 @@ void InventoryUI::DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>&
 	{
 		for (int col = 0; col < static_cast<int>(Items[row].size()); ++col)
 		{
-			bool bSelected = !InventoryComponent->GetOnEquipment() && Cursor.X == col && Cursor.Y == row;
+			bool bSelected = !InventoryComponent->GetOnEquipment() && !InventoryComponent->GetOnChestPanel() && Cursor.X == col && Cursor.Y == row;
 			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, Items[row][col], bSelected);
 		}
 	}
@@ -246,6 +259,40 @@ void InventoryUI::DrawEquipmentPanel(int Y, int X)
 			wstring label = defaultLabels[row];
 			int labelX = X + max(1, (slotWidth - Renderer->GetTextDisplayWidth(label)) / 2);
 			Renderer->AddRender(slotY + slotHeight / 2, labelX, label);
+		}
+	}
+}
+
+void InventoryUI::DrawChestPanel(int Y, int X)
+{
+	if (!Renderer)
+	{
+		Renderer = DisplayManager::GetInstance();
+		return;
+	}
+
+	const vector<vector<UItem*>>& items = ChestManager::GetInstance()->GetContainerRef();
+	Vector cursor = InventoryComponent->GetCursor();
+	const int slotWidth = 16;
+	const int slotHeight = 7;
+	const int rows = static_cast<int>(items.size());
+	const int columns = rows > 0 ? static_cast<int>(items[0].size()) : 0;
+	int capacity = rows * columns;
+	int itemCount = 0;
+
+	for (int row = 0; row < rows; ++row)
+		for (int col = 0; col < static_cast<int>(items[row].size()); ++col)
+			if (items[row][col] != nullptr)
+				++itemCount;
+
+	Renderer->AddRender(Y, X, L"상자 (" + to_wstring(itemCount) + L"/" + to_wstring(capacity) + L")");
+
+	for (int row = 0; row < rows; ++row)
+	{
+		for (int col = 0; col < static_cast<int>(items[row].size()); ++col)
+		{
+			bool bSelected = InventoryComponent->GetOnChestPanel() && cursor.X == col && cursor.Y == row;
+			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, items[row][col], bSelected);
 		}
 	}
 }
@@ -307,11 +354,16 @@ void InventoryUI::DrawHoverDialog(int Y, int X, const UItem* item)
 	}
 
 	Renderer->PutCell(Y + 1, X + 2, GetItemIcon(item), Renderer->MakeConsoleAttribute(CC_YELLOW));
-	Renderer->AddRender(Y + 1, X + 4, itemName);
+	Renderer->AddRender(Y + 1, X + 4, itemName, GetRarityColor(itemInfo.Rarity));
+	if (itemInfo.Type == ItemType::Equipment)
+		Renderer->AddRender(Y + 2, X + 2, wstring(L"등급: ") + GetRarityName(itemInfo.Rarity), GetRarityColor(itemInfo.Rarity));
 	Renderer->AddRender(Y + 3, X + 2, typeText);
-	Renderer->AddRender(Y + 4, X + 2, L"Price: " + to_wstring(itemInfo.Price));
+	Renderer->AddRender(Y + 4, X + 2, L"Price: " + to_wstring(item->GetPrice()));
 	if (itemInfo.EffectAmount)
-		Renderer->AddRender(Y + 5, X + 2, amountContent + to_wstring(itemInfo.EffectAmount));
+	{
+		int shownAmount = static_cast<int>(round(itemInfo.EffectAmount * GetRarityStatMultiplier(itemInfo.Rarity)));
+		Renderer->AddRender(Y + 5, X + 2, amountContent + to_wstring(shownAmount));
+	}
 }
 
 wchar_t InventoryUI::GetItemIcon(const UItem* item)

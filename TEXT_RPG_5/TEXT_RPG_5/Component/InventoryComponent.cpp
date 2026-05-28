@@ -8,6 +8,8 @@
 #include "../Manager/InputManager.h"
 #include "../Manager/ShopManager.h"
 #include "../Manager/CraftingManager.h"
+#include "../Manager/ChestManager.h"
+#include "../Manager/MapManager.h"
 #include "../Manager/ItemManager.h"
 #include "../Manager/ViewportManager.h"
 #include "../Player.h"
@@ -60,11 +62,46 @@ void UInventoryComponent::OpenShop(int ShopId)
     SetOnShop(true);
 }
 
+bool UInventoryComponent::OpenChest()
+{
+    Vector ChestPos;
+    if (!GetAdjacentChest(ChestPos))
+        return false;
+
+    ChestManager* Chest = ChestManager::GetInstance();
+    Chest->SetPlayerInventory(this);
+    if (!Chest->OpenChestAt(ChestPos))
+        return false;
+
+    OpenInventory();
+    bOnEquipment = false;
+    bOnChest = true;
+    bChestPanel = false;
+    ResetCursor();
+    return true;
+}
+
+bool UInventoryComponent::GetAdjacentChest(Vector& OutPos)
+{
+    if (PlayerPtr == nullptr)
+        return false;
+
+    Vector Pos = PlayerPtr->GetPosition();
+    MapManager* Map = MapManager::GetInstance();
+    if (Map->GetType(Pos.Y, Pos.X + 1) == MapObjectType::Chest) { OutPos = { Pos.X + 1, Pos.Y }; return true; }
+    if (Map->GetType(Pos.Y, Pos.X - 1) == MapObjectType::Chest) { OutPos = { Pos.X - 1, Pos.Y }; return true; }
+    if (Map->GetType(Pos.Y + 1, Pos.X) == MapObjectType::Chest) { OutPos = { Pos.X, Pos.Y + 1 }; return true; }
+    if (Map->GetType(Pos.Y - 1, Pos.X) == MapObjectType::Chest) { OutPos = { Pos.X, Pos.Y - 1 }; return true; }
+    return false;
+}
+
 void UInventoryComponent::CloseInventory()
 {
     bOpenedInventory = false;
     bOnEquipment = false;
     bOnCrafting = false;
+    bOnChest = false;
+    bChestPanel = false;
     if (bOnShop)
     {
         bOnShop = false;
@@ -281,6 +318,29 @@ void UInventoryComponent::SelectCursor()
         return;
     }
 
+    if (bOnChest)
+    {
+        ChestManager* Chest = ChestManager::GetInstance();
+        if (bChestPanel)
+        {
+            // 상자 -> 인벤토리
+            UItem* ChestItem = Chest->GetItem(GetCursor());
+            if (ChestItem == nullptr) return;
+            if (AddItem(ChestItem))
+                Chest->RemoveAt(GetCursor());
+        }
+        else
+        {
+            // 인벤토리 -> 상자
+            UItem* InvItem = GetItem(GetCursor());
+            if (InvItem == nullptr) return;
+            DetachItem(InvItem);
+            if (!Chest->StoreItem(InvItem))
+                AddItem(InvItem);   // 상자가 가득 차면 되돌림
+        }
+        return;
+    }
+
     UItem* Item = GetItem(GetCursor());
     if (Item == nullptr) return;
 
@@ -333,9 +393,10 @@ Vector UInventoryComponent::CursorUp()
 
 Vector UInventoryComponent::CursorDown()
 {
-    if (CurrentCursor.Y < Container.size() - 1)
+    int MaxRows = bChestPanel ? ChestManager::GetInstance()->GetMaxRow() : (int)Container.size();
+    if (CurrentCursor.Y < MaxRows - 1)
         CurrentCursor.Y += 1;
-    
+
     return CurrentCursor;
 }
 
@@ -347,11 +408,23 @@ Vector UInventoryComponent::CursorLeft()
         CurrentCursor = { MaxColumn - 1, 0 };
         return CurrentCursor;
     }
-    
+
+    if (bChestPanel)
+    {
+        if (CurrentCursor.X > 0)
+            CurrentCursor.X -= 1;
+        else
+        {
+            bChestPanel = false;                  // 상자 왼쪽 끝 -> 인벤토리 오른쪽 끝
+            CurrentCursor = { MaxColumn - 1, 0 };
+        }
+        return CurrentCursor;
+    }
+
     if (CurrentCursor.X > 0)
         CurrentCursor.X -= 1;
-    
-    
+
+
     return CurrentCursor;
 }
 
@@ -360,17 +433,28 @@ Vector UInventoryComponent::CursorRight()
     if (bOnEquipment)
         return CurrentCursor;
 
-    
+    if (bChestPanel)
+    {
+        if (CurrentCursor.X < ChestManager::GetInstance()->GetMaxColumn() - 1)
+            CurrentCursor.X += 1;
+        return CurrentCursor;
+    }
+
     if (CurrentCursor.X < MaxColumn - 1)
     {
         CurrentCursor.X += 1;
+    }
+    else if (bOnChest)
+    {
+        bChestPanel = true;                       // 인벤토리 오른쪽 끝 -> 상자
+        CurrentCursor = { 0, 0 };
     }
     else if (!bOnShop && !bOnCrafting)
     {
         bOnEquipment = true;
         CurrentCursor = { 0, 0 };
     }
-    
+
     return CurrentCursor;
 }
 
@@ -423,11 +507,11 @@ void UInventoryComponent::ClearQuickSlot(UItem* Item)
 
 bool UInventoryComponent::BuyItem(UItem* Item)
 {
-    if (Gold >= Item->GetItemInfo().Price)
+    if (Gold >= Item->GetPrice())
     {
         if (AddItem(Item))
         {
-            AddGold(-(Item->GetItemInfo().Price));
+            AddGold(-(Item->GetPrice()));
             return true;
         }
     }
@@ -440,7 +524,7 @@ bool UInventoryComponent::BuyItem(UItem* Item)
 void UInventoryComponent::SellItem(UItem* Item)
 {
     if (Item == nullptr) return;
-    int Price = Item->GetItemInfo().Price;
+    int Price = Item->GetPrice();
     if (RemoveItem(Item))
         AddGold(Price / 2);
 }
@@ -491,7 +575,7 @@ int UInventoryComponent::CountItemById(ItemId Id)
 
 void UInventoryComponent::ToggleCrafting()
 {
-    if (bOnShop)
+    if (bOnShop || bOnChest)
         return;
 
     if (bOnCrafting)
@@ -535,13 +619,20 @@ void UInventoryComponent::Tick(float DeltaTime)
         if (Input->IsKeyTap(KeyCode::_3)) UseQuickSlot(2);
         if (Input->IsKeyTap(KeyCode::_4)) UseQuickSlot(3);
         if (Input->IsKeyTap(KeyCode::I)) OpenInventory();
-        if (Input->IsKeyTap(KeyCode::E)) OpenShop(1);
+        if (Input->IsKeyTap(KeyCode::E))
+        {
+            // 상자가 인접하면 상자 열기, 아니면 상점 열기
+            if (!OpenChest()) OpenShop(1);
+        }
         return;
     }
-    
+
     //이 밑으로는 다 bOpenedInventory가 true일 때만(인벤토리 열었을 경우에만) 작동.
-    
+
     if (Input->IsKeyTap(KeyCode::I)) CloseInventory();
+
+    //상자 닫기 (열려있을 때 TAB)
+    if (Input->IsKeyTap(KeyCode::TAB) && bOnChest) CloseInventory();
 
     //크래프팅 모드 전환/복귀 (커서 아이템을 재료로 쓰는 레시피 나열)
     if (Input->IsKeyTap(KeyCode::A)) ToggleCrafting();
@@ -584,7 +675,7 @@ void UInventoryComponent::Tick(float DeltaTime)
     
     //아이템 버리기
     bool bBuyMode = bOnShop && !ShopManager::GetInstance()->GetSellMode();
-    if (Input->IsKeyTap(KeyCode::X) && !bOnEquipment && !bBuyMode && !bOnCrafting)
+    if (Input->IsKeyTap(KeyCode::X) && !bOnEquipment && !bBuyMode && !bOnCrafting && !bOnChest)
     {
         RemoveItem(GetItem(GetCursor()));
     }
