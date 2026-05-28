@@ -364,6 +364,7 @@ void InventoryUI::DrawHoverDialog(int Y, int X, const UItem* item)
 		int shownAmount = static_cast<int>(round(itemInfo.EffectAmount * GetRarityStatMultiplier(itemInfo.Rarity)));
 		Renderer->AddRender(Y + 5, X + 2, amountContent + to_wstring(shownAmount));
 	}
+	Renderer->AddRender(Y + 6, X + 2, L"(A) 조합하기");
 }
 
 wchar_t InventoryUI::GetItemIcon(const UItem* item)

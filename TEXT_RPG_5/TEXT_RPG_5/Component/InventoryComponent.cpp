@@ -622,7 +622,7 @@ void UInventoryComponent::Tick(float DeltaTime)
         if (Input->IsKeyTap(KeyCode::E))
         {
             // 상자가 인접하면 상자 열기, 아니면 상점 열기
-            if (!OpenChest()) OpenShop(1);
+            OpenChest();
         }
         return;
     }

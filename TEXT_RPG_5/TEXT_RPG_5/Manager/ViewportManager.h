@@ -7,6 +7,7 @@
 #include "../UI/DialogUI.h"
 #include "../UI/BattleUI.h"
 #include "../UI/ItemLogUI.h"
+#include "../UI/EnterShopUI.h"
 
 struct Vector;
 class UCombatComponent;
@@ -46,6 +47,7 @@ public:
 	void OpenInventory();
 	void OpenExitDialog();
 	void OpenBattleUI();
+	void OpenEnterShop();
 	void ShowMessageDialog(const wstring& Message, float Duration = 1.5f);
 	void AddItemLog(const UItem* Item);
 	void ResetRuntimeCache();
@@ -68,6 +70,7 @@ private:
 	HUDUI PlayerStatus;
 	InventoryUI Inventory;
 	ShopUI Shop;
+	EnterShopUI EnterShop;
 	CraftingUI Crafting;
 	DialogUI Dialog;
 	BattleUI Battle;

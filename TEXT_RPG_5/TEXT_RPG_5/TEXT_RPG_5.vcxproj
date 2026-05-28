@@ -1416,6 +1416,7 @@
     <ClCompile Include="UI\ItemLogUI.cpp" />
     <ClCompile Include="UI\MainMenuUI.cpp" />
     <ClCompile Include="UI\NameInputUI.cpp" />
+    <ClCompile Include="UI\EnterShopUI.cpp" />
     <ClCompile Include="UI\ShopUI.cpp" />
     <ClCompile Include="UI\CraftingUI.cpp" />
     <ClCompile Include="UI\HUDUI.cpp" />
@@ -1855,6 +1856,7 @@
     <ClInclude Include="UI\ItemLogUI.h" />
     <ClInclude Include="UI\MainMenuUI.h" />
     <ClInclude Include="UI\NameInputUI.h" />
+    <ClInclude Include="UI\EnterShopUI.h" />
       <ClInclude Include="UI\ShopUI.h" />
       <ClInclude Include="UI\CraftingUI.h" />
       <ClInclude Include="UI\RarityColor.h" />

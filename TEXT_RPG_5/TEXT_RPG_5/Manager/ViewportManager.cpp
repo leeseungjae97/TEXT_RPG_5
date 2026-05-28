@@ -1295,6 +1295,14 @@ void ViewportManager::OpenBattleUI()
 	}
 }
 
+void ViewportManager::OpenEnterShop()
+{
+	if (!EnterShop.IsOpen())
+	{
+		EnterShop.Open();
+	}
+}
+
 void ViewportManager::ShowMessageDialog(const wstring& Message, float Duration)
 {
 	Dialog.OpenMessage(Message, Duration);
@@ -1441,6 +1449,12 @@ void ViewportManager::Tick(float DeltaTime)
 		Battle.Tick(DeltaTime);
 		return;
 	}
+	
+	if (EnterShop.IsOpen())
+	{
+		EnterShop.Tick(DeltaTime);
+		return;
+	}
 
 	if (inventoryComponent != nullptr && inventoryComponent->GetOpenedInventory() && InputManager::GetInstance()->IsKeyTap(KeyCode::ESCAPE))
 	{
@@ -1513,6 +1527,7 @@ void ViewportManager::RenderUI()
 	ItemLog.Render();
 	Battle.Render();
 	Dialog.Render();
+	EnterShop.Render();
 }
 
 void ViewportManager::ResetRuntimeCache()

@@ -194,11 +194,7 @@ void UMoveComponent::OpenShop()
 
 	if (!bWasOnShop)
 	{
-		if (UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>())
-		{
-			ShopManager::GetInstance()->SetPlayerInventory(InventoryComponent);
-			InventoryComponent->OpenShop(1);
-		}
+		ViewportManager::GetInstance()->OpenEnterShop();
 	}
 
 	bWasOnShop = true;
