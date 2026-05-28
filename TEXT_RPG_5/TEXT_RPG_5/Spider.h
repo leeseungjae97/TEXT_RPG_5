@@ -8,6 +8,6 @@ public:
     Spider(int PlayerLevel);
     
 protected:
-    virtual void Attackplayer(Player* player) override;
+    virtual void BuildAttackValue(Player* player) override;
     virtual vector<FItemWeight> GetDropTable() override;
 };

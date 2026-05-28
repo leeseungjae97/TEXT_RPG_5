@@ -31,6 +31,9 @@ protected:
 	float AttackInterval;
 	float AttackVisibleTime;
 	float AttackVisibleDuration;
+	float AttackTelegraphElapsedTime;
+	float AttackTelegraphDuration;
+	bool bAttackTelegraphActive;
 	vector<Vector> AttackValue;
 
 	bool bIsShiny = false;
@@ -48,10 +51,13 @@ public:
 	int GetAttack();
 	float GetMoveAlpha() const;
 	bool IsAttackVisible() const { return AttackVisibleTime > 0.0f; }
+	bool IsAttackTelegraphActive() const { return bAttackTelegraphActive; }
 	const vector<Vector>& GetAttackValue() const { return AttackValue; }
 
 	void TakeDamage(int damage);
 	bool IsDead();
+	void TransitionAttackTelegraphToAttack(float DeltaTime);
+
 	
 	//부활테스트
 	virtual bool Revive() { return false; }
@@ -80,7 +86,9 @@ protected:
 	
 	bool CanAttackplayer(Player* player);
 	
-	virtual void Attackplayer(Player* player);
+	void Attackplayer(Player* player);
+	virtual void BuildAttackValue(Player* player);
+	void ExecutePendingAttack(Player* player);
 	
 	void MoveTowardPlayer(Player* player);
 	

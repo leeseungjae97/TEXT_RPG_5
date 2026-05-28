@@ -19,6 +19,12 @@ enum class ViewportFadeState
 	FadeIn
 };
 
+enum class ViewportRenderMode
+{
+	ISO,
+	ThreeD
+};
+
 class ViewportManager : public Singleton<ViewportManager>
 {
 public:
@@ -47,6 +53,8 @@ public:
 	void TickFade(float DeltaTime);
 	void RenderFade();
 	bool IsFadeFinished() const { return FadeState == ViewportFadeState::None; }
+	bool Is3DMode() const { return RenderMode == ViewportRenderMode::ThreeD; }
+	ViewportRenderMode GetRenderMode() const { return RenderMode; }
 
 	Vector WorldToIso(float WorldX, float WorldY, int OriginX, int OriginY);
 	Vector GetISOPosition();
@@ -63,6 +71,7 @@ private:
 	BattleUI Battle;
 	ItemLogUI ItemLog;
 	ViewportFadeState FadeState = ViewportFadeState::None;
+	ViewportRenderMode RenderMode = ViewportRenderMode::ISO;
 	float FadeElapsed = 0.0f;
 	float FadeDuration = 0.7f;
 	Player* PlayerPtr;

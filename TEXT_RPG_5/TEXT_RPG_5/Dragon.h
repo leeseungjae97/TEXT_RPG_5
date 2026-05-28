@@ -12,7 +12,7 @@ public:
     virtual void OnSpawnFromPool() override;
     
 protected:
-    virtual void Attackplayer(Player* player) override;
+    virtual void BuildAttackValue(Player* player) override;
     virtual vector<FItemWeight> GetDropTable() override;
     
 private:

@@ -11,7 +11,83 @@
 #include "../Define.h"
 #include "../pch.h"
 #include "../Manager/DisplayManager.h"
+#include "../Manager/ViewportManager.h"
 #include "EquipmentComponent.h"
+
+namespace
+{
+	EDirection TurnLeft(EDirection Direction)
+	{
+		switch (Direction)
+		{
+		case EDirection::UP:
+			return EDirection::LEFT;
+		case EDirection::LEFT:
+			return EDirection::DOWN;
+		case EDirection::DOWN:
+			return EDirection::RIGHT;
+		case EDirection::RIGHT:
+			return EDirection::UP;
+		case EDirection::NONE:
+		default:
+			return EDirection::UP;
+		}
+	}
+
+	EDirection TurnRight(EDirection Direction)
+	{
+		switch (Direction)
+		{
+		case EDirection::UP:
+			return EDirection::RIGHT;
+		case EDirection::RIGHT:
+			return EDirection::DOWN;
+		case EDirection::DOWN:
+			return EDirection::LEFT;
+		case EDirection::LEFT:
+			return EDirection::UP;
+		case EDirection::NONE:
+		default:
+			return EDirection::UP;
+		}
+	}
+
+	EDirection TurnBack(EDirection Direction)
+	{
+		switch (Direction)
+		{
+		case EDirection::UP:
+			return EDirection::DOWN;
+		case EDirection::DOWN:
+			return EDirection::UP;
+		case EDirection::LEFT:
+			return EDirection::RIGHT;
+		case EDirection::RIGHT:
+			return EDirection::LEFT;
+		case EDirection::NONE:
+		default:
+			return EDirection::DOWN;
+		}
+	}
+
+	Vector GetDirectionOffset(EDirection Direction)
+	{
+		switch (Direction)
+		{
+		case EDirection::UP:
+			return { 0, -1 };
+		case EDirection::DOWN:
+			return { 0, 1 };
+		case EDirection::LEFT:
+			return { -1, 0 };
+		case EDirection::RIGHT:
+			return { 1, 0 };
+		case EDirection::NONE:
+		default:
+			return { 0, 0 };
+		}
+	}
+}
 
 UMoveComponent::UMoveComponent(AObject* InOwner)
 	: UComponent(InOwner)
@@ -131,6 +207,63 @@ void UMoveComponent::HandleMoveInput()
 {
 	if (PlayerPtr->IsMoving())
 	{
+		return;
+	}
+
+	if (ViewportManager::GetInstance()->Is3DMode())
+	{
+		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::LEFT))
+		{
+			SetFacingDirection(TurnLeft(FacingDirection));
+			MoveElapsedTime = 0.0f;
+			return;
+		}
+
+		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::RIGHT))
+		{
+			SetFacingDirection(TurnRight(FacingDirection));
+			MoveElapsedTime = 0.0f;
+			return;
+		}
+
+		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::DOWN))
+		{
+			SetFacingDirection(TurnBack(FacingDirection));
+			MoveElapsedTime = 0.0f;
+			return;
+		}
+
+		if (!InputManager::GetInstance()->IsKeyPressed(KeyCode::UP))
+		{
+			return;
+		}
+
+		Vector Offset = GetDirectionOffset(FacingDirection);
+		if (Offset.X == 0 && Offset.Y == 0)
+		{
+			return;
+		}
+
+		Vector NextPosition = {
+			PlayerPtr->GetPosition().X + Offset.X,
+			PlayerPtr->GetPosition().Y + Offset.Y
+		};
+
+		if (NextPosition.X < 1 || NextPosition.X >= MAP_MAX_X - 1 ||
+			NextPosition.Y < 1 || NextPosition.Y >= MAP_MAX_Y - 1)
+		{
+			return;
+		}
+
+		if (MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Monster)
+			|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Wall)
+			|| MapManager::GetInstance()->IsTypeExist(NextPosition, MapObjectType::Shop))
+		{
+			return;
+		}
+
+		PlayerPtr->BeginMoveTo(NextPosition);
+		MoveElapsedTime = 0.0f;
 		return;
 	}
 

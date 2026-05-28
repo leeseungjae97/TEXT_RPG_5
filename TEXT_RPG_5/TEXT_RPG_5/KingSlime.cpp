@@ -31,7 +31,7 @@ KingSlime::KingSlime (int PlayerLevel)
     TrySetShiny();
 }
 
-void KingSlime::Attackplayer(Player* player)
+void KingSlime::BuildAttackValue(Player* player)
 {
     if (player == nullptr)
     {
@@ -83,10 +83,10 @@ void KingSlime::GroundAttack(Player* player)
         }
     }
     
-    if (bHitPlayer)
-    {
-        player->TakeDamage(Attack);
-    }
+    // if (bHitPlayer)
+    // {
+    //     player->TakeDamage(Attack);
+    // }
 }
 
 void KingSlime::CrossAttack(Player* player)
@@ -137,10 +137,10 @@ void KingSlime::CrossAttack(Player* player)
         }
     }
     
-    if (bHitPlayer)
-    {
-        player->TakeDamage(Attack);
-    }
+    // if (bHitPlayer)
+    // {
+    //     player->TakeDamage(Attack);
+    // }
 }
 
 
