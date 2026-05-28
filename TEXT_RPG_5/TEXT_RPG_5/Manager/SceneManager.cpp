@@ -12,9 +12,11 @@
 #include "../KingSlime.h"
 #include "../OrcMage.h"
 #include"../Mimic.h"
+#include "../QueenSpider.h"
 #include "../Projectile.h"
 #include "MapManager.h"
 #include "StageManager.h"
+
 
 SceneManager::SceneManager()
 {
@@ -29,6 +31,9 @@ SceneManager::~SceneManager()
 
 void SceneManager::Tick(float DeltaTime)
 {
+	//타일테스트
+	MapManager::GetInstance()->Tick(DeltaTime);
+	
 	for (int i = 0; i < Objects.size(); ++i)
 	{
 		if (Objects[i] != nullptr && !Objects[i]->IsDestroy())
@@ -77,6 +82,7 @@ void SceneManager::EnsurePools()
 	ObjectPoolManager::GetInstance()->Preload<KingSlime>(1, 1);
 	ObjectPoolManager::GetInstance()->Preload<OrcMage>(1, 1);
 	ObjectPoolManager::GetInstance()->Preload<Mimic>(1, 1);
+	ObjectPoolManager::GetInstance()->Preload<QueenSpider>(1, 1);
 	ObjectPoolManager::GetInstance()->Preload<Dragon>(3, 1);
 	ObjectPoolManager::GetInstance()->Preload<Projectile>(10);
 	bPoolsInitialized = true;

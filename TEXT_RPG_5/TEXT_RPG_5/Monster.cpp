@@ -58,7 +58,10 @@ string Monster::GetName()
 	if (Name.find(L"오크") != wstring::npos) return "Orc";
 	
 	if (Name.find(L"드래곤") != wstring::npos) return "Dragon";
+	
+	if (Name.find(L"거미여왕") != wstring::npos) return "QueenSpider";
 	if (Name.find(L"거미") != wstring::npos) return "Spider";
+	
 	if (Name.find(L"Troll") != wstring::npos) return "Troll";
 	if (Name.find(L"미믹") != wstring::npos) return "Mimic";
 	
@@ -677,18 +680,23 @@ void Monster::ConfigureForStage(int InLevel, bool InBoss)
 	}
 	else if (typeName == "Mimic")
 	{
-		MaxHealth = Level * 180 + rand() % (Level * 50 + 1);
+		MaxHealth = Level * 100 + rand() % (Level * 50 + 1);
 		Attack = Level * 30 + rand() % (Level * 6 + 1);
 	}
 	else if (typeName == "OrcMage")
 	{
 		MaxHealth = Level * 170 + rand() % (Level * 50 + 1);
-		Attack = Level * 30 + rand() % (Level * 6 + 1);
+		Attack = Level * 20 + rand() % (Level * 6 + 1);
+	}
+	else if (typeName == "QueenSpider")
+	{
+		MaxHealth = Level * 200 + rand() % (Level * 70 + 1);
+		Attack = Level * 20 + rand() % (Level * 8 + 1);
 	}
 	else if (typeName == "Dragon")
 	{
-		MaxHealth = Level * 300 + rand() % (Level * 80 + 1);
-		Attack = Level * 18 + rand() % (Level * 8 + 1);
+		MaxHealth = Level * 250 + rand() % (Level * 80 + 1);
+		Attack = Level * 15 + rand() % (Level * 8 + 1);
 	}
 	else
 	{
