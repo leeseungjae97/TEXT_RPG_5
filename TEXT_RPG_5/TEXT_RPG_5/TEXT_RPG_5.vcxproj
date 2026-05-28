@@ -1403,6 +1403,7 @@
     <ClCompile Include="Manager\ViewportManager.cpp" />
     <ClCompile Include="Mimic.cpp" />
     <ClCompile Include="OrcMage.cpp" />
+    <ClCompile Include="QueenSpider.cpp" />
     <ClCompile Include="Spider.cpp" />
     <ClCompile Include="UI\BattleUI.cpp" />
     <ClCompile Include="UI\DialogUI.cpp" />
@@ -1786,6 +1787,7 @@
     <ClInclude Include="Enum\ComponentTypeEnum.h" />
     <ClInclude Include="Enum\Direction.h" />
     <ClInclude Include="Enum\ItemTypeEnum.h" />
+    <ClInclude Include="Enum\OverlayTileType.h" />
     <ClInclude Include="Enum\StatType.h" />
     <ClInclude Include="Enum\MapObjectTypeEnum.h" />
     <ClInclude Include="Enum\WeaponType.h" />
@@ -1822,11 +1824,13 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
+    <ClInclude Include="QueenSpider.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Slime.h" />
     <ClInclude Include="Spider.h" />
     <ClInclude Include="Struct\ItemInfo.h" />
     <ClInclude Include="Struct\ItemWeight.h" />
+    <ClInclude Include="Struct\OverlayTile.h" />
     <ClInclude Include="Struct\Recipe.h" />
     <ClInclude Include="Struct\Buff.h" />
     <ClInclude Include="Troll.h" />

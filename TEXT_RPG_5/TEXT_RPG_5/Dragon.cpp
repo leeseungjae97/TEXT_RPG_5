@@ -66,6 +66,8 @@ void Dragon::BuildAttackValue(Player* player)
     UpdatePhase();
     
     AttackValue.clear();
+    //타일테스트
+    AttackTileType = EMonsterAttackTileType::Default;
     
     int Pattern = GetRandomPatternByPhase();
     
@@ -99,6 +101,9 @@ void Dragon::BuildAttackValue(Player* player)
 
 void Dragon::BreathAttack(Player* player)
 {
+    //타일테스트
+    AttackTileType = EMonsterAttackTileType::Breath;
+    
     if (player == nullptr)
     {
         return;
@@ -169,6 +174,9 @@ void Dragon::BreathAttack(Player* player)
 
 void Dragon::FireballAttack(Player* player)
 {
+    //타일테스트
+    AttackTileType = EMonsterAttackTileType::Fire;
+    
     if (player == nullptr)
     {
         return;
@@ -279,6 +287,9 @@ bool Dragon::RushAttack(Player* player)
 
 void Dragon::PhaseThreeAttack(Player* player)
 {
+    //타일테스트
+    AttackTileType = EMonsterAttackTileType::Dark;
+    
     if (player == nullptr)
     {
         return;

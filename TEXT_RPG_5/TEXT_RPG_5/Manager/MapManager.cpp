@@ -9,6 +9,7 @@
 #include "../Player.h"
 #include "../Projectile.h"
 
+
 MapManager::MapManager()
 {
 	
@@ -21,6 +22,7 @@ MapManager::~MapManager()
 
 void MapManager::Tick(float DeltaTime)
 {
+	
 }
 
 bool MapManager::IsValidPosition(Vector Pos) const
@@ -160,6 +162,8 @@ void MapManager::UpdateMap()
 
 void MapManager::BeginPlay()
 {
+	
+	
 	Map.clear();
 	Map.resize(MAP_MAX_Y, vector<Coordinate>(MAP_MAX_X, {MapObjectType::Path, NO_ID}));
 	vector<Vector>& ShopPoses = ShopManager::GetInstance()->GetShopPoses();

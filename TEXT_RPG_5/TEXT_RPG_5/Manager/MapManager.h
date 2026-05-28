@@ -23,6 +23,9 @@ private:
 	bool CanPlaceObject(AObject* Object, Vector Pos) const;
 	Coordinate MakeCoordinate(AObject* Object) const;
 	
+	//타일테스트 
+	void UpdateOverlayTiles(float DeltaTime);
+
 public:
 	bool IsMapInitSize();
 	bool MoveObject(AObject* Object, Vector From, Vector To);
@@ -39,7 +42,11 @@ public:
 	MapObjectType GetType(int Y, int X);
 	AObject* GetMapObject(Vector Pos, MapObjectType Type);
 	AObject* GetMapObject(int Y, int X, MapObjectType Type);
+	
+	
+
 
 private:
 	vector<vector<Coordinate>> Map;
+	
 };

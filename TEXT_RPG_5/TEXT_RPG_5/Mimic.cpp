@@ -28,7 +28,7 @@ Mimic::Mimic(int PlayerLevel)
     bUseBfs = false;
 
     
-    AttackRange = 6;
+    AttackRange = 3;
 
     AttackInterval = 3.0f;
     AttackElapsedtime = 0.0f;
@@ -138,15 +138,15 @@ void Mimic::RushWithCrossAttack()
     NextPosition.X = Position.X + Direction.X;
     NextPosition.Y = Position.Y + Direction.Y;
 
-    if (!(NextPosition.X == Position.X && NextPosition.Y == Position.Y))
-    {
-        BeginMoveTo(NextPosition);
-    }
-    // 순간이동 느낌
-    // if (!(FinalPosition.X == Position.X && FinalPosition.Y == Position.Y))
+    // if (!(NextPosition.X == Position.X && NextPosition.Y == Position.Y))
     // {
-    //     BeginMoveTo(FinalPosition);
+    //     BeginMoveTo(NextPosition);
     // }
+    // 순간이동 느낌
+    if (!(FinalPosition.X == Position.X && FinalPosition.Y == Position.Y))
+    {
+        BeginMoveTo(FinalPosition);
+    }
 }
 
 void Mimic::AddAttackCell(Vector Pos)

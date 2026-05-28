@@ -12,9 +12,11 @@
 #include "../KingSlime.h"
 #include "../OrcMage.h"
 #include"../Mimic.h"
+#include "../QueenSpider.h"
 #include "../Projectile.h"
 #include "MapManager.h"
 #include "StageManager.h"
+
 
 SceneManager::SceneManager()
 {
@@ -29,6 +31,9 @@ SceneManager::~SceneManager()
 
 void SceneManager::Tick(float DeltaTime)
 {
+	//타일테스트
+	MapManager::GetInstance()->Tick(DeltaTime);
+	
 	for (int i = 0; i < Objects.size(); ++i)
 	{
 		if (Objects[i] != nullptr && !Objects[i]->IsDestroy())
@@ -77,6 +82,7 @@ void SceneManager::EnsurePools()
 	ObjectPoolManager::GetInstance()->Preload<KingSlime>(1, 1);
 	ObjectPoolManager::GetInstance()->Preload<OrcMage>(1, 1);
 	ObjectPoolManager::GetInstance()->Preload<Mimic>(1, 1);
+	ObjectPoolManager::GetInstance()->Preload<QueenSpider>(1, 1);
 	ObjectPoolManager::GetInstance()->Preload<Dragon>(3, 1);
 	ObjectPoolManager::GetInstance()->Preload<Projectile>(10);
 	bPoolsInitialized = true;
@@ -136,20 +142,30 @@ void SceneManager::LoadCurrentStage()
 		spi->ConfigureForStage(monsterLevel);
 		spi->SetPosition(i * 3 + offset, i * 3 + offset);
 		spi->SetPrevPosition(i * 3 + offset, i * 3 + offset);
+		
+		Mimic* Mim = SpawnObject<Mimic>(monsterLevel);
+		Mim->ConfigureForStage(monsterLevel);
+		Mim->SetPosition(i * 3 + 1 + offset, i * 3 + 2 + offset);
+		Mim->SetPrevPosition(i * 3 + 1 + offset, i * 3 + 2 + offset);
 	}
   //보스테스트
 	Vector bossPosition = { min(MAP_MAX_X - 4, 28 + offset), min(MAP_MAX_Y - 4, 14 + offset) };
 	
 	if (stage == 0)
 	{
-		KingSlime* boss = SpawnObject<KingSlime>(monsterLevel + 2);
-		boss->ConfigureForStage(monsterLevel + 2, true);
-		boss->SetPosition(bossPosition);
-		boss->SetPrevPosition(bossPosition);
-		// Mimic* boss = SpawnObject<Mimic>(monsterLevel + 2);
+		// KingSlime* boss = SpawnObject<KingSlime>(monsterLevel + 2);
 		// boss->ConfigureForStage(monsterLevel + 2, true);
 		// boss->SetPosition(bossPosition);
 		// boss->SetPrevPosition(bossPosition);
+		
+		// QueenSpider* boss = SpawnObject<QueenSpider>(monsterLevel + 2);
+		// boss->ConfigureForStage(monsterLevel + 2, true);
+		// boss->SetPosition(bossPosition);
+		// boss->SetPrevPosition(bossPosition);
+		Dragon* boss = SpawnObject<Dragon>(monsterLevel + 2);
+		boss->ConfigureForStage(monsterLevel + 2, true);
+		boss->SetPosition(bossPosition);
+		boss->SetPrevPosition(bossPosition);
 	}
 	else if (stage == 1)
 	{
