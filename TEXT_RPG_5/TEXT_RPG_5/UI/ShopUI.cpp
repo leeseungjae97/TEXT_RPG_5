@@ -58,7 +58,7 @@ void ShopUI::Render()
 	DrawBackground(y - 2, x - 3, panelWidth + 6, panelHeight + 6);
 	DrawItemPanel(y, x, items, bSellMode ? L"Inventory" : L"Shop");
 
-	Renderer->AddRender(y - 1, x, L"(Z)구매/판매  (E)모드전환  (ESC)닫기");
+	Renderer->AddRender(y - 1, x, L"(Z)구매/판매  (C)모드전환  (ESC)닫기");
 }
 
 void ShopUI::DrawBackground(int Y, int X, int Width, int Height)
@@ -105,6 +105,10 @@ void ShopUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem* Item
 	Renderer->PutCell(Y + 2, X + Width / 2, GetItemIcon(Item), Renderer->MakeConsoleAttribute(iconColor));
 
 	wstring itemName = Renderer->ToWideString(itemInfo.Name);
+	if (itemInfo.Type == ItemType::Equipment && Item->GetEnhancementCount() > 0)
+	{
+		itemName += L" +" + to_wstring(Item->GetEnhancementCount());
+	}
 	int maxNameWidth = max(1, Width - 2);
 	if (Renderer->GetTextDisplayWidth(itemName) > maxNameWidth)
 	{

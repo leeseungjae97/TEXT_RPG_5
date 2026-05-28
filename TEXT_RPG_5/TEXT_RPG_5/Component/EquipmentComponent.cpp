@@ -97,6 +97,7 @@ void UEquipmentComponent::ApplyEquipEffect(UItem* Item)
     case StatType::HP:    PlayerPtr->SetHP(PlayerPtr->GetHP() + Amount);          break;
     case StatType::MaxHP: PlayerPtr->SetMax_HP(PlayerPtr->GetMax_HP() + Amount);  break;
     case StatType::Power: PlayerPtr->SetPower(PlayerPtr->GetPower() + Amount);    break;
+    case StatType::MovementSpeed: PlayerPtr->SetMovementSpeed(PlayerPtr->GetMovementSpeed() + Amount);    break;
     default: break;
     }
 }
@@ -112,6 +113,8 @@ void UEquipmentComponent::RemoveEquipEffect(UItem* Item)
     case StatType::HP:    PlayerPtr->SetHP(PlayerPtr->GetHP() - Amount);          break;
     case StatType::MaxHP: PlayerPtr->SetMax_HP(PlayerPtr->GetMax_HP() - Amount);  break;
     case StatType::Power: PlayerPtr->SetPower(PlayerPtr->GetPower() - Amount);    break;
+    case StatType::MovementSpeed: PlayerPtr->SetMovementSpeed(PlayerPtr->GetMovementSpeed() - Amount);    break;
+
     default: break;
     }
 }

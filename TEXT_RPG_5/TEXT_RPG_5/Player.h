@@ -30,6 +30,7 @@ public:
 	int GetMax_Exp();
 	int GetGold();
 	bool GetIsAttack();
+	float GetMovementSpeed() { return this->TotalStat.MovementSpeed; }
 	
 	void TakeDamage(int damage);
 	bool IsDead();
@@ -44,6 +45,7 @@ public:
 	void SetMax_Exp(int Max_Exp);
 	void SetGold(int Gold);
 	void SetIsAttack(bool Value);
+	float SetMovementSpeed(float Speed) { return this->TotalStat.MovementSpeed = Speed; }
 
 public:
 	virtual void BeginPlay(){}

@@ -16,10 +16,10 @@ namespace ItemDB
 	const FItemInfo DRAGON_HEART    = { "용의 심장",   ItemType::Usable,    ItemId::DRAGON_HEART,    1000, 200, StatType::HP,    EquipmentType::NONE   };
 	const FItemInfo LEATHER_HELMET  = { "가죽 모자",   ItemType::Equipment, ItemId::LEATHER_HELMET,  100,  25,  StatType::MaxHP, EquipmentType::Head   };
 	const FItemInfo LEATHER_ARMOR   = { "가죽 갑옷",   ItemType::Equipment, ItemId::LEATHER_ARMOR,   300,  50,  StatType::MaxHP, EquipmentType::Body   };
-	const FItemInfo LEATHER_BOOTS   = { "가죽 장화",   ItemType::Equipment, ItemId::LEATHER_BOOTS,   100,  25,  StatType::MaxHP, EquipmentType::Boots  };
+	const FItemInfo EXPLORER_BOOTS   = { "탐험가의 부츠",   ItemType::Equipment, ItemId::EXPLORER_BOOTS,   100,  30,  StatType::MovementSpeed, EquipmentType::Boots  };
 	const FItemInfo PLATE_HELMET    = { "플레이트 투구", ItemType::Equipment, ItemId::PLATE_HELMET,   400,  60,  StatType::MaxHP, EquipmentType::Head   };
 	const FItemInfo PLATE_ARMOR     = { "플레이트 갑옷", ItemType::Equipment, ItemId::PLATE_ARMOR,    900,  120, StatType::MaxHP, EquipmentType::Body   };
-	const FItemInfo PLATE_BOOTS     = { "플레이트 장화", ItemType::Equipment, ItemId::PLATE_BOOTS,    400,  60,  StatType::MaxHP, EquipmentType::Boots  };
+	const FItemInfo BOOTS_OF_WIND     = { "바람의 부츠", ItemType::Equipment, ItemId::BOOTS_OF_WIND,    400,  50,  StatType::MovementSpeed, EquipmentType::Boots  };
 
 	const FItemInfo FIRE_WALL_SCROLL     = { "불기둥 주문서",  ItemType::Usable,    ItemId::FIRE_WALL_SCROLL,    120,  80,  StatType::None,  EquipmentType::NONE   };
 	const FItemInfo LIGHTNING_STRIKE_SCROLL       = { "전격 주문서", ItemType::Usable,   ItemId::LIGHTNING_STRIKE_SCROLL,      200,  60,  StatType::None,  EquipmentType::NONE   };
@@ -39,10 +39,10 @@ namespace ItemDB
 		{ "용의 심장",    ItemType::Usable,    ItemId::DRAGON_HEART,    1000, 200, StatType::HP,    EquipmentType::NONE   }, //10
 		{ "가죽 모자",    ItemType::Equipment, ItemId::LEATHER_HELMET,  100,  25,  StatType::MaxHP, EquipmentType::Head   }, //11
 		{ "가죽 갑옷",    ItemType::Equipment, ItemId::LEATHER_ARMOR,   300,  50,  StatType::MaxHP, EquipmentType::Body   }, //12
-		{ "가죽 장화",    ItemType::Equipment, ItemId::LEATHER_BOOTS,   100,  25,  StatType::MaxHP, EquipmentType::Boots  }, //13
+		{ "탐험가의 부츠",    ItemType::Equipment, ItemId::EXPLORER_BOOTS,   100,  30,  StatType::MovementSpeed, EquipmentType::Boots  }, //13
 		{ "플레이트 투구", ItemType::Equipment, ItemId::PLATE_HELMET,   400,  60,  StatType::MaxHP, EquipmentType::Head   }, //14
 		{ "플레이트 갑옷", ItemType::Equipment, ItemId::PLATE_ARMOR,    900,  120, StatType::MaxHP, EquipmentType::Body   }, //15
-		{ "플레이트 장화", ItemType::Equipment, ItemId::PLATE_BOOTS,    400,  60,  StatType::MaxHP, EquipmentType::Boots  }, //16
+		{ "바람의 부츠", ItemType::Equipment, ItemId::BOOTS_OF_WIND,    400,  50,  StatType::MovementSpeed, EquipmentType::Boots  }, //16
 		{ "불기둥 주문서",  ItemType::Usable,    ItemId::FIRE_WALL_SCROLL,    120,  80,  StatType::None,  EquipmentType::NONE   }, //17
 		{ "전격 주문서", ItemType::Usable,   ItemId::LIGHTNING_STRIKE_SCROLL,      200,  60,  StatType::None,  EquipmentType::NONE   }, //18
 		{ "불의 영약",   ItemType::Usable,   ItemId::FLAME_POTION,     350,  40,  StatType::None,  EquipmentType::NONE   }, //19

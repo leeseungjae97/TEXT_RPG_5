@@ -60,7 +60,7 @@ vector<FItemWeight> Orc::GetDropTable()
 		{ ItemId::STRENGTH_POTION, 20},
 		{ ItemId::PLATE_HELMET, 1},
 		{ ItemId::PLATE_ARMOR, 1},
-		{ ItemId::PLATE_BOOTS, 10},
+		{ ItemId::BOOTS_OF_WIND, 10},
 		{ ItemId::AXE, 30}
 		
 		};

@@ -8,6 +8,7 @@
 #include "../Manager/InputManager.h"
 #include "../Manager/ShopManager.h"
 #include "../Manager/CraftingManager.h"
+#include "../Manager/EnhancementManager.h"
 #include "../Manager/ChestManager.h"
 #include "../Manager/MapManager.h"
 #include "../Manager/ItemManager.h"
@@ -89,6 +90,8 @@ bool UInventoryComponent::OpenChest()
 
     OpenInventory();
     bOnEquipment = false;
+    bOnCrafting = false;
+    bOnEnhancement = false;
     bOnChest = true;
     bChestPanel = false;
     bChestPromptDismissed = false;
@@ -116,6 +119,7 @@ void UInventoryComponent::CloseInventory()
     bOpenedInventory = false;
     bOnEquipment = false;
     bOnCrafting = false;
+    bOnEnhancement = false;
     bOnChest = false;
     bChestPanel = false;
     if (bOnShop)
@@ -345,6 +349,12 @@ void UInventoryComponent::SelectCursor()
         return;
     }
 
+    if (bOnEnhancement)
+    {
+        EnhancementManager::GetInstance()->SelectCursor();
+        return;
+    }
+
     if (bOnChest)
     {
         ChestManager* Chest = ChestManager::GetInstance();
@@ -420,7 +430,9 @@ Vector UInventoryComponent::CursorUp()
 
 Vector UInventoryComponent::CursorDown()
 {
-    int MaxRows = bChestPanel ? ChestManager::GetInstance()->GetMaxRow() : (int)Container.size();
+    int MaxRows = bChestPanel ? ChestManager::GetInstance()->GetMaxRow() :
+        (bOnCrafting ? (int)CraftingManager::GetInstance()->GetContainerRef().size() :
+            (bOnEnhancement ? (int)EnhancementManager::GetInstance()->GetContainerRef().size() : (int)Container.size()));
     if (CurrentCursor.Y < MaxRows - 1)
         CurrentCursor.Y += 1;
 
@@ -476,7 +488,7 @@ Vector UInventoryComponent::CursorRight()
         bChestPanel = true;                       // 인벤토리 오른쪽 끝 -> 상자
         CurrentCursor = { 0, 0 };
     }
-    else if (!bOnShop && !bOnCrafting)
+    else if (!bOnShop && !bOnCrafting && !bOnEnhancement)
     {
         bOnEquipment = true;
         CurrentCursor = { 0, 0 };
@@ -560,7 +572,11 @@ bool UInventoryComponent::SetOnShop(bool OnShop)
 {
     bOnShop = OnShop;
     if (bOnShop)
+    {
+        bOnCrafting = false;
+        bOnEnhancement = false;
         CloseEquipmentPanel();
+    }
     else
         ShopManager::GetInstance()->SetSellMode(false);
     return bOnShop;
@@ -570,7 +586,11 @@ bool UInventoryComponent::ToggleOnShop()
 {
     bOnShop = !bOnShop;
     if (bOnShop)
+    {
+        bOnCrafting = false;
+        bOnEnhancement = false;
         CloseEquipmentPanel();
+    }
     else
         ShopManager::GetInstance()->SetSellMode(false);
     return bOnShop;
@@ -582,6 +602,8 @@ vector<vector<UItem*>>& UInventoryComponent::GetFocusedContainer()
         return ShopManager::GetInstance()->GetContainerRef();
     if (bOnCrafting)
         return CraftingManager::GetInstance()->GetContainerRef();
+    if (bOnEnhancement)
+        return EnhancementManager::GetInstance()->GetContainerRef();
     return Container;
 }
 
@@ -605,6 +627,13 @@ void UInventoryComponent::ToggleCrafting()
     if (bOnShop || bOnChest)
         return;
 
+    if (bOnEnhancement)
+    {
+        bOnEnhancement = false;
+        ResetCursor();
+        return;
+    }
+
     if (bOnCrafting)
     {
         bOnCrafting = false;
@@ -624,6 +653,43 @@ void UInventoryComponent::ToggleCrafting()
     if (Crafting->OpenCraftingFor(Material->GetItemInfo().Id))
     {
         bOnCrafting = true;
+        bOnEnhancement = false;
+        ResetCursor();
+    }
+}
+
+void UInventoryComponent::ToggleEnhancement()
+{
+    if (bOnShop || bOnChest)
+        return;
+
+    if (bOnCrafting)
+    {
+        bOnCrafting = false;
+        ResetCursor();
+        return;
+    }
+
+    if (bOnEnhancement)
+    {
+        bOnEnhancement = false;
+        ResetCursor();
+        return;
+    }
+
+    if (bOnEquipment)
+        return;
+
+    UItem* Target = GetItem(GetCursor());
+    if (Target == nullptr || Target->GetItemInfo().Type != ItemType::Equipment)
+        return;
+
+    EnhancementManager* Enhancement = EnhancementManager::GetInstance();
+    Enhancement->SetPlayerInventory(this);
+    if (Enhancement->OpenEnhancementFor(Target))
+    {
+        bOnCrafting = false;
+        bOnEnhancement = true;
         ResetCursor();
     }
 }
@@ -697,6 +763,9 @@ void UInventoryComponent::Tick(float DeltaTime)
     //크래프팅 모드 전환/복귀 (커서 아이템을 재료로 쓰는 레시피 나열)
     if (Input->IsKeyTap(KeyCode::A)) ToggleCrafting();
 
+    //강화 모드 전환/복귀 (커서 장비와 같은 장비만 재료로 나열)
+    if (!bOnShop && Input->IsKeyTap(KeyCode::C)) ToggleEnhancement();
+
     //장비 아이템 지급(디버그용)
     if (Input->IsKeyTap(KeyCode::B))
     {
@@ -706,10 +775,10 @@ void UInventoryComponent::Tick(float DeltaTime)
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::STAFF));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_HELMET));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_ARMOR));
-        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_BOOTS));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::EXPLORER_BOOTS));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_HELMET));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_ARMOR));
-        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_BOOTS));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::BOOTS_OF_WIND));
     }
 
     //추가 아이템 지급 소모품 및 골드
@@ -735,7 +804,7 @@ void UInventoryComponent::Tick(float DeltaTime)
     
     //아이템 버리기
     bool bBuyMode = bOnShop && !ShopManager::GetInstance()->GetSellMode();
-    if (Input->IsKeyTap(KeyCode::X) && !bOnEquipment && !bBuyMode && !bOnCrafting && !bOnChest)
+    if (Input->IsKeyTap(KeyCode::X) && !bOnEquipment && !bBuyMode && !bOnCrafting && !bOnEnhancement && !bOnChest)
     {
         RemoveItem(GetItem(GetCursor()));
     }

@@ -33,6 +33,29 @@ UItem* ItemManager::CreateRandomItem(const vector<FItemWeight>& Pool)
     return nullptr;
 }
 
+UItem* ItemManager::CreateRandomItemWithRarity(const vector<FItemWeight>& Pool, ERarity Rarity)
+{
+    int Total = 0;
+    for (const FItemWeight& Entry : Pool)
+        Total += Entry.Weight;
+
+    if (Total <= 0)
+    {
+        return nullptr;
+    }
+
+    int Roll = rand() % Total;
+    int Acc = 0;
+    for (const FItemWeight& Entry : Pool)
+    {
+        Acc += Entry.Weight;
+        if (Roll < Acc)
+            return CreateItemWithRarity(Entry.Id, Rarity);
+    }
+
+    return nullptr;
+}
+
 ERarity ItemManager::RollEquipmentRarity()
 {
     int Roll = rand() % 100;   // 0~99
@@ -49,6 +72,18 @@ UItem* ItemManager::CreateItem(ItemId Id)
     if (Item != nullptr && Item->GetItemInfo().Type == ItemType::Equipment)
     {
         Item->SetRarity(RollEquipmentRarity());
+    }
+
+    return Item;
+}
+
+UItem* ItemManager::CreateItemWithRarity(ItemId Id, ERarity Rarity)
+{
+    UItem* Item = CreateBaseItem(Id);
+
+    if (Item != nullptr)
+    {
+        Item->SetRarity(Rarity);
     }
 
     return Item;
@@ -106,8 +141,8 @@ UItem* ItemManager::CreateBaseItem(ItemId Id)
     case ItemId::LEATHER_ARMOR:
         return new EquipmentItem(ItemDB::LEATHER_ARMOR);
 
-    case ItemId::LEATHER_BOOTS:
-        return new EquipmentItem(ItemDB::LEATHER_BOOTS);
+    case ItemId::EXPLORER_BOOTS:
+        return new EquipmentItem(ItemDB::EXPLORER_BOOTS);
 
     case ItemId::PLATE_HELMET:
         return new EquipmentItem(ItemDB::PLATE_HELMET);
@@ -115,8 +150,8 @@ UItem* ItemManager::CreateBaseItem(ItemId Id)
     case ItemId::PLATE_ARMOR:
         return new EquipmentItem(ItemDB::PLATE_ARMOR);
 
-    case ItemId::PLATE_BOOTS:
-        return new EquipmentItem(ItemDB::PLATE_BOOTS);
+    case ItemId::BOOTS_OF_WIND:
+        return new EquipmentItem(ItemDB::BOOTS_OF_WIND);
 
     default:
         return nullptr;

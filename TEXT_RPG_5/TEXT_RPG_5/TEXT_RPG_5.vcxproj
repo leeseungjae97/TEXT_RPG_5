@@ -1147,6 +1147,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Manager\CraftingManager.cpp" />
+    <ClCompile Include="Manager\EnhancementManager.cpp" />
     <ClCompile Include="Manager\ChestManager.cpp" />
     <ClCompile Include="Manager\InputManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1793,7 +1794,6 @@
     <ClInclude Include="Enum\ComponentTypeEnum.h" />
     <ClInclude Include="Enum\Direction.h" />
     <ClInclude Include="Enum\ItemTypeEnum.h" />
-    <ClInclude Include="Enum\OverlayTileType.h" />
     <ClInclude Include="Enum\StatType.h" />
     <ClInclude Include="Enum\MapObjectTypeEnum.h" />
     <ClInclude Include="Enum\WeaponType.h" />
@@ -1808,6 +1808,7 @@
     <ClInclude Include="KingSlime.h" />
     <ClInclude Include="Manager\BattleManager.h" />
     <ClInclude Include="Manager\CraftingManager.h" />
+    <ClInclude Include="Manager\EnhancementManager.h" />
     <ClInclude Include="Manager\ChestManager.h" />
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\ItemManager.h" />
@@ -1840,7 +1841,6 @@
     <ClInclude Include="Spider.h" />
     <ClInclude Include="Struct\ItemInfo.h" />
     <ClInclude Include="Struct\ItemWeight.h" />
-    <ClInclude Include="Struct\OverlayTile.h" />
     <ClInclude Include="Struct\Recipe.h" />
     <ClInclude Include="Struct\Buff.h" />
     <ClInclude Include="Struct\R2Config.h" />

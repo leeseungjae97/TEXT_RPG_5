@@ -10,6 +10,7 @@ enum class StatType
     MaxExp,
     Level,
     Gold,
+    MovementSpeed,
     
     Max
 };

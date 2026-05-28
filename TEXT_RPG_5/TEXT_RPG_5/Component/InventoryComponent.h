@@ -39,6 +39,7 @@ protected:
 	bool bOnEquipment = false;
 	bool bOpenedInventory = false;
 	bool bOnCrafting = false;
+	bool bOnEnhancement = false;
 	bool bOnChest = false;       // 상자 열림 (인벤토리와 나란히 표시)
 	bool bChestPanel = false;    // 커서가 상자 그리드에 있는지 (false면 인벤토리 그리드)
 	bool bWasOnChest = false;
@@ -98,9 +99,11 @@ public:
 	void SellItem(UItem* Item);
 
 	void ToggleCrafting();
+	void ToggleEnhancement();
 	void ChestOpenWithUI();
 	void DismissChestPrompt();
 	bool GetOnCrafting(){return bOnCrafting;}
+	bool GetOnEnhancement(){return bOnEnhancement;}
 
 	bool IsChestAdjust();
 	bool OpenChest();   // 인접한 상자를 열면 true, 없으면 false

@@ -19,9 +19,9 @@ private:
 	void QuickSlotRender();
 	void DrawBackground(int Y, int X, int Width, int Height);
 	void DrawItemSlot(int Y, int X, int Width, int Height, const UItem* item, bool bSelected = false);
-	void DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title);
+	void DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title, int SlotWidth, int SlotHeight);
 	void DrawEquipmentPanel(int Y, int X);
-	void DrawChestPanel(int Y, int X);
+	void DrawChestPanel(int Y, int X, int SlotWidth, int SlotHeight);
 	void DrawHoverDialog(int Y, int X, const UItem* item);
 	wchar_t GetItemIcon(const UItem* item);
 	

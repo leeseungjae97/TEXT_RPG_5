@@ -10,6 +10,7 @@
 #include "Manager/InputManager.h"
 #include "Manager/ShopManager.h"
 #include "Manager/CraftingManager.h"
+#include "Manager/EnhancementManager.h"
 #include "Manager/ChestManager.h"
 #include "Manager/StageManager.h"
 #include "Player.h"
@@ -48,6 +49,7 @@ void GameInstance::BeginPlay()
 	TimeManager::GetInstance()->BeginPlay();
 	
 	ShopManager::GetInstance()->BeginPlay();
+	EnhancementManager::GetInstance()->BeginPlay();
 	StageManager::GetInstance()->BeginPlay();
 	ChestManager::GetInstance()->BeginPlay();
 	MapManager::GetInstance()->BeginPlay();
@@ -434,6 +436,7 @@ void GameInstance::ResetGameWorld()
 	ShopManager::GetInstance()->ResetRuntimeCache();
 	ShopManager::GetInstance()->RestoreShop();
 	CraftingManager::GetInstance()->ResetRuntimeCache();
+	EnhancementManager::GetInstance()->ResetRuntimeCache();
 	ChestManager::GetInstance()->ResetRuntimeCache();
 	BattleManager::GetInstance()->Reset();
 	StageManager::GetInstance()->Reset();
@@ -446,6 +449,7 @@ void GameInstance::ResetGameWorld()
 void GameInstance::RestartGame()
 {
 	ShopManager::GetInstance()->BeginPlay();
+	EnhancementManager::GetInstance()->BeginPlay();
 	StageManager::GetInstance()->BeginPlay();
 	ChestManager::GetInstance()->BeginPlay();
 	MapManager::GetInstance()->BeginPlay();

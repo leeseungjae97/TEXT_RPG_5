@@ -12,7 +12,7 @@ static const vector<FRecipe> RecipeBook =
 {
     { ItemId::LEATHER_ARMOR,  { ItemId::GOBLIN_LEATHER, ItemId::GOBLIN_LEATHER } },
     { ItemId::LEATHER_HELMET, { ItemId::GOBLIN_LEATHER, ItemId::SLIME_JELLY } },
-    { ItemId::LEATHER_BOOTS,  { ItemId::GOBLIN_LEATHER, ItemId::ORC_TUSK } },
+    { ItemId::EXPLORER_BOOTS,  { ItemId::GOBLIN_LEATHER, ItemId::ORC_TUSK } },
     { ItemId::AXE,            { ItemId::ORC_TUSK, ItemId::LONGSWORD } },
     { ItemId::FLAME_POTION,   { ItemId::SPIDER_EYE, ItemId::STRENGTH_POTION } },
     { ItemId::PLATE_HELMET,   { ItemId::ORC_TUSK, ItemId::GOBLIN_LEATHER, ItemId::SLIME_JELLY } },
@@ -34,7 +34,7 @@ void CraftingManager::ClearContainer()
 {
     for (int y = 0; y < (int)Container.size(); ++y)
     {
-        for (int x = 0; x < MaxColumn; ++x)
+        for (int x = 0; x < (int)Container[y].size(); ++x)
         {
             delete Container[y][x];
             Container[y][x] = nullptr;
@@ -106,7 +106,6 @@ bool CraftingManager::HasIngredients(const FRecipe& Recipe)
 
     return true;
 }
-
 
 bool CraftingManager::OpenCraftingFor(ItemId Material)
 {

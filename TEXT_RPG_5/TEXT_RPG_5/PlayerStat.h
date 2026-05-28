@@ -11,5 +11,6 @@ struct PlayerStat
 	int Exp;
 	int Max_Exp;
 	int Gold;
+	float MovementSpeed = 100;
 	bool IsAttack;
 };
