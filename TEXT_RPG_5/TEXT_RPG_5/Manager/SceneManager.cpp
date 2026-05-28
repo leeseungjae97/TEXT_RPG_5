@@ -9,6 +9,7 @@
 #include "../Slime.h"
 #include "../Spider.h"
 #include "../Dragon.h"
+#include "../KingSlime.h"
 #include "../Projectile.h"
 #include "MapManager.h"
 #include "StageManager.h"
@@ -71,6 +72,7 @@ void SceneManager::EnsurePools()
 	ObjectPoolManager::GetInstance()->Preload<Orc>(10, 1);
 	ObjectPoolManager::GetInstance()->Preload<Slime>(10, 1);
 	ObjectPoolManager::GetInstance()->Preload<Spider>(10, 1);
+	ObjectPoolManager::GetInstance()->Preload<KingSlime>(1, 1);
 	ObjectPoolManager::GetInstance()->Preload<Dragon>(3, 1);
 	ObjectPoolManager::GetInstance()->Preload<Projectile>(10);
 	bPoolsInitialized = true;
@@ -131,12 +133,36 @@ void SceneManager::LoadCurrentStage()
 		spi->SetPosition(i * 3 + offset, i * 3 + offset);
 		spi->SetPrevPosition(i * 3 + offset, i * 3 + offset);
 	}
-
-	Dragon* boss = SpawnObject<Dragon>(monsterLevel + 2);
-	boss->ConfigureForStage(monsterLevel + 2, true);
+  //보스테스트
 	Vector bossPosition = { min(MAP_MAX_X - 4, 28 + offset), min(MAP_MAX_Y - 4, 14 + offset) };
-	boss->SetPosition(bossPosition);
-	boss->SetPrevPosition(bossPosition);
+	
+	if (stage == 0)
+	{
+		KingSlime* boss = SpawnObject<KingSlime>(monsterLevel + 2);
+		boss->ConfigureForStage(monsterLevel + 2, true);
+		boss->SetPosition(bossPosition);
+		boss->SetPrevPosition(bossPosition);
+	}
+	else if (stage == 1)
+	{
+		Dragon* boss = SpawnObject<Dragon>(monsterLevel + 2);
+		boss->ConfigureForStage(monsterLevel + 2, true);
+		boss->SetPosition(bossPosition);
+		boss->SetPrevPosition(bossPosition);
+	}
+	else
+	{
+		Dragon* boss = SpawnObject<Dragon>(monsterLevel + 2);
+		boss->ConfigureForStage(monsterLevel + 2, true);
+		boss->SetPosition(bossPosition);
+		boss->SetPrevPosition(bossPosition);
+	}
+	
+	// Dragon* boss = SpawnObject<Dragon>(monsterLevel + 2);
+	// boss->ConfigureForStage(monsterLevel + 2, true);
+	// Vector bossPosition = { min(MAP_MAX_X - 4, 28 + offset), min(MAP_MAX_Y - 4, 14 + offset) };
+	// boss->SetPosition(bossPosition);
+	// boss->SetPrevPosition(bossPosition);
 }
 
 void SceneManager::Reset()

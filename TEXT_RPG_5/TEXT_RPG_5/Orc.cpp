@@ -32,7 +32,7 @@ Orc::Orc(int playerLevel)
 	TrySetShiny();
 }
 
-void Orc::Attackplayer(Player* player)
+void Orc::BuildAttackValue(Player* player)
 {
 	if (player == nullptr)
 	{
@@ -50,13 +50,6 @@ void Orc::Attackplayer(Player* player)
 			AttackValue.push_back({ playerPosition.X + x, playerPosition.Y + y });
 		}
 	}
-	
-	AttackVisibleTime = AttackVisibleDuration;
-	
-	player->TakeDamage(Attack);
-	
-	AttackElapsedtime = 0.0f;
-	
 }
 
 vector<FItemWeight> Orc::GetDropTable()

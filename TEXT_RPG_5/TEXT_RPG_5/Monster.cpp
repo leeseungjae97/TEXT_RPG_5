@@ -37,6 +37,9 @@ Monster::Monster()
 	AttackInterval = 1.5f;
 	AttackVisibleTime = 0.0f;
 	AttackVisibleDuration = 0.18f;
+	AttackTelegraphElapsedTime = 0.0f;
+	AttackTelegraphDuration = 0.6f;
+	bAttackTelegraphActive = false;
 }
 
 Monster::~Monster()
@@ -96,12 +99,43 @@ bool Monster::IsDead()
 	return Health <= 0;
 }
 
+void Monster::TransitionAttackTelegraphToAttack(float DeltaTime)
+{
+	if (bAttackTelegraphActive)
+	{
+		AttackTelegraphElapsedTime += DeltaTime * GetSlowRatio();
+		AttackVisibleTime = max(AttackTelegraphDuration - AttackTelegraphElapsedTime, 0.0f);
+		if (AttackTelegraphElapsedTime >= AttackTelegraphDuration)
+		{
+			ExecutePendingAttack(SceneManager::GetInstance()->GetPlayer());
+			bAttackTelegraphActive = false;
+			AttackTelegraphElapsedTime = 0.0f;
+			AttackVisibleTime = AttackVisibleDuration;
+		}
+	}
+	else if (AttackVisibleTime > 0.0f)
+	{
+		AttackVisibleTime -= DeltaTime;
+		if (AttackVisibleTime <= 0.0f)
+		{
+			AttackVisibleTime = 0.0f;
+			AttackValue.clear();
+		}
+	}
+}
+
 void Monster::Tick(float DeltaTime)
 {
 	AObject::Tick(DeltaTime);
 
 	if (IsDead())
 	{
+		//부활테스트
+		if (Revive())
+		{
+			return;
+		}
+		
 		Destroy();
 		return;
 	}
@@ -113,18 +147,9 @@ void Monster::Tick(float DeltaTime)
 		CommitMoveIfNeeded(GetMoveAlpha());
 	}
 
-	if (AttackVisibleTime > 0.0f)
-	{
-		AttackVisibleTime -= DeltaTime;
-		if (AttackVisibleTime <= 0.0f)
-		{
-			AttackVisibleTime = 0.0f;
-			AttackValue.clear();
-		}
-	}
+	TransitionAttackTelegraphToAttack(DeltaTime);
 	
 	Player* player = SceneManager::GetInstance()->GetPlayer();
-	//Player* player = FindPlayer();
 	
 	if (player == nullptr)
 	{
@@ -132,6 +157,11 @@ void Monster::Tick(float DeltaTime)
 	}
 	
 	if (player->IsDead())
+	{
+		return;
+	}
+
+	if (bAttackTelegraphActive)
 	{
 		return;
 	}
@@ -199,6 +229,10 @@ void Monster::OnSpawnFromPool()
 	AObject::OnSpawnFromPool();
 	Health = MaxHealth;
 	bIsBoss = false;
+	AttackValue.clear();
+	AttackVisibleTime = 0.0f;
+	AttackTelegraphElapsedTime = 0.0f;
+	bAttackTelegraphActive = false;
 }
 
 void Monster::OnReturnToPool()
@@ -525,11 +559,35 @@ bool Monster::CanAttackplayer(Player* player)
 	{
 		return false;
 	}
+
+	if (bAttackTelegraphActive)
+	{
+		return false;
+	}
 	
 	return true;
 }
 
 void Monster::Attackplayer(Player* player)
+{
+	if (player == nullptr)
+	{
+		return;
+	}
+
+	BuildAttackValue(player);
+	if (AttackValue.empty())
+	{
+		return;
+	}
+
+	bAttackTelegraphActive = true;
+	AttackTelegraphElapsedTime = 0.0f;
+	AttackVisibleTime = AttackTelegraphDuration;
+	AttackElapsedtime = 0.0f;
+}
+
+void Monster::BuildAttackValue(Player* player)
 {
 	if (player == nullptr)
 	{
@@ -543,11 +601,24 @@ void Monster::Attackplayer(Player* player)
 	AttackValue.push_back({ playerPosition.X + 1, playerPosition.Y });
 	AttackValue.push_back({ playerPosition.X, playerPosition.Y - 1 });
 	AttackValue.push_back({ playerPosition.X, playerPosition.Y + 1 });
-	AttackVisibleTime = AttackVisibleDuration;
-	
-	player -> TakeDamage(Attack);
-	
-	AttackElapsedtime = 0.0f;
+}
+
+void Monster::ExecutePendingAttack(Player* player)
+{
+	if (player == nullptr || player->IsDead())
+	{
+		return;
+	}
+
+	const Vector PlayerPosition = player->GetPosition();
+	for (const Vector& AttackPosition : AttackValue)
+	{
+		if (AttackPosition.X == PlayerPosition.X && AttackPosition.Y == PlayerPosition.Y)
+		{
+			player->TakeDamage(Attack);
+			return;
+		}
+	}
 }
 
 bool Monster::IsShiny() const
@@ -615,7 +686,7 @@ void Monster::ConfigureForStage(int InLevel, bool InBoss)
 
 void Monster::TrySetShiny()
 {
-	if (rand() % 3 == 0)
+	if (rand() % 100 == 0)
 	{
 		bIsShiny = true;
 		

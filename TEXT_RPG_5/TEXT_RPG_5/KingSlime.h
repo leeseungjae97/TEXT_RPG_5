@@ -2,12 +2,16 @@
 
 #include "Monster.h"
 
-class Spider : public Monster
+class KingSlime : public Monster
 {
-public: 
-    Spider(int PlayerLevel);
+public:
+    KingSlime(int Playerlevel);
     
 protected:
     virtual void BuildAttackValue(Player* player) override;
     virtual vector<FItemWeight> GetDropTable() override;
+    
+private:
+    void GroundAttack(Player* player);
+    void CrossAttack(Player* player);
 };

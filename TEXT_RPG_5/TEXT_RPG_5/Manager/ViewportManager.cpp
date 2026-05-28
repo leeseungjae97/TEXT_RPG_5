@@ -849,6 +849,30 @@ void ViewportManager::Render2DtoISO()
 					renderManager->PutCell(iso.Y, iso.X + 1, L'>', attribute);
 				};
 
+			auto drawAttackTelegraphTile = [&](const Vector& attackPosition)
+				{
+					if (fabsf(static_cast<float>(attackPosition.X) - cameraPosition.X) > viewRadiusX ||
+						fabsf(static_cast<float>(attackPosition.Y) - cameraPosition.Y) > viewRadiusY)
+					{
+						return;
+					}
+
+					Vector iso = WorldToIso(
+						static_cast<float>(attackPosition.X) - cameraPosition.X,
+						static_cast<float>(attackPosition.Y) - cameraPosition.Y,
+						originX,
+						originY
+					);
+
+					WORD outlineAttribute = MakeAttribute(StageManager::GetInstance()->GetCrystalColor());
+					WORD shineAttribute = MakeAttribute(CC_WHITE);
+					drawIsoDiamond(iso, outlineAttribute);
+					renderManager->PutCell(iso.Y - 2, iso.X, L'*', shineAttribute);
+					renderManager->PutCell(iso.Y, iso.X - 8, L'*', shineAttribute);
+					renderManager->PutCell(iso.Y, iso.X + 8, L'*', shineAttribute);
+					renderManager->PutCell(iso.Y + 1, iso.X, L'*', shineAttribute);
+				};
+
 			auto drawAttackTile = [&](const Vector& attackPosition, int color, WeaponType weaponType)
 				{
 					if (fabsf(static_cast<float>(attackPosition.X) - cameraPosition.X) > viewRadiusX ||
@@ -909,7 +933,14 @@ void ViewportManager::Render2DtoISO()
 
 				for (const Vector& attackPosition : monster->GetAttackValue())
 				{
-					drawAttackTile(attackPosition, CC_MAGENTA, WeaponType::NONE);
+					if (monster->IsAttackTelegraphActive())
+					{
+						drawAttackTelegraphTile(attackPosition);
+					}
+					else
+					{
+						drawAttackTile(attackPosition, CC_MAGENTA, WeaponType::NONE);
+					}
 				}
 			}
 		};
@@ -1288,6 +1319,11 @@ void ViewportManager::Tick(float DeltaTime)
 		return;
 	}
 
+	if (InputManager::GetInstance()->IsKeyTap(KeyCode::N))
+	{
+		RenderMode = Is3DMode() ? ViewportRenderMode::ISO : ViewportRenderMode::ThreeD;
+	}
+
 	OpenBattleUI();
 	OpenExitDialog();
 }
@@ -1304,10 +1340,14 @@ void ViewportManager::Render()
 
 void ViewportManager::RenderObject()
 {	
-	// Render2Dto3D();
-	Render2DtoISO();
-	// if (bIso) Render2DtoISO();
-	// else      Render2Dto3D();
+	if (Is3DMode())
+	{
+		Render2Dto3D();
+	}
+	else
+	{
+		Render2DtoISO();
+	}
 }
 
 void ViewportManager::RenderUI()
@@ -1361,6 +1401,11 @@ void ViewportManager::Render2Dto3D()
 		PlayerPtr = SceneManager::GetInstance()->GetPlayer();
 	}
 
+	if (PlayerPtr == nullptr)
+	{
+		return;
+	}
+
 	float playerX = 1.0f;
 	float playerY = 1.0f;
 	float playerA = PI;
@@ -1376,7 +1421,7 @@ void ViewportManager::Render2Dto3D()
 			moveAlpha = moveComponent->GetMoveAlpha();
 		}
 
-		FVector playerPosition = InterpolatePosition(PlayerPtr->GetPrevPosition(), PlayerPtr->GetPosition(), moveAlpha);
+		FVector playerPosition = InterpolatePosition(PlayerPtr->GetPrevPosition(), GetRenderTargetPosition(PlayerPtr), moveAlpha);
 		playerX = playerPosition.X;
 		playerY = playerPosition.Y;
 
@@ -1548,7 +1593,9 @@ void ViewportManager::Render2Dto3D()
 	}
 
 	if (!combatComponent)
+	{
 		combatComponent = PlayerPtr->GetComponent<UCombatComponent>();
+	}
 	
 	if (combatComponent != nullptr && combatComponent->IsAttackVisible())
 	{
@@ -1560,4 +1607,6 @@ void ViewportManager::Render2Dto3D()
 		renderManager->PutCell(centerY, centerX + 1, L'-', MakeAttribute(CC_RED));
 		renderManager->PutCell(centerY + 1, centerX, L'|', MakeAttribute(CC_RED));
 	}
+
+	renderManager->AddRender(1, 1, L"3D");
 }
