@@ -58,7 +58,7 @@ void CraftingUI::Render()
 	UItem* hovered = CraftingManager::GetInstance()->GetItem(InventoryComponent->GetCursor());
 	DrawRecipeInfo(y, x + panelWidth + 4, hovered);
 
-	Renderer->AddRender(y - 1, x, L"(E)제작  (A/ESC)닫기");
+	Renderer->AddRender(y - 1, x, L"(Z)제작  (A/ESC)닫기");
 }
 
 void CraftingUI::DrawBackground(int Y, int X, int Width, int Height)

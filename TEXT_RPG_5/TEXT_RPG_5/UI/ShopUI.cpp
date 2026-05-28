@@ -7,6 +7,7 @@
 #include "../Manager/SceneManager.h"
 #include "../Manager/ShopManager.h"
 #include "../Player.h"
+#include "RarityColor.h"
 
 void ShopUI::ResetCache()
 {
@@ -111,7 +112,7 @@ void ShopUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem* Item
 	}
 
 	int nameX = X + 1 + max(0, (maxNameWidth - Renderer->GetTextDisplayWidth(itemName)) / 2);
-	Renderer->AddRender(Y + Height - 2, nameX, itemName);
+	Renderer->AddRender(Y + Height - 2, nameX, itemName, GetRarityColor(itemInfo.Rarity));
 }
 
 void ShopUI::DrawItemPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title)

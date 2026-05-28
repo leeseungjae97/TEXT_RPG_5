@@ -33,7 +33,28 @@ UItem* ItemManager::CreateRandomItem(const vector<FItemWeight>& Pool)
     return nullptr;
 }
 
+ERarity ItemManager::RollEquipmentRarity()
+{
+    int Roll = rand() % 100;   // 0~99
+    if (Roll < 1)  return ERarity::Unique;   // 2%
+    if (Roll < 10) return ERarity::Rare;     // 8%
+    return ERarity::Common;                  // 90%
+}
+
 UItem* ItemManager::CreateItem(ItemId Id)
+{
+    UItem* Item = CreateBaseItem(Id);
+
+    // 장비 아이템만 생성 시 1회 등급 부여
+    if (Item != nullptr && Item->GetItemInfo().Type == ItemType::Equipment)
+    {
+        Item->SetRarity(RollEquipmentRarity());
+    }
+
+    return Item;
+}
+
+UItem* ItemManager::CreateBaseItem(ItemId Id)
 {
     switch (Id)
     {

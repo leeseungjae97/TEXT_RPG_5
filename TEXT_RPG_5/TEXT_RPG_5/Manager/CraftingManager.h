@@ -31,6 +31,7 @@ private:
 
 public:
     void SetPlayerInventory(UInventoryComponent* Inventory);
+    void ResetRuntimeCache();
     void BeginPlay();
 
     vector<vector<UItem*>> GetContainer() {return Container;}

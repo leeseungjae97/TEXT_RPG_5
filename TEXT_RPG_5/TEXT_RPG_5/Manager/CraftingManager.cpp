@@ -49,6 +49,13 @@ void CraftingManager::SetPlayerInventory(UInventoryComponent* Inventory)
 }
 
 
+void CraftingManager::ResetRuntimeCache()
+{
+    ClearContainer();
+    PlayerInventory = nullptr;
+}
+
+
 void CraftingManager::BeginPlay()
 {
 }

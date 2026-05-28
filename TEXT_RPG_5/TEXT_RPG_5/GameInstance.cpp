@@ -9,6 +9,7 @@
 #include "Manager/SceneManager.h"
 #include "Manager/InputManager.h"
 #include "Manager/ShopManager.h"
+#include "Manager/CraftingManager.h"
 #include "Manager/StageManager.h"
 #include "Player.h"
 
@@ -429,6 +430,7 @@ void GameInstance::ResetGameWorld()
 	ViewportManager::GetInstance()->ResetRuntimeCache();
 	ShopManager::GetInstance()->ResetRuntimeCache();
 	ShopManager::GetInstance()->RestoreShop();
+	CraftingManager::GetInstance()->ResetRuntimeCache();
 	BattleManager::GetInstance()->Reset();
 	StageManager::GetInstance()->Reset();
 	SceneManager::GetInstance()->Reset();

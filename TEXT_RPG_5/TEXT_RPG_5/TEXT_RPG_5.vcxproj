@@ -1788,6 +1788,7 @@
     <ClInclude Include="Enum\MapObjectTypeEnum.h" />
     <ClInclude Include="Enum\WeaponType.h" />
     <ClInclude Include="Enum\BuffType.h" />
+    <ClInclude Include="Enum\RarityEnum.h" />
     <ClInclude Include="Item\AllItems.h" />
     <ClInclude Include="Item\EquipmentItem.h" />
     <ClInclude Include="Item\Item.h" />
@@ -1841,6 +1842,7 @@
     <ClInclude Include="UI\NameInputUI.h" />
       <ClInclude Include="UI\ShopUI.h" />
       <ClInclude Include="UI\CraftingUI.h" />
+      <ClInclude Include="UI\RarityColor.h" />
       <ClInclude Include="UI\HUDUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

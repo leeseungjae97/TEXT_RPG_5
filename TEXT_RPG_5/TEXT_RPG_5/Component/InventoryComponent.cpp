@@ -423,11 +423,11 @@ void UInventoryComponent::ClearQuickSlot(UItem* Item)
 
 bool UInventoryComponent::BuyItem(UItem* Item)
 {
-    if (Gold >= Item->GetItemInfo().Price)
+    if (Gold >= Item->GetPrice())
     {
         if (AddItem(Item))
         {
-            AddGold(-(Item->GetItemInfo().Price));
+            AddGold(-(Item->GetPrice()));
             return true;
         }
     }
@@ -440,7 +440,7 @@ bool UInventoryComponent::BuyItem(UItem* Item)
 void UInventoryComponent::SellItem(UItem* Item)
 {
     if (Item == nullptr) return;
-    int Price = Item->GetItemInfo().Price;
+    int Price = Item->GetPrice();
     if (RemoveItem(Item))
         AddGold(Price / 2);
 }

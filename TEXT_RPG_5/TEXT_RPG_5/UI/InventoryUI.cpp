@@ -7,9 +7,10 @@
 #include "../Manager/SceneManager.h"
 #include "../Player.h"
 #include "../Item/Item.h"
+#include "RarityColor.h"
 
 
-InventoryUI::InventoryUI() 
+InventoryUI::InventoryUI()
 	: PlayerPtr(nullptr), InventoryComponent(nullptr), Renderer(nullptr)
 {
 }
@@ -164,7 +165,7 @@ void InventoryUI::DrawItemSlot(int Y, int X, int Width, int Height, const UItem*
 	}
 	
 	int nameX = X + 1 + max(0, (maxNameWidth - Renderer->GetTextDisplayWidth(itemName)) / 2);
-	Renderer->AddRender(Y + Height - 2, nameX, itemName);
+	Renderer->AddRender(Y + Height - 2, nameX, itemName, GetRarityColor(ItemInfo.Rarity));
 }
 
 void InventoryUI::DrawInventoryPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title)
@@ -307,11 +308,16 @@ void InventoryUI::DrawHoverDialog(int Y, int X, const UItem* item)
 	}
 
 	Renderer->PutCell(Y + 1, X + 2, GetItemIcon(item), Renderer->MakeConsoleAttribute(CC_YELLOW));
-	Renderer->AddRender(Y + 1, X + 4, itemName);
+	Renderer->AddRender(Y + 1, X + 4, itemName, GetRarityColor(itemInfo.Rarity));
+	if (itemInfo.Type == ItemType::Equipment)
+		Renderer->AddRender(Y + 2, X + 2, wstring(L"등급: ") + GetRarityName(itemInfo.Rarity), GetRarityColor(itemInfo.Rarity));
 	Renderer->AddRender(Y + 3, X + 2, typeText);
-	Renderer->AddRender(Y + 4, X + 2, L"Price: " + to_wstring(itemInfo.Price));
+	Renderer->AddRender(Y + 4, X + 2, L"Price: " + to_wstring(item->GetPrice()));
 	if (itemInfo.EffectAmount)
-		Renderer->AddRender(Y + 5, X + 2, amountContent + to_wstring(itemInfo.EffectAmount));
+	{
+		int shownAmount = static_cast<int>(round(itemInfo.EffectAmount * GetRarityStatMultiplier(itemInfo.Rarity)));
+		Renderer->AddRender(Y + 5, X + 2, amountContent + to_wstring(shownAmount));
+	}
 }
 
 wchar_t InventoryUI::GetItemIcon(const UItem* item)

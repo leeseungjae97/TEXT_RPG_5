@@ -15,6 +15,9 @@ private:
     ItemManager();
     ~ItemManager();
 
+    UItem* CreateBaseItem(ItemId Id);
+    ERarity RollEquipmentRarity();
+
 public:
     UItem* CreateItem(ItemId Id);
     UItem* CreateRandomItem(const vector<FItemWeight>& Pool);

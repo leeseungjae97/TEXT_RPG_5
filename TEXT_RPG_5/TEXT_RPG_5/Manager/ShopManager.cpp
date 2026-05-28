@@ -177,7 +177,7 @@ void ShopManager::TryBuyItem()
         return;
     }
     
-    if (PlayerInventory->GetGold() >= Item->GetItemInfo().Price)
+    if (PlayerInventory->GetGold() >= Item->GetPrice())
     {
         if (PlayerInventory->BuyItem(Item) == true )
         {
