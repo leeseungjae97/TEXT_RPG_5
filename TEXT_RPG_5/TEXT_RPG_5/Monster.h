@@ -7,6 +7,14 @@
 
 class Player;
 
+enum class EMonsterAttackTileType
+{
+	Default,
+	Fire,
+	Breath,
+	Dark
+};
+
 class Monster : public AObject
 {
 protected:
@@ -17,6 +25,9 @@ protected:
 	int Attack;
 	
 	int RenderScale = 1;
+	//타일테스트
+	EMonsterAttackTileType AttackTileType = EMonsterAttackTileType::Default;
+
 
 protected:
 	
@@ -55,6 +66,9 @@ public:
 	bool IsAttackVisible() const { return AttackVisibleTime > 0.0f; }
 	bool IsAttackTelegraphActive() const { return bAttackTelegraphActive; }
 	const vector<Vector>& GetAttackValue() const { return AttackValue; }
+	
+	//타일테스트
+	EMonsterAttackTileType GetAttackTileType() const { return AttackTileType; }
 
 	void TakeDamage(int damage);
 	bool IsDead();

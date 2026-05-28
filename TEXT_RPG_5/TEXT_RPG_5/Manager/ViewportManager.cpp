@@ -839,6 +839,52 @@ void ViewportManager::Render2DtoISO()
 						renderManager->PutCell(iso.Y - 3, iso.X, L'|', baseAttribute);
 					}
 				};
+			//타일테스트
+			auto drawDragonBreathOverlayTile = [&](const Vector& tilePosition)
+			{
+				if (fabsf(static_cast<float>(tilePosition.X) - cameraPosition.X) > viewRadiusX ||
+					fabsf(static_cast<float>(tilePosition.Y) - cameraPosition.Y) > viewRadiusY)
+				{
+					return;
+				}
+
+				Vector iso = WorldToIso(
+					static_cast<float>(tilePosition.X) - cameraPosition.X,
+					static_cast<float>(tilePosition.Y) - cameraPosition.Y,
+					originX,
+					originY
+				);
+
+				WORD fireAttribute = MakeAttribute(CC_RED);
+				WORD hotAttribute = MakeAttribute(CC_YELLOW);
+
+				drawIsoDiamond(iso, fireAttribute);
+
+				renderManager->PutCell(iso.Y - 1, iso.X - 1, L'~', fireAttribute);
+				renderManager->PutCell(iso.Y - 1, iso.X,     L'^', hotAttribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 1, L'~', fireAttribute);
+
+				renderManager->PutCell(iso.Y, iso.X - 2, L'<', fireAttribute);
+				renderManager->PutCell(iso.Y, iso.X,     L'W', hotAttribute);
+				renderManager->PutCell(iso.Y, iso.X + 2, L'>', fireAttribute);
+			};
+		
+		
+		
+			//타일테스트
+			auto drawBreathTile = [&](Vector iso)
+			{
+				WORD fireAttribute = MakeAttribute(CC_RED);
+				WORD hotAttribute = MakeAttribute(CC_YELLOW);
+
+				renderManager->PutCell(iso.Y - 1, iso.X - 1, L'~', fireAttribute);
+				renderManager->PutCell(iso.Y - 1, iso.X,     L'^', hotAttribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 1, L'~', fireAttribute);
+
+				renderManager->PutCell(iso.Y, iso.X - 2, L'<', fireAttribute);
+				renderManager->PutCell(iso.Y, iso.X,     L'W', hotAttribute);
+				renderManager->PutCell(iso.Y, iso.X + 2, L'>', fireAttribute);
+			};
 
 			auto drawDefaultAttackTile = [&](Vector iso, int color)
 				{
@@ -902,7 +948,7 @@ void ViewportManager::Render2DtoISO()
 						drawDefaultAttackTile(iso, color);
 					}
 				};
-
+		
 			Player* player = SceneManager::GetInstance()->GetPlayer();
 			if (player != nullptr)
 			{
@@ -930,7 +976,8 @@ void ViewportManager::Render2DtoISO()
 				{
 					continue;
 				}
-
+				
+				//타일테스트
 				for (const Vector& attackPosition : monster->GetAttackValue())
 				{
 					if (monster->IsAttackTelegraphActive())
@@ -939,9 +986,45 @@ void ViewportManager::Render2DtoISO()
 					}
 					else
 					{
-						drawAttackTile(attackPosition, CC_MAGENTA, WeaponType::NONE);
+						EMonsterAttackTileType attackTileType = monster->GetAttackTileType();
+
+						if (attackTileType == EMonsterAttackTileType::Breath)
+						{
+							if (fabsf(static_cast<float>(attackPosition.X) - cameraPosition.X) > viewRadiusX ||
+								fabsf(static_cast<float>(attackPosition.Y) - cameraPosition.Y) > viewRadiusY)
+							{
+								continue;
+							}
+
+							Vector iso = WorldToIso(
+								static_cast<float>(attackPosition.X) - cameraPosition.X,
+								static_cast<float>(attackPosition.Y) - cameraPosition.Y,
+								originX,
+								originY
+							);
+
+							drawBreathTile(iso);
+						}
+						else if (attackTileType == EMonsterAttackTileType::Fire)
+						{
+							drawAttackTile(attackPosition, CC_RED, WeaponType::Magic);
+						}
+						else
+						{
+							drawAttackTile(attackPosition, CC_MAGENTA, WeaponType::NONE);
+						}
 					}
 				}
+				// {
+				// 	if (monster->IsAttackTelegraphActive())
+				// 	{
+				// 		drawAttackTelegraphTile(attackPosition);
+				// 	}
+				// 	else
+				// 	{
+				// 		drawAttackTile(attackPosition, CC_MAGENTA, WeaponType::NONE);
+				// 	}
+				// }
 			}
 		};
 

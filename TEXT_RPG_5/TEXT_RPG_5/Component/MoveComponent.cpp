@@ -212,21 +212,21 @@ void UMoveComponent::HandleMoveInput()
 
 	if (ViewportManager::GetInstance()->Is3DMode())
 	{
-		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::LEFT))
-		{
-			SetFacingDirection(TurnLeft(FacingDirection));
-			MoveElapsedTime = 0.0f;
-			return;
-		}
-
-		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::RIGHT))
+		if (InputManager::GetInstance()->IsKeyTap(KeyCode::LEFT))
 		{
 			SetFacingDirection(TurnRight(FacingDirection));
 			MoveElapsedTime = 0.0f;
 			return;
 		}
 
-		if (InputManager::GetInstance()->IsKeyPressed(KeyCode::DOWN))
+		if (InputManager::GetInstance()->IsKeyTap(KeyCode::RIGHT))
+		{
+			SetFacingDirection(TurnLeft(FacingDirection));
+			MoveElapsedTime = 0.0f;
+			return;
+		}
+
+		if (InputManager::GetInstance()->IsKeyTap(KeyCode::DOWN))
 		{
 			SetFacingDirection(TurnBack(FacingDirection));
 			MoveElapsedTime = 0.0f;
