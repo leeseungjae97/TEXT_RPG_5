@@ -3,6 +3,7 @@
 #include "DisplayManager.h"
 #include "SceneManager.h"
 #include "ShopManager.h"
+#include "ChestManager.h"
 #include "StageManager.h"
 #include "../Object.h"
 #include "../Monster.h"
@@ -49,6 +50,8 @@ void MapManager::Tick(float DeltaTime)
 // B : Boss {킹슬라임, 오크메이지, 킹스파이더, 드래곤}
 void MapManager::MapParsing(int CurrentStage)
 {
+	ChestManager::GetInstance()->ClearChests();   // 새 맵 파싱 전 상자 상태 초기화
+
 	for (int i = 0 ; i < MAP_MAX_Y; ++i)
 	{
 		for (int j = 0 ; j < MAP_MAX_X; ++j)
@@ -117,9 +120,10 @@ void MapManager::MapParsing(int CurrentStage)
 					Map[CurrentPos.Y][CurrentPos.X] = {MapObjectType::Shop, NO_ID};
 				}
 				break;
-			case 'T': // Mimmic or Box
+			case 'T': // Mimmic or Box (상자)
 				{
-					
+					Map[i][j] = { MapObjectType::Chest, NO_ID };
+					ChestManager::GetInstance()->RegisterChest(CurrentPos);
 				}
 				break;
 			case 'C': // 나중에
@@ -212,7 +216,7 @@ bool MapManager::CanPlaceObject(AObject* Object, Vector Pos) const
 	}
 
 	const Coordinate& Current = Map[Pos.Y][Pos.X];
-	if (Current.Type == MapObjectType::Wall || Current.Type == MapObjectType::Shop || Current.Type == MapObjectType::Crystal)
+	if (Current.Type == MapObjectType::Wall || Current.Type == MapObjectType::Shop || Current.Type == MapObjectType::Crystal || Current.Type == MapObjectType::Chest)
 	{
 		return false;
 	}
@@ -223,6 +227,16 @@ bool MapManager::CanPlaceObject(AObject* Object, Vector Pos) const
 	}
 
 	return true;
+}
+
+bool MapManager::CanMoveObjectTo(AObject* Object, Vector Pos) const
+{
+	if (Object == nullptr)
+	{
+		return false;
+	}
+
+	return CanPlaceObject(Object, Pos);
 }
 
 bool MapManager::MoveObject(AObject* Object, Vector From, Vector To)
