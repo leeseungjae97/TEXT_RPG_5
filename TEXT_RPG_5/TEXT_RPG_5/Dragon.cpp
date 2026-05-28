@@ -1,6 +1,7 @@
 ﻿#include "Dragon.h"
 #include "Player.h"
 #include "Manager/MapManager.h"
+#include "Define.h"
 #include <cstdlib>
 
 Dragon::Dragon(int PlayerLevel)
@@ -25,7 +26,7 @@ if (PlayerLevel <= 0)
 	
     bUseBfs = true;
 	
-    AttackRange = 4;
+    AttackRange = 12;
     AttackInterval = 3.0f;
     AttackElapsedtime = 0.0f;
     
@@ -34,6 +35,8 @@ if (PlayerLevel <= 0)
     bHasRevive = false;
     
     TrySetShiny();
+    
+    RenderScale = 4;
 }
 
 //부활테스트
@@ -103,44 +106,64 @@ void Dragon::BreathAttack(Player* player)
 
     Vector playerPosition = player->GetPosition();
 
-    int diffX = playerPosition.X - Position.X;
-    int diffY = playerPosition.Y - Position.Y;
+    int DiffX = playerPosition.X - Position.X;
+    int DiffY = playerPosition.Y - Position.Y;
 
-    Vector direction = { 0, 0 };
+    Vector Direction;
 
-    if (abs(diffX) > abs(diffY))
+   
+    if (abs(DiffX) > abs(DiffY))
     {
-        if (diffX > 0)
+        if (DiffX > 0)
         {
-            direction = { 1, 0 };
+            Direction = { 1, 0 };   
         }
         else
         {
-            direction = { -1, 0 };
+            Direction = { -1, 0 };  
         }
     }
     else
     {
-        if (diffY > 0)
+        if (DiffY > 0)
         {
-            direction = { 0, 1 };
+            Direction = { 0, 1 };   
         }
         else
         {
-            direction = { 0, -1 };
+            Direction = { 0, -1 };  
         }
+    }
+
+    
+    Vector SideDirection;
+
+    if (Direction.X != 0)
+    {
+        
+        SideDirection = { 0, 1 };
+    }
+    else
+    {
+        
+        SideDirection = { 1, 0 };
     }
 
     for (int i = 1; i <= AttackRange; ++i)
     {
-        Vector AttackPosition;
-        AttackPosition.X = Position.X + direction.X * i;
-        AttackPosition.Y = Position.Y + direction.Y * i;
+        Vector CenterPosition;
+        CenterPosition.X = Position.X + Direction.X * i;
+        CenterPosition.Y = Position.Y + Direction.Y * i;
 
-        AttackValue.push_back(AttackPosition);
+        for (int side = -1; side <= 1; ++side)
+        {
+            Vector AttackPosition;
+            AttackPosition.X = CenterPosition.X + SideDirection.X * side;
+            AttackPosition.Y = CenterPosition.Y + SideDirection.Y * side;
+
+            AddAttackCell(AttackPosition);
+        }
     }
-
-    // player->TakeDamage(Attack);
 }
 
 
@@ -153,15 +176,27 @@ void Dragon::FireballAttack(Player* player)
 
     Vector playerPosition = player->GetPosition();
 
-    for (int y = -1; y <= 1; ++y)
+    vector<Vector> Offsets =
     {
-        for (int x = -1; x <= 1; ++x)
-        {
-            AttackValue.push_back({ playerPosition.X + x, playerPosition.Y + y });
-        }
-    }
+        {  0,  0 },
 
-    // player->TakeDamage(Attack);
+        
+        { -4, -4 }, {  0, -4 }, {  4, -4 },
+
+       
+        { -2, -2 }, {  0, -2 }, {  2, -2 },
+
+        
+        { -4,  0 }, { -2,  0 }, {  2,  0 }, {  4,  0 },
+
+       
+        { -2,  2 }, {  0,  2 }, {  2,  2 },
+
+      
+        { -4,  4 }, {  0,  4 }, {  4,  4 }
+    };
+
+    AddPattern(playerPosition, Offsets);
 }
 
 
@@ -340,6 +375,36 @@ bool Dragon::Revive()
     return true;
 }
 
+void Dragon::AddAttackCell(Vector Pos)
+{
+    if (Pos.X < 0 || Pos.X >= MAP_MAX_X ||
+        Pos.Y < 0 || Pos.Y >= MAP_MAX_Y)
+    {
+        return;
+    }
+
+    for (const Vector& Value : AttackValue)
+    {
+        if (Value.X == Pos.X && Value.Y == Pos.Y)
+        {
+            return;
+        }
+    }
+
+    AttackValue.push_back(Pos);
+}
+
+void Dragon::AddPattern(Vector Center, const vector<Vector>& Offsets)
+{
+    for (const Vector& Offset : Offsets)
+    {
+        Vector Pos;
+        Pos.X = Center.X + Offset.X;
+        Pos.Y = Center.Y + Offset.Y;
+
+        AddAttackCell(Pos);
+    }
+}
 
 
 vector<FItemWeight> Dragon::GetDropTable()

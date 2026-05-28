@@ -10,9 +10,9 @@ Slime::Slime(int playerLevel)
 
 	Name = L"슬라임";
 	Level = playerLevel;
-	Health = playerLevel * 25 + rand() % (playerLevel * 10 + 1);
+	Health = playerLevel * 35 + rand() % (playerLevel * 10 + 1);
 	MaxHealth = Health;
-	Attack = playerLevel * 3 + rand() % (playerLevel * 3 + 1);
+	Attack = playerLevel * 4 + rand() % (playerLevel * 2 + 1);
 	
 	MoveInterval = 1.1f;
 
@@ -38,7 +38,7 @@ vector<FItemWeight> Slime::GetDropTable()
 		{ ItemId::SLIME_JELLY, 70 },
 		{ ItemId::HP_POTION,  25 },
 		{ ItemId::LONGSWORD, 25 },
-		{ ItemId::BOW, 10 },
+		{ ItemId::BOW, 1 },
 		{ ItemId::STAFF, 1},
 	};
 }
