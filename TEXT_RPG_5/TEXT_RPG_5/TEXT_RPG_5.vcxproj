@@ -1802,6 +1802,7 @@
     <ClInclude Include="Manager\ShopManager.h" />
     <ClInclude Include="Manager\StageManager.h" />
     <ClInclude Include="Manager\TimeManager.h" />
+    <ClInclude Include="Map\Map.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PlayerStat.h" />

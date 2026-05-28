@@ -32,7 +32,7 @@ Spider::Spider(int playerLevel)
     TrySetShiny();
 }
 
-void Spider::Attackplayer(Player* player)
+void Spider::BuildAttackValue(Player* player)
 {
     if (player == nullptr)
     {
@@ -56,8 +56,6 @@ void Spider::Attackplayer(Player* player)
             AttackValue.push_back({ playerPosition.X, playerPosition.Y + i });
             AttackValue.push_back({ playerPosition.X, playerPosition.Y - i });
         }
-        
-        player->TakeDamage(Attack);
     }
     else
     {
@@ -96,13 +94,7 @@ void Spider::Attackplayer(Player* player)
 
             AttackValue.push_back(attackPosition);
         }
-        
-        player->TakeDamage(Attack);
     }
-    
-    AttackVisibleTime = AttackVisibleDuration;
-    
-    AttackElapsedtime = 0.0f;
 }
 
 vector<FItemWeight> Spider::GetDropTable()

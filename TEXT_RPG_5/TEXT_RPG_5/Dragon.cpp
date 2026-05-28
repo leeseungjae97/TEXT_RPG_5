@@ -31,7 +31,7 @@ if (PlayerLevel <= 0)
     TrySetShiny();
 }
 
-void Dragon::Attackplayer(Player* player)
+void Dragon::BuildAttackValue(Player* player)
 {
     if (player == nullptr)
     {
@@ -80,8 +80,6 @@ void Dragon::Attackplayer(Player* player)
         
             AttackValue.push_back(AttackPosition);
         }
-        player->TakeDamage(Attack);
-        
     }
     else
     {
@@ -92,15 +90,7 @@ void Dragon::Attackplayer(Player* player)
                 AttackValue.push_back({ playerPosition.X + x, playerPosition.Y + y });
             }
         }
-        
-        player->TakeDamage(Attack);
     }
-    
-   
-    
-    AttackVisibleTime = AttackVisibleDuration;
-    
-    AttackElapsedtime = 0.0f;
 }
 
 vector<FItemWeight> Dragon::GetDropTable()
