@@ -13,6 +13,7 @@
 #include "Manager/EnhancementManager.h"
 #include "Manager/ChestManager.h"
 #include "Manager/StageManager.h"
+#include "Network/R2Connector.h"
 #include "Player.h"
 
 namespace
@@ -94,6 +95,12 @@ void GameInstance::Run()
 		DisplayManager::GetInstance()->Render();
 		return;
 
+	case GameFlowState::Leaderboard:
+		TickLeaderboard(DeltaTime);
+		Leaderboard.Render();
+		DisplayManager::GetInstance()->Render();
+		return;
+
 	case GameFlowState::NameInput:
 		TickNameInput(DeltaTime);
 		NameInput.Render();
@@ -108,10 +115,12 @@ void GameInstance::Run()
 		return;
 
 	case GameFlowState::FadeInGame:
+		TimeManager::GetInstance()->AddStoredTime(DeltaTime);
 		SceneManager::GetInstance()->Tick(DeltaTime);
 		ViewportManager::GetInstance()->Tick(DeltaTime);
 		TickFadeInGame(DeltaTime);
 		ViewportManager::GetInstance()->Render();
+		RenderStoredTime();
 		ViewportManager::GetInstance()->RenderFade();
 		DisplayManager::GetInstance()->Render();
 		Destroy();
@@ -120,16 +129,19 @@ void GameInstance::Run()
 	case GameFlowState::FadeOutToNextStage:
 		TickFadeOutToNextStage(DeltaTime);
 		ViewportManager::GetInstance()->Render();
+		RenderStoredTime();
 		ViewportManager::GetInstance()->RenderFade();
 		DisplayManager::GetInstance()->Render();
 		Destroy();
 		return;
 
 	case GameFlowState::FadeInNextStage:
+		TimeManager::GetInstance()->AddStoredTime(DeltaTime);
 		SceneManager::GetInstance()->Tick(DeltaTime);
 		ViewportManager::GetInstance()->Tick(DeltaTime);
 		TickFadeInNextStage(DeltaTime);
 		ViewportManager::GetInstance()->Render();
+		RenderStoredTime();
 		ViewportManager::GetInstance()->RenderFade();
 		DisplayManager::GetInstance()->Render();
 		Destroy();
@@ -138,6 +150,7 @@ void GameInstance::Run()
 	case GameFlowState::FadeOutToGameOver:
 		TickFadeOutToGameOver(DeltaTime);
 		ViewportManager::GetInstance()->Render();
+		RenderStoredTime();
 		ViewportManager::GetInstance()->RenderFade();
 		DisplayManager::GetInstance()->Render();
 		Destroy();
@@ -146,6 +159,7 @@ void GameInstance::Run()
 	case GameFlowState::FadeInGameOver:
 		TickFadeInGameOver(DeltaTime);
 		GameOver.Render();
+		RenderStoredTime();
 		ViewportManager::GetInstance()->RenderFade();
 		DisplayManager::GetInstance()->Render();
 		return;
@@ -153,12 +167,14 @@ void GameInstance::Run()
 	case GameFlowState::GameOver:
 		TickGameOver(DeltaTime);
 		GameOver.Render();
+		RenderStoredTime();
 		DisplayManager::GetInstance()->Render();
 		return;
 
 	case GameFlowState::FadeOutToGameClear:
 		TickFadeOutToGameClear(DeltaTime);
 		ViewportManager::GetInstance()->Render();
+		RenderStoredTime();
 		ViewportManager::GetInstance()->RenderFade();
 		DisplayManager::GetInstance()->Render();
 		Destroy();
@@ -167,6 +183,7 @@ void GameInstance::Run()
 	case GameFlowState::FadeInGameClear:
 		TickFadeInGameClear(DeltaTime);
 		GameClear.Render();
+		RenderStoredTime();
 		ViewportManager::GetInstance()->RenderFade();
 		DisplayManager::GetInstance()->Render();
 		return;
@@ -174,6 +191,39 @@ void GameInstance::Run()
 	case GameFlowState::GameClear:
 		TickGameClear(DeltaTime);
 		GameClear.Render();
+		RenderStoredTime();
+		DisplayManager::GetInstance()->Render();
+		return;
+
+	case GameFlowState::RankNameConfirm:
+		TickRankNameConfirm(DeltaTime);
+		GameClear.Render();
+		RenderStoredTime();
+		RenderRankNameConfirm();
+		DisplayManager::GetInstance()->Render();
+		return;
+
+	case GameFlowState::RankNameInput:
+		TickRankNameInput(DeltaTime);
+		GameClear.Render();
+		RenderStoredTime();
+		RankNameInput.Render();
+		DisplayManager::GetInstance()->Render();
+		return;
+
+	case GameFlowState::RankSubmitting:
+		TickRankSubmitting(DeltaTime);
+		GameClear.Render();
+		RenderStoredTime();
+		RenderRankLoading(L"순위 등록 중");
+		DisplayManager::GetInstance()->Render();
+		return;
+
+	case GameFlowState::RankSubmitted:
+		TickRankSubmitted(DeltaTime);
+		GameClear.Render();
+		RenderStoredTime();
+		RenderRankSubmitted();
 		DisplayManager::GetInstance()->Render();
 		return;
 
@@ -189,6 +239,7 @@ void GameInstance::Run()
 			return;
 		}
 
+		TimeManager::GetInstance()->AddStoredTime(DeltaTime);
 		StageManager::GetInstance()->Tick(DeltaTime);
 		if (StageManager::GetInstance()->ShouldStartGameClear())
 		{
@@ -207,6 +258,7 @@ void GameInstance::Run()
 			TickStagePrompt(DeltaTime);
 			ViewportManager::GetInstance()->Render();
 			RenderStagePrompt();
+			RenderStoredTime();
 			DisplayManager::GetInstance()->Render();
 			Destroy();
 			return;
@@ -228,6 +280,7 @@ void GameInstance::Run()
 		}
 		ViewportManager::GetInstance()->Tick(DeltaTime);
 		ViewportManager::GetInstance()->Render();
+		RenderStoredTime();
 		if (ViewportManager::GetInstance()->IsBossIntroPlaying())
 		{
 			ViewportManager::GetInstance()->RenderFade();
@@ -249,9 +302,24 @@ void GameInstance::TickMainMenu(float DeltaTime)
 		return;
 	}
 
+	if (action == MainMenuAction::Leaderboard)
+	{
+		Leaderboard.Open();
+		FlowState = GameFlowState::Leaderboard;
+		return;
+	}
+
 	if (action == MainMenuAction::Exit)
 	{
 		RequestQuit();
+	}
+}
+
+void GameInstance::TickLeaderboard(float DeltaTime)
+{
+	if (Leaderboard.Tick(DeltaTime) == LeaderboardAction::Back)
+	{
+		FlowState = GameFlowState::MainMenu;
 	}
 }
 
@@ -266,6 +334,7 @@ void GameInstance::TickNameInput(float DeltaTime)
 		}
 
 		FlowState = GameFlowState::FadeOutToGame;
+		TimeManager::GetInstance()->ResetStoredTime();
 		ViewportManager::GetInstance()->StartFadeOut();
 		return;
 	}
@@ -381,6 +450,7 @@ void GameInstance::TickGameClear(float DeltaTime)
 	if (action == GameClearAction::Retry)
 	{
 		ResetGameWorld();
+		TimeManager::GetInstance()->ResetStoredTime();
 		FlowState = GameFlowState::FadeInGame;
 		ViewportManager::GetInstance()->StartFadeIn();
 		return;
@@ -390,6 +460,77 @@ void GameInstance::TickGameClear(float DeltaTime)
 	{
 		ResetGameWorld();
 		FlowState = GameFlowState::MainMenu;
+	}
+
+	if (action == GameClearAction::RegisterRank)
+	{
+		FlowState = GameFlowState::RankNameConfirm;
+	}
+}
+
+void GameInstance::TickRankNameConfirm(float DeltaTime)
+{
+	InputManager* input = InputManager::GetInstance();
+	if (input->IsKeyTap(KeyCode::Z))
+	{
+		if (Player* player = SceneManager::GetInstance()->GetPlayer())
+		{
+			StartRankSubmit(player->GetName());
+		}
+		return;
+	}
+
+	if (input->IsKeyTap(KeyCode::ESCAPE))
+	{
+		FlowState = GameFlowState::GameClear;
+		return;
+	}
+
+	if (input->IsKeyTap(KeyCode::X))
+	{
+		RankNameInput.Open();
+		FlowState = GameFlowState::RankNameInput;
+	}
+}
+
+void GameInstance::TickRankNameInput(float DeltaTime)
+{
+	NameInputAction action = RankNameInput.Tick(DeltaTime);
+	if (action == NameInputAction::Start)
+	{
+		StartRankSubmit(ToUtf8String(RankNameInput.GetPlayerName()));
+		return;
+	}
+
+	if (action == NameInputAction::Cancel)
+	{
+		FlowState = GameFlowState::GameClear;
+	}
+}
+
+void GameInstance::TickRankSubmitting(float DeltaTime)
+{
+	RankLoadingTimer += DeltaTime;
+	if (RankLoadingTimer >= 0.3f)
+	{
+		RankLoadingTimer = 0.0f;
+		RankLoadingDotCount = RankLoadingDotCount % 3 + 1;
+	}
+
+	if (RankSubmitFuture.valid() &&
+		RankSubmitFuture.wait_for(chrono::milliseconds(0)) == future_status::ready)
+	{
+		RankSubmitFuture.get();
+		FlowState = GameFlowState::RankSubmitted;
+	}
+}
+
+void GameInstance::TickRankSubmitted(float DeltaTime)
+{
+	InputManager* input = InputManager::GetInstance();
+	if (input->IsKeyTap(KeyCode::Z) || input->IsKeyTap(KeyCode::ESCAPE) || input->IsKeyTap(KeyCode::X))
+	{
+		FlowState = GameFlowState::GameClear;
 	}
 }
 
@@ -442,6 +583,104 @@ void GameInstance::RenderStagePrompt()
 	renderer->AddRender(y + 2, x + (width - renderer->GetTextDisplayWidth(clearText)) / 2, clearText, CC_YELLOW);
 	renderer->AddRender(y + 4, x + (width - renderer->GetTextDisplayWidth(moveText)) / 2, moveText, CC_WHITE);
 	renderer->AddRender(y + 6, x + (width - renderer->GetTextDisplayWidth(inputText)) / 2, inputText, CC_CYAN);
+}
+
+void GameInstance::RenderStoredTime()
+{
+	DisplayManager::GetInstance()->AddRender(2, 1, L"TIME : " + TimeManager::GetInstance()->GetFormattedStoredTime(), CC_CYAN);
+}
+
+void GameInstance::RenderRankNameConfirm()
+{
+	DisplayManager* renderer = DisplayManager::GetInstance();
+	const int width = 58;
+	const int height = 10;
+	const int x = max(1, (SCREEN_WIDTH - width) / 2);
+	const int y = max(1, (SCREEN_HEIGHT - height) / 2);
+	const WORD background = renderer->MakeConsoleAttribute(CC_BLACK, CC_BLACK);
+
+	for (int row = 0; row < height; ++row)
+	{
+		for (int col = 0; col < width; ++col)
+		{
+			renderer->PutCell(y + row, x + col, L' ', background);
+		}
+	}
+
+	wstring playerName = L"Unknown";
+	if (Player* player = SceneManager::GetInstance()->GetPlayer())
+	{
+		playerName = renderer->ToWideString(player->GetName());
+	}
+
+	renderer->DrawBox(y, x, width, height);
+	renderer->AddRender(y + 2, x + 8, L"현재 플레이어 이름으로 등록하시겠습니까?", CC_WHITE);
+	renderer->AddRender(y + 4, x + 8, L"NAME : " + playerName, CC_CYAN);
+	renderer->AddRender(y + 6, x + 8, L"TIME : " + TimeManager::GetInstance()->GetFormattedStoredTime(), CC_CYAN);
+	renderer->AddRender(y + 8, x + 8, L"(Z) 예        (X) 이름 입력        (ESC) 취소", CC_DARKGRAY);
+}
+
+void GameInstance::RenderRankLoading(const wstring& Message)
+{
+	DisplayManager* renderer = DisplayManager::GetInstance();
+	const int width = 42;
+	const int height = 7;
+	const int x = max(1, (SCREEN_WIDTH - width) / 2);
+	const int y = max(1, (SCREEN_HEIGHT - height) / 2);
+	const WORD background = renderer->MakeConsoleAttribute(CC_BLACK, CC_BLACK);
+
+	for (int row = 0; row < height; ++row)
+	{
+		for (int col = 0; col < width; ++col)
+		{
+			renderer->PutCell(y + row, x + col, L' ', background);
+		}
+	}
+
+	renderer->DrawBox(y, x, width, height);
+	wstring text = Message + wstring(RankLoadingDotCount, L'.');
+	renderer->AddRender(y + 3, x + (width - renderer->GetTextDisplayWidth(text)) / 2, text, CC_CYAN);
+}
+
+void GameInstance::RenderRankSubmitted()
+{
+	DisplayManager* renderer = DisplayManager::GetInstance();
+	const int width = 38;
+	const int height = 7;
+	const int x = max(1, (SCREEN_WIDTH - width) / 2);
+	const int y = max(1, (SCREEN_HEIGHT - height) / 2);
+	const WORD background = renderer->MakeConsoleAttribute(CC_BLACK, CC_BLACK);
+
+	for (int row = 0; row < height; ++row)
+	{
+		for (int col = 0; col < width; ++col)
+		{
+			renderer->PutCell(y + row, x + col, L' ', background);
+		}
+	}
+
+	renderer->DrawBox(y, x, width, height);
+	renderer->AddRender(y + 2, x + 13, L"등록 완료!", CC_CYAN);
+	renderer->AddRender(y + 4, x + 12, L"(Z) 닫기", CC_DARKGRAY);
+}
+
+void GameInstance::StartRankSubmit(const string& Name)
+{
+	const double storedTime = TimeManager::GetInstance()->GetStoredTime();
+	int level = 1;
+	if (Player* player = SceneManager::GetInstance()->GetPlayer())
+	{
+		level = player->GetLevel();
+	}
+
+	RankLoadingTimer = 0.0f;
+	RankLoadingDotCount = 1;
+	RankSubmitFuture = async(launch::async, [Name, storedTime, level]()
+	{
+		R2Connector::GetInstance()->WriteLeaderboard(Name, static_cast<float>(storedTime), level);
+		return true;
+	});
+	FlowState = GameFlowState::RankSubmitting;
 }
 
 void GameInstance::ResetGameWorld()

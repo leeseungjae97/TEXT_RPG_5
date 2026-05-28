@@ -60,11 +60,6 @@ void SceneManager::Destroy()
 void SceneManager::BeginPlay()
 {
 	EnsurePools();
-	if (CurrentPlayer == nullptr)
-	{
-		CurrentPlayer = SpawnObject<Player>("player", 100, 30);
-	}
-
 	LoadCurrentStage();
 }
 
@@ -112,9 +107,9 @@ void SceneManager::LoadCurrentStage()
 	{
 		CurrentPlayer = SpawnObject<Player>("player", 100, 30);
 	}
-	// const int stage = StageManager::GetInstance()->GetCurrentStage();
-	StageManager::GetInstance()->SetCurrentStage(2);
-	MapManager::GetInstance()->MapParsing(2);
+	const int stage = StageManager::GetInstance()->GetCurrentStage();
+	// StageManager::GetInstance()->SetCurrentStage(stage);
+	MapManager::GetInstance()->MapParsing(stage);
 	
 	Vector playerStart = MapManager::GetInstance()->GetPlayerPosition(); 
 	CurrentPlayer->SetPosition(playerStart);

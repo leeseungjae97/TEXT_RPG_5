@@ -8,6 +8,7 @@ enum class MainMenuAction
 {
 	None,
 	StartGame,
+	Leaderboard,
 	Exit
 };
 

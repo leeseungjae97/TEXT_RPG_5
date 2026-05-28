@@ -1,5 +1,4 @@
-﻿/*
-#include "R2AsyncLoader.h"
+﻿#include "R2AsyncLoader.h"
 
 #include <aws/s3/S3Client.h>
 #include <aws/s3/S3ServiceClientModel.h>
@@ -211,4 +210,3 @@ void R2AsyncLoader::Tick()
 	m_IsLoading = false;
 	m_HasResult = true;
 }
-*/

@@ -25,11 +25,11 @@ MainMenuAction MainMenuUI::Tick(float DeltaTime)
 
 	if (input->IsKeyTap(KeyCode::UP))
 	{
-		SelectedIndex = (SelectedIndex + 2) % 3;
+		SelectedIndex = (SelectedIndex + 3) % 4;
 	}
 	if (input->IsKeyTap(KeyCode::DOWN))
 	{
-		SelectedIndex = (SelectedIndex + 1) % 3;
+		SelectedIndex = (SelectedIndex + 1) % 4;
 	}
 
 	if (input->IsKeyTap(KeyCode::_1))
@@ -41,7 +41,11 @@ MainMenuAction MainMenuUI::Tick(float DeltaTime)
 		bShowCredits = true;
 		return MainMenuAction::None;
 	}
-	if (input->IsKeyTap(KeyCode::_3) || input->IsKeyTap(KeyCode::ESCAPE))
+	if (input->IsKeyTap(KeyCode::_3))
+	{
+		return MainMenuAction::Leaderboard;
+	}
+	if (input->IsKeyTap(KeyCode::_4) || input->IsKeyTap(KeyCode::ESCAPE))
 	{
 		return MainMenuAction::Exit;
 	}
@@ -53,6 +57,7 @@ MainMenuAction MainMenuUI::Tick(float DeltaTime)
 			bShowCredits = true;
 			return MainMenuAction::None;
 		}
+		if (SelectedIndex == 2) return MainMenuAction::Leaderboard;
 		return MainMenuAction::Exit;
 	}
 
@@ -87,18 +92,18 @@ void MainMenuUI::RenderTitle(int X, int Y)
 {
 	static const vector<wstring> title =
 	{
-		L"  ____ _   _ ____   ___  _   _  ___  ____    ____  _____    _    _     __  __",
-		L" / ___| | | |  _ \\ / _ \\| \\ | |/ _ \\/ ___|  |  _ \\| ____|  / \\  | |   |  \\/  |",
-		L"| |   | |_| | |_) | | | |  \\| | | | \\___ \\  | |_) |  _|   / _ \\ | |   | |\\/| |",
-		L"| |___|  _  |  _ <| |_| | |\\  | |_| |___) | |  _ <| |___ / ___ \\| |___| |  | |",
-		L" \\____|_| |_|_| \\_\\\\___/|_| \\_|\\___/|____/  |_| \\_\\_____/_/   \\_\\_____|_|  |_|",
+		L" ____   ___    _    ____  _     ____  ",
+		L"|  _ \\ |_ _|  / \\  | __ )| |   | ___| ",
+		L"| | | | | |  / _ \\ |  _ \\| |   |___ \\ ",
+		L"| |_| | | | / ___ \\| |_) | |___ ___) |",
+		L"|____/ |___/_/   \\_\\____/|_____|____/ ",
 		L"",
-		L"        R E A L - T I M E   I S O M E T R I C   T E X T   R P G"
+		L"R E A L - T I M E   I S O M E T R I C   T E X T   R P G"
 	};
 
 	for (int i = 0; i < static_cast<int>(title.size()); ++i)
 	{
-		Renderer->AddRender(Y + i, X, title[i], i == 6 ? CC_DARKYELLOW : CC_LIGHTGRAY);
+		Renderer->AddRender(Y + i, X + 30, title[i], i == 6 ? CC_DARKYELLOW : CC_LIGHTGRAY);
 	}
 }
 
@@ -106,39 +111,56 @@ void MainMenuUI::RenderLandscape(int X, int Y)
 {
 	static const vector<wstring> sky =
 	{
-		L"          .       *             .             *",
-		L"    .                 .                  .     ",
-		L"              .              *                 ",
-		L"       *              .              .         "
+		L"          .       *             .             *                 .          *",
+		L"    .                 .                  .               .                  ",
+		L"              .              *                    .                     .   ",
+		L"       *              .              .                   *           *      "
 	};
 
 	for (int i = 0; i < static_cast<int>(sky.size()); ++i)
 	{
-		Renderer->AddRender(Y + i, X + ((i + StarOffset) % 3), sky[i], CC_DARKYELLOW);
+		Renderer->AddRender(Y + ((i + StarOffset) % 3), X + i, sky[i], CC_DARKYELLOW);
 	}
 
-	static const vector<wstring> castle =
-	{
-		L"                         /\\",
-		L"              /\\        /  \\        /\\",
-		L"             /  \\      /____\\      /  \\",
-		L"        /\\  /____\\       ||       /____\\",
-		L"       /  \\   ||      ___||___      ||",
-		L"      /____\\  ||     |  []  |      ||",
-		L"        ||  __||__   | [] []|   ___||___",
-		L"    ____||_| []  |___|______|___| [] [] |",
-		L"   | [] [] |_____| [] [] [] []  |_______|",
-		L"   |_______|  |  |______________|  | |  |",
-		L"      /\\      |       /\\  /\\       | |",
-		L"     /  \\     |      /  \\/  \\      | |",
-		L"    /____\\____|_____/________\\_____|_|____",
-		L"       ||        ||     ||      ||",
-		L"  ~ ~ ~||~ ~ ~ ~ || ~ ~ || ~ ~ || ~ ~ ~"
-	};
+static const vector<wstring> skull =
+{
+    L"==---++**+                               :.                       +***+---=--::.",
+    L"==--=++**-                         ....  ::                       -***+=-:---::.",
+    L"===-==++*.                       :---:-::--.                       =**++-==--::.",
+    L"=+++=++++.                  .:::.:......    .:...  ..              :**+++++=-::.",
+    L"+====++++               :-:-:::...           ::--:---:. .          .**++++=+=:..",
+    L"+====++*=           ...::..                     ...::::..           =#*++==+=-:.",
+    L"==-=+++*.          .:..                               .....         .##*+=====-.",
+    L"--=++++:       ...                                        ...:.      =%#*+===-:.",
+    L"===+*+.     :.::.                            ..              ....     +##*+==--",
+    L"-=+**=     ..      .:--=+=-----------:..::-=====+++*+=---:             +#*+==-:",
+    L"=++**.           :=-.:-+*%#*%%#*+***+=--*####%%@@@#+-.....=-     ..     -*++==:.",
+    L"++++.      .     ==     .===#@@@@@%#*-+%@@@@@@%*-..--     +=    ...      -**+=-.",
+    L"+++.      ..     :*     .*+. :=+#%%*==++++**=:    -*:     ++.    ..      .**+=-.",
+    L"+*:       ..    .=#                  =#*===               :%+:   .        +*++-.",
+    L"+*.       .    :=+%: ....       -+::=@@@%%@#=        .... =%*:    .       .+*+=.",
+    L"**-       :    .+*@%+*****++==-*@@+:+%@@%%@@@%=:::=+=+*#*+%%+-    .        :**=.",
+    L"**-       :     -*%@@@@%@@@@@@@@@@#+*%@@#%@@@@@@%#%@%@@@@%%#+.    .         +*=.",
+    L"**-       .     :#%%@%@@@@@@@@@%%%##--+:-%@@@@@@@@@@@@%@@%%%-       .      :+*=.",
+    L"+=.              -+%@%*+*%@#**#%%%%+     =%@@@%#*#%#+==+#%#-        .      .++=.",
+    L".                  .:    :+%++#%@@#   :.  =@%@@%+-.                         ...",
+    L"       .                   ...=%@%#=-=*+++#%##%=..                              ",
+    L"      ..                    .===+=+*##**#*####*=-                               ",
+    L"     .                       .-=-=+*##*++***##=:                                ",
+    L"     .                         ::---:=-:-----:.             .                   ",
+    L"   ..              .             .:+:*+##-:                    . .      ..      ",
+    L"   .           ......             .:.-:==-..     .                              ",
+    L"          . ..                     .-==---:.                      .::.          ",
+    L"                                   .:=**=:...                                    ",
+    L"                                .=+**#@@@%*++.                                  ",
+    L"                                -#@@##@@@%@@+:                                  ",
+    L"                                :=*%#*+#*##*+:                                  ",
+    L"                                 .:=-    .::.                                   "
+};
 
-	for (int i = 0; i < static_cast<int>(castle.size()); ++i)
+	for (int i = 0; i < static_cast<int>(skull.size()); ++i)
 	{
-		Renderer->AddRender(Y + 8 + i, X, castle[i], CC_DARKYELLOW);
+		Renderer->AddRender(Y + 8 + i, X, skull[i], CC_DARKYELLOW);
 	}
 }
 
@@ -148,17 +170,19 @@ void MainMenuUI::RenderMenu(int X, int Y)
 	{
 		L"[1]  Game Start",
 		L"[2]  Credits",
-		L"[3]  Exit"
+		L"[3]  Leaderboard",
+		L"[4]  Exit"
 	};
 
 	static const vector<wstring> rightTexts =
 	{
 		L"새 게임 시작",
 		L"제작진",
+		L"리더보드",
 		L"게임 종료"
 	};
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
 		const bool bSelected = SelectedIndex == i;
 		const int y = Y + i * 4;
@@ -184,11 +208,11 @@ void MainMenuUI::RenderCredits(int X, int Y)
 	Y += 4;
 	Renderer->DrawBox(Y, X, width, height);
 	Renderer->AddRender(Y + 2, X + 4, L"Credits", CC_WHITE);
-	Renderer->AddRender(Y + 4, X + 4, L"Render, Engine, UI, Logic : 이승재", CC_GRAY);
+	Renderer->AddRender(Y + 4, X + 4, L"Render, Engine, UI : 이승재", CC_GRAY);
 	Renderer->AddRender(Y + 5, X + 4, L"Player, Weapon : 박성규", CC_GRAY);
 	Renderer->AddRender(Y + 6, X + 4, L"Inventory, Item, Shop : 김인철", CC_GRAY);
 	Renderer->AddRender(Y + 7, X + 4, L"Monster, Attack Pattern : 최현준", CC_GRAY);
 	Renderer->AddRender(Y + 8, X + 4, L"LevelUp 성창훈", CC_GRAY);
-	Renderer->AddRender(Y + 10, X + 4, L"Chronos Realm - Console Isometric RPG", CC_DARKYELLOW);
+	Renderer->AddRender(Y + 10, X + 4, L"DIABL5 - Console Isometric RPG", CC_DARKYELLOW);
 	Renderer->AddRender(Y + 12, X + 4, L"(ESC/Z/X) 돌아가기", CC_DARKGRAY);
 }

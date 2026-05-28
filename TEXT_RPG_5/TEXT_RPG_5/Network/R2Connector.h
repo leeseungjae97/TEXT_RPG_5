@@ -1,5 +1,4 @@
-﻿/*
-#pragma once
+﻿#pragma once
 #include "../Singleton.h"
 #include "../pch.h"
 #include "../Struct/R2Config.h"
@@ -12,7 +11,7 @@ public:
 	~R2Connector();
 public:
 	string ReadLeaderboard();
-	void WriteLeaderboard(string Name, float Time);
+	void WriteLeaderboard(string Name, float Time, int Level = 1);
 	
 private:
 	string Trim(const string& text);
@@ -28,22 +27,23 @@ private:
 	const string& objectKey,
 	string& outText);
 	
-	string CreateNewPlayerIniText();
-	string UpdatePlayerIniText(const string& oldText);
+	string CreateLeaderboardText(const string& oldText, const string& Name, float Time, int Level);
 	
 	bool WriteOrUpdateIniOnR2(
 	Aws::S3::S3Client& s3Client,
 	const R2Config& config,
-	const string& objectKey);
+	const string& objectKey,
+	const string& Name,
+	float Time,
+	int Level);
 	
 public:
 	
 private:
 	R2Config Config;
 
-	const string ConfigPath = "../../r2Config.ini";
+	const string ConfigPath = "../r2Config.ini";
 
 	// R2 Bucket 안에 저장될 파일 이름
 	const string ObjectKey = "text-rpg-leaderboard.txt";
-};
-*/
+}; 

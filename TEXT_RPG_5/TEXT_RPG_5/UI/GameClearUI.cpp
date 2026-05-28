@@ -3,6 +3,7 @@
 #include "../Define.h"
 #include "../Manager/DisplayManager.h"
 #include "../Manager/InputManager.h"
+#include "../Manager/TimeManager.h"
 
 GameClearAction GameClearUI::Tick(float DeltaTime)
 {
@@ -16,7 +17,7 @@ GameClearAction GameClearUI::Tick(float DeltaTime)
 	InputManager* input = InputManager::GetInstance();
 	if (input->IsKeyTap(KeyCode::UP) || input->IsKeyTap(KeyCode::DOWN))
 	{
-		SelectedIndex = 1 - SelectedIndex;
+		SelectedIndex = input->IsKeyTap(KeyCode::UP) ? (SelectedIndex + 2) % 3 : (SelectedIndex + 1) % 3;
 	}
 
 	if (input->IsKeyTap(KeyCode::_1))
@@ -27,9 +28,15 @@ GameClearAction GameClearUI::Tick(float DeltaTime)
 	{
 		return GameClearAction::MainMenu;
 	}
+	if (input->IsKeyTap(KeyCode::_3))
+	{
+		return GameClearAction::RegisterRank;
+	}
 	if (input->IsKeyTap(KeyCode::Z))
 	{
-		return SelectedIndex == 0 ? GameClearAction::Retry : GameClearAction::MainMenu;
+		if (SelectedIndex == 0) return GameClearAction::Retry;
+		if (SelectedIndex == 1) return GameClearAction::MainMenu;
+		return GameClearAction::RegisterRank;
 	}
 
 	return GameClearAction::None;
@@ -47,6 +54,7 @@ void GameClearUI::Render()
 	RenderCastle(SCREEN_WIDTH / 2 + 12, 14);
 	RenderMenu(54, 36);
 	RenderEpilogue(4, SCREEN_HEIGHT - 13);
+	Renderer->AddRender(31, 54, L"CLEAR TIME : " + TimeManager::GetInstance()->GetFormattedStoredTime(), CC_CYAN);
 }
 
 void GameClearUI::RenderTitle(int X, int Y)
@@ -65,7 +73,7 @@ void GameClearUI::RenderTitle(int X, int Y)
 	{
 		Renderer->AddRender(Y + i, X, title[i], CC_LIGHTGRAY);
 	}
-	Renderer->AddRender(Y + 7, X + 14, L"----  C H R O N O S   R E A L M  ----", CC_DARKYELLOW);
+	Renderer->AddRender(Y + 7, X + 14, L"---- D I A B L 5  ----", CC_DARKYELLOW);
 }
 
 void GameClearUI::RenderCastle(int X, int Y)
@@ -88,12 +96,12 @@ void GameClearUI::RenderCastle(int X, int Y)
 		L"          | | | | | | | || | | | | | |",
 		L"          | | | | | | | || | | | | | |",
 			L" ",
-		L"Render, Engine, UI, Logic : 이승재",
+		L"Render, Engine, UI : 이승재",
 		L"Player, Weapon : 박성규",
 		L"Inventory, Item, Shop : 김인철",
 		L"Monster, Attack Pattern : 최현준",
 		L"LevelUp 성창훈",
-		L"Chronos Realm - Console Isometric RPG",
+		L"DIABL5 - Console Isometric RPG",
 	};
 
 	for (int i = 0; i < static_cast<int>(castle.size()); ++i)
@@ -104,10 +112,10 @@ void GameClearUI::RenderCastle(int X, int Y)
 
 void GameClearUI::RenderMenu(int X, int Y)
 {
-	static const vector<wstring> leftTexts = { L"[1]  Retry", L"[2]  Quit" };
-	static const vector<wstring> rightTexts = { L"다시 플레이하기", L"메인 메뉴로 가기" };
+	static const vector<wstring> leftTexts = { L"[1]  Retry", L"[2]  Quit", L"[3]  Register" };
+	static const vector<wstring> rightTexts = { L"다시 플레이하기", L"메인 메뉴로 가기", L"랭크 등록" };
 
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
 		const bool bSelected = SelectedIndex == i;
 		const int y = Y + i * 4;
@@ -125,8 +133,9 @@ void GameClearUI::RenderMenu(int X, int Y)
 
 void GameClearUI::RenderEpilogue(int X, int Y)
 {
-	Renderer->AddRender(Y, X, L"YOU HAVE CONQUERED THE REALM OF TIME.", CC_GRAY);
-	Renderer->AddRender(Y + 2, X, L"YOUR LEGEND WILL BE WRITTEN IN THE CHRONICLES.", CC_GRAY);
-	Renderer->AddRender(Y + 4, X, L"THANK YOU, TRAVELER.", CC_GRAY);
-	Renderer->AddRender(Y + 7, X, L"-----------------------------<>-----------------------------", CC_GRAY);
+	Renderer->AddRender(Y, X, L"YOU HAVE DESCENDED INTO THE DEPTHS OF DIABL5.", CC_GRAY);
+	Renderer->AddRender(Y + 2, X, L"THE LORDS OF DARKNESS HAVE BEEN SILENCED.", CC_GRAY);
+	Renderer->AddRender(Y + 4, X, L"YOUR LEGEND WILL ECHO THROUGH THE ABYSS.", CC_GRAY);
+	Renderer->AddRender(Y + 7, X, L"THANK YOU, WANDERER.", CC_GRAY);
+	Renderer->AddRender(Y + 9, X, L"-----------------------------<>-----------------------------", CC_GRAY);
 }
