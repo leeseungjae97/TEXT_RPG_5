@@ -30,10 +30,37 @@ static const vector<FItemWeight> ShopItemPool =
     { ItemId::STAFF,           10 },
     { ItemId::LEATHER_HELMET,   5 },
     { ItemId::LEATHER_ARMOR,    5 },
-    { ItemId::LEATHER_BOOTS,    5 },
+    { ItemId::EXPLORER_BOOTS,    5 },
     { ItemId::PLATE_HELMET,     2 },
     { ItemId::PLATE_ARMOR,      2 },
-    { ItemId::PLATE_BOOTS,      2 },
+    { ItemId::BOOTS_OF_WIND,      2 },
+};
+
+static const vector<FItemWeight> ShopBonusPool =
+{
+    { ItemId::LONGSWORD, 30 },
+    { ItemId::BOW,       30 },
+    { ItemId::AXE,       30 },
+    { ItemId::STAFF,     30 },
+    { ItemId::LEATHER_ARMOR,     10 },
+    { ItemId::LEATHER_HELMET,     10 },
+    { ItemId::EXPLORER_BOOTS,     10 },
+    { ItemId::PLATE_ARMOR,     10 },
+    { ItemId::PLATE_HELMET,     10 },
+    { ItemId::BOOTS_OF_WIND,     10 },
+};
+
+struct FShopBonusItemRule
+{
+    const vector<FItemWeight>* Pool;
+    ERarity Rarity;
+};
+
+static const vector<FShopBonusItemRule> ShopBonusItemRules =
+{
+    { &ShopBonusPool, ERarity::Rare },
+    { &ShopBonusPool, ERarity::Rare },
+    { &ShopBonusPool, ERarity::Unique },
 };
 
 ShopManager::ShopManager()
@@ -93,6 +120,14 @@ void ShopManager::RestoreShop()
             Container[y][x] = GetRandomItem();
         }
     }
+
+    for (const FShopBonusItemRule& Rule : ShopBonusItemRules)
+    {
+        if (Rule.Pool != nullptr)
+        {
+            AddItemToNextEmptySlot(ItemManager::GetInstance()->CreateRandomItemWithRarity(*Rule.Pool, Rule.Rarity));
+        }
+    }
 }
 //테스트
 void ShopManager::BeginPlay()
@@ -127,6 +162,29 @@ UItem* ShopManager::GetItem(Vector Index)
 UItem* ShopManager::GetRandomItem()
 {
     return ItemManager::GetInstance()->CreateRandomItem(ShopItemPool);
+}
+
+bool ShopManager::AddItemToNextEmptySlot(UItem* Item)
+{
+    if (Item == nullptr)
+    {
+        return false;
+    }
+
+    for (int y = 0; y < (int)Container.size(); ++y)
+    {
+        for (int x = 0; x < (int)Container[y].size(); ++x)
+        {
+            if (Container[y][x] == nullptr)
+            {
+                Container[y][x] = Item;
+                return true;
+            }
+        }
+    }
+
+    delete Item;
+    return false;
 }
 
 

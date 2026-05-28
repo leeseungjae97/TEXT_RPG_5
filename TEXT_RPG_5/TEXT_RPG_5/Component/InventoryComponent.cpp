@@ -646,10 +646,10 @@ void UInventoryComponent::Tick(float DeltaTime)
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::STAFF));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_HELMET));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_ARMOR));
-        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_BOOTS));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::EXPLORER_BOOTS));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_HELMET));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_ARMOR));
-        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_BOOTS));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::BOOTS_OF_WIND));
     }
 
     //추가 아이템 지급 소모품 및 골드

@@ -42,7 +42,7 @@ private:
 	EDirection FacingDirection;
 	EDirection PreviousFacingDirection;
 	float MoveElapsedTime = 0.0f;
-	float MoveInterval = 0.12f;
+	float MoveInterval = 0.24f;
 	float TurnElapsedTime = 0.0f;
 	float TurnDuration = 0.18f;
 	bool bWasOnShop = false;
@@ -53,6 +53,7 @@ public:
 	bool CanTeleportPosition(Vector Position);
 	bool FindTeleportPosition(Vector TargetPosition, Vector& OutPosition);
 	Vector GetTeleportTargetPosition();
+	float GetMoveIntervalByPlayerSpeed() const;
 	
 	bool IsNearShop(Vector Position);
 	

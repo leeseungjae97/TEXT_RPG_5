@@ -27,6 +27,8 @@ private:
     
     bool bSellMode = false;
     int LastVisitedShopId = -1;
+
+    bool AddItemToNextEmptySlot(UItem* Item);
     
 public:
     void SetPlayerInventory(UInventoryComponent* Inventory);

@@ -20,5 +20,7 @@ private:
 
 public:
     UItem* CreateItem(ItemId Id);
+    UItem* CreateItemWithRarity(ItemId Id, ERarity Rarity);
     UItem* CreateRandomItem(const vector<FItemWeight>& Pool);
+    UItem* CreateRandomItemWithRarity(const vector<FItemWeight>& Pool, ERarity Rarity);
 };

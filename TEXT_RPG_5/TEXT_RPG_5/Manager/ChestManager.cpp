@@ -16,10 +16,10 @@ static const vector<FItemWeight> ChestItemPool =
     { ItemId::STAFF,            10 },
     { ItemId::LEATHER_HELMET,    8 },
     { ItemId::LEATHER_ARMOR,     8 },
-    { ItemId::LEATHER_BOOTS,     8 },
+    { ItemId::EXPLORER_BOOTS,     8 },
     { ItemId::PLATE_HELMET,      4 },
     { ItemId::PLATE_ARMOR,       4 },
-    { ItemId::PLATE_BOOTS,       4 },
+    { ItemId::BOOTS_OF_WIND,       4 },
     { ItemId::HP_POTION,        200 },
     { ItemId::STRENGTH_POTION,  100 },
 };

@@ -126,12 +126,13 @@ void UMoveComponent::SetFacingDirection(EDirection Str)
 
 float UMoveComponent::GetMoveAlpha() const
 {
-	if (MoveInterval <= 0.0f)
+	const float CurrentMoveInterval = GetMoveIntervalByPlayerSpeed();
+	if (CurrentMoveInterval <= 0.0f)
 	{
 		return 1.0f;
 	}
 
-	return min(MoveElapsedTime / MoveInterval, 1.0f);
+	return min(MoveElapsedTime / CurrentMoveInterval, 1.0f);
 }
 
 float UMoveComponent::GetTurnAlpha() const
@@ -542,6 +543,23 @@ bool UMoveComponent::IsNearShop(Vector Position)
 	return false;
 }
 
+float UMoveComponent::GetMoveIntervalByPlayerSpeed() const
+{
+	if (PlayerPtr == nullptr)
+	{
+		return MoveInterval;
+	}
+
+	const float MovementSpeed = PlayerPtr->GetMovementSpeed();
+	if (MovementSpeed <= 0.0f)
+	{
+		return MoveInterval;
+	}
+
+	return (MoveInterval * 100.0f) / MovementSpeed;
+}
+
+
 void UMoveComponent::Tick(float DeltaTime)
 {
 	if(nullptr == PlayerPtr)
@@ -556,17 +574,20 @@ void UMoveComponent::Tick(float DeltaTime)
 	TurnElapsedTime += DeltaTime;
 	TeleportElapsedTime += DeltaTime;
 
+	const float CurrentMoveInterval = GetMoveIntervalByPlayerSpeed();
+	const float MoveAlpha = GetMoveAlpha();
+
 	if (PlayerPtr->IsMoving())
 	{
-		PlayerPtr->CommitMoveIfNeeded(GetMoveAlpha());
+		PlayerPtr->CommitMoveIfNeeded(MoveAlpha);
 	}
 
-	if (MoveElapsedTime < MoveInterval)
+	if (MoveElapsedTime < CurrentMoveInterval)
 	{
 		return;
 	}
 
-	PlayerPtr->FinishMoveIfNeeded(GetMoveAlpha());
+	PlayerPtr->FinishMoveIfNeeded(MoveAlpha);
 	
 	OpenShop();
 	if (UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>())
