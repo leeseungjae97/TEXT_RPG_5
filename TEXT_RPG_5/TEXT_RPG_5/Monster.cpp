@@ -50,11 +50,18 @@ Monster::~Monster()
 string Monster::GetName()
 {
 	if (Name.find(L"고블린") != wstring::npos) return "Goblin";
+	
+	if (Name.find(L"킹슬라임") != wstring::npos) return "KingSlime";
 	if (Name.find(L"슬라임") != wstring::npos) return "Slime";
+	
+	if (Name.find(L"오크메이지") != wstring::npos) return "OrcMage";
 	if (Name.find(L"오크") != wstring::npos) return "Orc";
+	
 	if (Name.find(L"드래곤") != wstring::npos) return "Dragon";
 	if (Name.find(L"거미") != wstring::npos) return "Spider";
 	if (Name.find(L"Troll") != wstring::npos) return "Troll";
+	if (Name.find(L"미믹") != wstring::npos) return "Mimic";
+	
 	return "Monster";
 }
 
@@ -645,28 +652,43 @@ void Monster::ConfigureForStage(int InLevel, bool InBoss)
 	string typeName = GetName();
 	if (typeName == "Goblin")
 	{
-		MaxHealth = Level * 25 + rand() % (Level * 10 + 1);
-		Attack = Level * 3 + rand() % (Level * 3 + 1);
+		MaxHealth = Level * 45 + rand() % (Level * 15 + 1);
+		Attack = Level * 6 + rand() % (Level * 3 + 1);
 	}
 	else if (typeName == "Slime")
 	{
-		MaxHealth = Level * 20 + rand() % (Level * 8 + 1);
-		Attack = Level * 2 + rand() % (Level * 2 + 1);
+		MaxHealth = Level * 35 + rand() % (Level * 10 + 1);
+		Attack = Level * 4 + rand() % (Level * 2 + 1);
 	}
 	else if (typeName == "Orc")
 	{
-		MaxHealth = Level * 50 + rand() % (Level * 20 + 1);
-		Attack = Level * 7 + rand() % (Level * 5 + 1);
+		MaxHealth = Level * 70 + rand() % (Level * 20 + 1);
+		Attack = Level * 10 + rand() % (Level * 5 + 1);
 	}
 	else if (typeName == "Spider")
 	{
-		MaxHealth = Level * 30 + rand() % (Level * 10 + 1);
-		Attack = Level * 4 + rand() % (Level * 4 + 1);
+		MaxHealth = Level * 50 + rand() % (Level * 15 + 1);
+		Attack = Level * 7 + rand() % (Level * 3 + 1);
+	}
+	else if (typeName == "KingSlime")
+	{
+		MaxHealth = Level * 220 + rand() % (Level * 60 + 1);
+		Attack = Level * 25 + rand() % (Level * 5 + 1);
+	}
+	else if (typeName == "Mimic")
+	{
+		MaxHealth = Level * 180 + rand() % (Level * 50 + 1);
+		Attack = Level * 30 + rand() % (Level * 6 + 1);
+	}
+	else if (typeName == "OrcMage")
+	{
+		MaxHealth = Level * 170 + rand() % (Level * 50 + 1);
+		Attack = Level * 30 + rand() % (Level * 6 + 1);
 	}
 	else if (typeName == "Dragon")
 	{
-		MaxHealth = Level * 80 + rand() % (Level * 30 + 1);
-		Attack = Level * 12 + rand() % (Level * 8 + 1);
+		MaxHealth = Level * 300 + rand() % (Level * 80 + 1);
+		Attack = Level * 18 + rand() % (Level * 8 + 1);
 	}
 	else
 	{
@@ -676,7 +698,8 @@ void Monster::ConfigureForStage(int InLevel, bool InBoss)
 
 	if (bIsBoss)
 	{
-		MaxHealth *= 2;
+		MaxHealth = static_cast<int>(MaxHealth * 1.25f);
+		//MaxHealth *= 2;
 		Attack += Level * 5;
 	}
 
@@ -686,7 +709,7 @@ void Monster::ConfigureForStage(int InLevel, bool InBoss)
 
 void Monster::TrySetShiny()
 {
-	if (rand() % 100 == 0)
+	if (rand() % 30 == 0)
 	{
 		bIsShiny = true;
 		

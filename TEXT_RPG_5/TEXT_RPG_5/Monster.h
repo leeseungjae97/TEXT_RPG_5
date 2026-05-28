@@ -15,6 +15,8 @@ protected:
 	int Health;
 	int MaxHealth;
 	int Attack;
+	
+	int RenderScale = 1;
 
 protected:
 	

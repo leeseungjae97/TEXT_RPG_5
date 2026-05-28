@@ -103,8 +103,8 @@ vector<FItemWeight> Spider::GetDropTable()
     {
         { ItemId::SPIDER_EYE, 70 },
         { ItemId::HP_POTION,  20 },
-        { ItemId::BOW,        10 },
-        { ItemId::STAFF, 5},
+        { ItemId::BOW,        1 },
+        { ItemId::STAFF, 5} 
         
-        };
+      };
 }
