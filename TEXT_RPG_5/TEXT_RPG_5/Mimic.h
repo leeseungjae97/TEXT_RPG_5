@@ -15,4 +15,11 @@ private:
     void RushWithCrossAttack();
     void CrossRushAttack();
     void AddAttackCell(Vector Pos);
+    
+public:
+    bool IsDiscovered() { return bIsDiscovered; }
+    void SetDiscovered() { bIsDiscovered = true; }
+    
+private:
+    bool bIsDiscovered;
 };

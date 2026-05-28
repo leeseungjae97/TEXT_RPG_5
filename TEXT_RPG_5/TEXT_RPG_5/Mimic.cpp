@@ -24,11 +24,10 @@ Mimic::Mimic(int PlayerLevel)
 
     PrevPosition = Position;
 
-    
     bUseBfs = false;
-
+    bIsDiscovered = false;
     
-    AttackRange = 3;
+    AttackRange = 1;
 
     AttackInterval = 3.0f;
     AttackElapsedtime = 0.0f;
@@ -45,11 +44,15 @@ void Mimic::BuildAttackValue(Player* player)
     }
 
     AttackValue.clear();
-
+    AttackRange = 3;
     RushWithCrossAttack();
 
     AttackVisibleTime = AttackVisibleDuration;
     AttackElapsedtime = 0.0f;
+    
+    bIsDiscovered = true;
+    bUseBfs = true;
+    
 }
 
 void Mimic::CrossRushAttack()
@@ -143,10 +146,10 @@ void Mimic::RushWithCrossAttack()
     //     BeginMoveTo(NextPosition);
     // }
     // 순간이동 느낌
-    if (!(FinalPosition.X == Position.X && FinalPosition.Y == Position.Y))
-    {
-        BeginMoveTo(FinalPosition);
-    }
+    // if (!(FinalPosition.X == Position.X && FinalPosition.Y == Position.Y))
+    // {
+    //     BeginMoveTo(FinalPosition);
+    // }
 }
 
 void Mimic::AddAttackCell(Vector Pos)

@@ -45,8 +45,9 @@ void MapManager::Tick(float DeltaTime)
 // G : Goblin
 // D : Spider
 // S : Shop
-// T : Monster 스폰 위치
+// T : Mimmic, Box
 // C : Cinema -> 보스 연출이 나오는 트리거 위치
+// K : Monster 스포너 위치
 // B : Boss {킹슬라임, 오크메이지, 킹스파이더, 드래곤}
 void MapManager::MapParsing(int CurrentStage)
 {
@@ -120,13 +121,30 @@ void MapManager::MapParsing(int CurrentStage)
 					Map[CurrentPos.Y][CurrentPos.X] = {MapObjectType::Shop, NO_ID};
 				}
 				break;
-			case 'T': // Mimmic or Box (상자)
+			case 'T': // Mimic or Box (상자)
 				{
-					Map[i][j] = { MapObjectType::Chest, NO_ID };
-					ChestManager::GetInstance()->RegisterChest(CurrentPos);
+					if(rand() % 2 == 0)
+					{
+						ChestManager::GetInstance()->RegisterChest(CurrentPos);
+						Map[i][j] = { MapObjectType::Chest, NO_ID };
+					}
+					else
+					{
+						Mimic* M = SceneManager::GetInstance()->SpawnObject<Mimic>(CurrentStage + 1);
+						M->ConfigureForStage(CurrentStage);
+					
+						M->SetPosition(CurrentPos);
+						M->SetPrevPosition(CurrentPos);
+						M->SetNextPosition(CurrentPos);
+					}
 				}
 				break;
-			case 'C': // 나중에
+			case 'C': // 보스 연출 트리거
+				{
+					
+				}
+				break;
+			case 'K': // Monster Spawner
 				{
 					
 				}
