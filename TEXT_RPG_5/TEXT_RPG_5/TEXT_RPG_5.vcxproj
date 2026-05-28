@@ -1791,7 +1791,6 @@
     <ClInclude Include="Enum\ComponentTypeEnum.h" />
     <ClInclude Include="Enum\Direction.h" />
     <ClInclude Include="Enum\ItemTypeEnum.h" />
-    <ClInclude Include="Enum\OverlayTileType.h" />
     <ClInclude Include="Enum\StatType.h" />
     <ClInclude Include="Enum\MapObjectTypeEnum.h" />
     <ClInclude Include="Enum\WeaponType.h" />
@@ -1838,7 +1837,6 @@
     <ClInclude Include="Spider.h" />
     <ClInclude Include="Struct\ItemInfo.h" />
     <ClInclude Include="Struct\ItemWeight.h" />
-    <ClInclude Include="Struct\OverlayTile.h" />
     <ClInclude Include="Struct\Recipe.h" />
     <ClInclude Include="Struct\Buff.h" />
     <ClInclude Include="Struct\R2Config.h" />
