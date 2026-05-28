@@ -108,7 +108,7 @@ void SceneManager::LoadCurrentStage()
 		CurrentPlayer = SpawnObject<Player>("player", 100, 30);
 	}
 	const int stage = StageManager::GetInstance()->GetCurrentStage();
-	// StageManager::GetInstance()->SetCurrentStage(stage);
+	// StageManager::GetInstance()->SetCurrentStage(2);
 	MapManager::GetInstance()->MapParsing(stage);
 	
 	Vector playerStart = MapManager::GetInstance()->GetPlayerPosition(); 
