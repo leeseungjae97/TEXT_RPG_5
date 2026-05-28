@@ -1410,6 +1410,7 @@
     <ClCompile Include="UI\MainMenuUI.cpp" />
     <ClCompile Include="UI\NameInputUI.cpp" />
     <ClCompile Include="UI\ShopUI.cpp" />
+    <ClCompile Include="UI\CraftingUI.cpp" />
     <ClCompile Include="UI\HUDUI.cpp" />
     <ClCompile Include="Manager\DisplayManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1819,6 +1820,7 @@
     <ClInclude Include="Spider.h" />
     <ClInclude Include="Struct\ItemInfo.h" />
     <ClInclude Include="Struct\ItemWeight.h" />
+    <ClInclude Include="Struct\Recipe.h" />
     <ClInclude Include="Struct\Buff.h" />
     <ClInclude Include="Troll.h" />
     <ClInclude Include="Struct\Coordinate.h" />
@@ -1835,6 +1837,7 @@
     <ClInclude Include="UI\MainMenuUI.h" />
     <ClInclude Include="UI\NameInputUI.h" />
       <ClInclude Include="UI\ShopUI.h" />
+      <ClInclude Include="UI\CraftingUI.h" />
       <ClInclude Include="UI\HUDUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

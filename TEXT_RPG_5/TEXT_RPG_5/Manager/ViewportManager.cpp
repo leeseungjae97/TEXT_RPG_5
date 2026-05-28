@@ -1323,6 +1323,10 @@ void ViewportManager::RenderUI()
 		{
 			Shop.Render();
 		}
+		else if (inventoryComponent != nullptr && inventoryComponent->GetOnCrafting())
+		{
+			Crafting.Render();
+		}
 		else
 		{
 			Inventory.Render();
@@ -1345,6 +1349,7 @@ void ViewportManager::ResetRuntimeCache()
 	PlayerStatus.ResetCache();
 	Inventory.ResetCache();
 	Shop.ResetCache();
+	Crafting.ResetCache();
 	ItemLog.Reset();
 }
 

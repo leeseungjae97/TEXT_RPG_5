@@ -1,50 +1,38 @@
-﻿//CraftingManager.cpp
+//CraftingManager.cpp
 
 #include "CraftingManager.h"
 #include "ItemManager.h"
 #include "../Item/ItemDB.h"
 #include "../Item/Item.h"
 #include "../Component/InventoryComponent.h"
-#include "../Struct/ItemWeight.h"
+#include "../Struct/Recipe.h"
 
-/* for template
-for (int y = 0; y < Container.size(); ++y)
-{
-    for (int x = 0; x < MaxColumn; ++x)
-    {
-        if (Container[y][x] != nullptr)
-        {
-            >>Execute<<
-        }
-    }
-}
-*/
 
-static const vector<FItemWeight> ShopItemPool =
+static const vector<FRecipe> RecipeBook =
 {
-    { ItemId::HP_POTION,       150 },
-    { ItemId::STRENGTH_POTION, 50 },
-    { ItemId::LONGSWORD,       10 },
-    { ItemId::BOW,             10 },
-    { ItemId::AXE,             10 },
-    { ItemId::STAFF,           10 },
-    { ItemId::LEATHER_HELMET,   5 },
-    { ItemId::LEATHER_ARMOR,    5 },
-    { ItemId::LEATHER_BOOTS,    5 },
-    { ItemId::PLATE_HELMET,     2 },
-    { ItemId::PLATE_ARMOR,      2 },
-    { ItemId::PLATE_BOOTS,      2 },
+    { ItemId::LEATHER_ARMOR,  { ItemId::GOBLIN_LEATHER, ItemId::GOBLIN_LEATHER } },
+    { ItemId::LEATHER_HELMET, { ItemId::GOBLIN_LEATHER, ItemId::SLIME_JELLY } },
+    { ItemId::LEATHER_BOOTS,  { ItemId::GOBLIN_LEATHER, ItemId::ORC_TUSK } },
+    { ItemId::AXE,            { ItemId::ORC_TUSK, ItemId::LONGSWORD } },
+    { ItemId::FLAME_POTION,   { ItemId::SPIDER_EYE, ItemId::STRENGTH_POTION } },
+    { ItemId::PLATE_HELMET,   { ItemId::ORC_TUSK, ItemId::GOBLIN_LEATHER, ItemId::SLIME_JELLY } },
 };
 
 CraftingManager::CraftingManager()
 {
-    Container.resize(MaxRow, vector<UItem*>(MaxColumn, nullptr));  // MaxRow 기준으로 초기화
-    RestoreShop();
+    Container.resize(MaxRow, vector<UItem*>(MaxColumn, nullptr));
 }
 
 CraftingManager::~CraftingManager()
 {
-    for (int y = 0; y < Container.size(); ++y)
+    ClearContainer();
+    Container.clear();
+}
+
+
+void CraftingManager::ClearContainer()
+{
+    for (int y = 0; y < (int)Container.size(); ++y)
     {
         for (int x = 0; x < MaxColumn; ++x)
         {
@@ -52,8 +40,6 @@ CraftingManager::~CraftingManager()
             Container[y][x] = nullptr;
         }
     }
-
-    Container.clear();
 }
 
 
@@ -62,40 +48,9 @@ void CraftingManager::SetPlayerInventory(UInventoryComponent* Inventory)
     PlayerInventory = Inventory;
 }
 
-void CraftingManager::RestoreShop()
-{
-    for (int y = 0; y < Container.size(); ++y)
-    {
-        for (int x = 0; x < MaxColumn; ++x)
-        {
-            delete Container[y][x];
-        }
-    }
-    
-    Container.clear();
-    Container.resize(MaxRow, vector<UItem*>(MaxColumn, nullptr));  // MaxRow 기준으로 초기화
 
-    for (int i = 0; i < NumberOfItems; ++i)
-    {
-        int x = i % MaxColumn;
-        int y = i / MaxColumn;
-
-        if (y < MaxRow)
-        {
-            Container[y][x] = GetRandomItem();
-        }
-    }
-}
-//테스트
 void CraftingManager::BeginPlay()
 {
-    // ShopPoses.resize(3);
-    //
-    // for (int i = 0 ; i < ShopPoses.size(); ++i)
-    // {
-    //     ShopPoses[i].X = 5 + i * 2;
-    //     ShopPoses[i].Y = 5 + i * 2;
-    // }
 }
 
 
@@ -105,98 +60,116 @@ UItem* CraftingManager::GetItem(Vector Index)
     {
         return nullptr;
     }
-    
+
     if (Index.X < 0 || Index.X >= MaxColumn)
     {
         return nullptr;
     }
-    
-    
+
     return Container[Index.Y][Index.X];
 }
 
 
-UItem* CraftingManager::GetRandomItem()
+const FRecipe* CraftingManager::GetRecipeByResult(ItemId Result)
 {
-    return ItemManager::GetInstance()->CreateRandomItem(ShopItemPool);
+    for (const FRecipe& Recipe : RecipeBook)
+    {
+        if (Recipe.Result == Result)
+            return &Recipe;
+    }
+
+    return nullptr;
 }
 
 
-bool CraftingManager::SetSellMode(bool EnableSellMode)
+bool CraftingManager::HasIngredients(const FRecipe& Recipe)
 {
-    if (EnableSellMode != bSellMode)
+    if (PlayerInventory == nullptr)
+        return false;
+
+    for (ItemId Ingredient : Recipe.Ingredients)
     {
-        bSellMode = EnableSellMode;
-        if (PlayerInventory != nullptr)
+        int Required = 0;
+        for (ItemId Other : Recipe.Ingredients)
+            if (Other == Ingredient) ++Required;
+
+        if (PlayerInventory->CountItemById(Ingredient) < Required)
+            return false;
+    }
+
+    return true;
+}
+
+
+bool CraftingManager::OpenCraftingFor(ItemId Material)
+{
+    ClearContainer();
+    Container.clear();
+    Container.resize(MaxRow, vector<UItem*>(MaxColumn, nullptr));
+
+    int Index = 0;
+    for (const FRecipe& Recipe : RecipeBook)
+    {
+        bool UsesMaterial = false;
+        for (ItemId Ingredient : Recipe.Ingredients)
         {
-            PlayerInventory->ResetCursor();
+            if (Ingredient == Material)
+            {
+                UsesMaterial = true;
+                break;
+            }
         }
-        return bSellMode;
+
+        if (!UsesMaterial)
+            continue;
+
+        int x = Index % MaxColumn;
+        int y = Index / MaxColumn;
+        if (y >= MaxRow)
+            break;
+
+        Container[y][x] = ItemManager::GetInstance()->CreateItem(Recipe.Result);
+        ++Index;
     }
 
-    return bSellMode;
+    return Index > 0;
 }
 
-bool CraftingManager::ToggleSellMode()
+
+bool CraftingManager::SelectCursor()
 {
-    bSellMode = !bSellMode;
-    if (PlayerInventory != nullptr)
-    {
-        PlayerInventory->ResetCursor();
-    }
-    return bSellMode;
+    return TryCraftItem();
 }
 
 
-
-void CraftingManager::SelectCursor()
+bool CraftingManager::TryCraftItem()
 {
-    if (bSellMode == true)
+    if (PlayerInventory == nullptr)
+        return false;
+    
+    UItem* Result = GetItem(PlayerInventory->GetCursor());
+    if (Result == nullptr)
+        return false;
+    
+    ItemId ResultId = Result->GetItemInfo().Id;
+    const FRecipe* Recipe = GetRecipeByResult(ResultId);
+    if (Recipe == nullptr)
+        return false;
+    
+    if (HasIngredients(*Recipe) == false)
     {
-        TrySellItem();
-    }
-    else
-    {
-        TryBuyItem();
-    }
-}
-
-void CraftingManager::TryBuyItem()
-{
-    UItem* Item = GetItem(PlayerInventory->GetCursor());
-    if (Item == nullptr)
-    {
-        return;
+        
+        return false;
+        
     }
     
-    if (PlayerInventory->GetGold() >= Item->GetItemInfo().Price)
+    for (ItemId Ingredient : Recipe->Ingredients)
     {
-        if (PlayerInventory->BuyItem(Item) == true )
-        {
-            Vector Cursor = PlayerInventory->GetCursor();
-            Container[Cursor.Y][Cursor.X] = nullptr;
-        }
-        else
-        {
-            //인벤토리가 가득 찼다는 피드백
-        }
+        UItem* Material = PlayerInventory->FindItemById(Ingredient);
+        PlayerInventory->RemoveItem(Material);
+        
     }
-    else
-    {
-        //골드가 부족하다는 피드백
-    }
-}
-
-void CraftingManager::EnterNewShop(int ShopId)
-{
-    if (ShopId != LastVisitedShopId)
-    {
-        RestoreShop();
-        LastVisitedShopId = ShopId;
-    }
-}
-
-void CraftingManager::TrySellItem()
-{
-    PlayerInventory->SellItem(PlayerInventory->GetItem(PlayerInventory->GetCursor()));
+    
+    
+    return PlayerInventory->AcquireItem(ItemManager::GetInstance()->CreateItem(ResultId));
 }

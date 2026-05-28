@@ -3,6 +3,7 @@
 #include "../UI/InventoryUI.h"
 #include "../UI/HUDUI.h"
 #include "../UI/ShopUI.h"
+#include "../UI/CraftingUI.h"
 #include "../UI/DialogUI.h"
 #include "../UI/BattleUI.h"
 #include "../UI/ItemLogUI.h"
@@ -59,6 +60,7 @@ private:
 	HUDUI PlayerStatus;
 	InventoryUI Inventory;
 	ShopUI Shop;
+	CraftingUI Crafting;
 	DialogUI Dialog;
 	BattleUI Battle;
 	ItemLogUI ItemLog;
