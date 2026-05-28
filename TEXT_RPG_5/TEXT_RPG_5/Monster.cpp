@@ -102,6 +102,12 @@ void Monster::Tick(float DeltaTime)
 
 	if (IsDead())
 	{
+		//부활테스트
+		if (Revive())
+		{
+			return;
+		}
+		
 		Destroy();
 		return;
 	}
@@ -615,7 +621,7 @@ void Monster::ConfigureForStage(int InLevel, bool InBoss)
 
 void Monster::TrySetShiny()
 {
-	if (rand() % 3 == 0)
+	if (rand() % 100 == 0)
 	{
 		bIsShiny = true;
 		

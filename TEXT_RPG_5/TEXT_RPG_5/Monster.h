@@ -53,6 +53,9 @@ public:
 	void TakeDamage(int damage);
 	bool IsDead();
 	
+	//부활테스트
+	virtual bool Revive() { return false; }
+	
 	bool IsShiny() const;
 	void TrySetShiny();
 	bool IsBoss() const { return bIsBoss; }
