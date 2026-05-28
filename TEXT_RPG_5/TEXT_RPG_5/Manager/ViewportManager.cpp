@@ -14,6 +14,7 @@
 #include "../Component/MoveComponent.h"
 #include "../Define.h"
 #include "../Monster.h"
+#include "../Mimic.h"
 #include "../Player.h"
 #include "../Projectile.h"
 
@@ -141,6 +142,7 @@ namespace
 		if (name.find(L"오크") != wstring::npos) return L'O';
 		if (name.find(L"드래곤") != wstring::npos) return L'D';
 		if (name.find(L"거미") != wstring::npos) return L'A';
+		if (name.find(L"미믹") != wstring::npos) return L'T';
 		return L'M';
 	}
 
@@ -159,6 +161,7 @@ namespace
 		if (name.find(L"오크") != wstring::npos) return CC_DARKYELLOW;
 		if (name.find(L"드래곤") != wstring::npos) return CC_RED;
 		if (name.find(L"거미") != wstring::npos) return CC_DARKYELLOW;
+		if (name.find(L"미믹") != wstring::npos) return CC_DARKYELLOW;
 		return CC_MAGENTA;
 	}
 	wchar_t GetDirectionArrow(EDirection Direction)
@@ -468,7 +471,41 @@ void ViewportManager::Render2DtoISO()
 
 			drawPlayerWeapon(iso, weaponType, direction, attackAnimationAlpha, bAttackAnimating);
 		};
+	auto drawIsoChest = [&](Vector iso)
+	{
+		WORD bodyAttribute = MakeAttribute(CC_DARKYELLOW);
+		WORD lidAttribute = MakeAttribute(CC_YELLOW);
+		WORD bandAttribute = MakeAttribute(CC_DARKRED);
+		WORD lockAttribute = MakeAttribute(CC_WHITE);
+		WORD shadowAttribute = MakeAttribute(CC_DARKGRAY);
 
+		// 그림자
+		for (int dx = -3; dx <= 3; ++dx)
+			renderManager->PutCell(iso.Y + 1, iso.X + dx, L'_', shadowAttribute);
+
+		// 뚜껑
+		renderManager->PutCell(iso.Y - 3, iso.X - 3, L'/', lidAttribute);
+		renderManager->PutCell(iso.Y - 3, iso.X + 3, L'\\', lidAttribute);
+		for (int dx = -2; dx <= 2; ++dx)
+			renderManager->PutCell(iso.Y - 3, iso.X + dx, L'=', lidAttribute);
+
+		// 금속 띠
+		renderManager->PutCell(iso.Y - 2, iso.X - 3, L'|', bodyAttribute);
+		renderManager->PutCell(iso.Y - 2, iso.X + 3, L'|', bodyAttribute);
+		for (int dx = -2; dx <= 2; ++dx)
+			renderManager->PutCell(iso.Y - 2, iso.X + dx, L'-', bandAttribute);
+
+		// 몸통 + 자물쇠
+		renderManager->PutCell(iso.Y - 1, iso.X - 3, L'|', bodyAttribute);
+		renderManager->PutCell(iso.Y - 1, iso.X + 3, L'|', bodyAttribute);
+		renderManager->PutCell(iso.Y - 1, iso.X, L'o', lockAttribute);
+
+		// 바닥
+		renderManager->PutCell(iso.Y, iso.X - 3, L'|', bodyAttribute);
+		renderManager->PutCell(iso.Y, iso.X + 3, L'|', bodyAttribute);
+		for (int dx = -2; dx <= 2; ++dx)
+			renderManager->PutCell(iso.Y, iso.X + dx, L'_', bodyAttribute);
+	};
 	auto drawIsoMonsterActor = [&](Vector iso, Monster* monster, WORD attribute)
 		{
 			if (monster == nullptr)
@@ -583,6 +620,14 @@ void ViewportManager::Render2DtoISO()
 				renderManager->PutCell(iso.Y - 1, iso.X + 4, L'/', legAttribute);
 				return;
 			}
+			if (name.find(L"미믹") != wstring::npos)
+			{
+				WORD legAttribute = MakeAttribute(CC_DARKYELLOW);
+				WORD eyeAttribute = MakeAttribute(CC_RED);
+				drawIsoChest(iso);
+				
+				return;
+			}
 
 			drawIsoActor(iso, L'M', attribute, false);
 		};
@@ -610,6 +655,14 @@ void ViewportManager::Render2DtoISO()
 			{
 				return;
 			}
+			if (monster->GetDisplayName().find(L"미믹") != wstring::npos)
+			{
+				if (Mimic* mimic = dynamic_cast<Mimic*>(monster))
+				{
+					if (!mimic->IsDiscovered())
+						return;
+				}
+			}
 
 			int maxHealth = max(1, monster->GetMaxHealth());
 			int currentHealth = min(max(monster->GetHealth(), 0), maxHealth);
@@ -621,6 +674,14 @@ void ViewportManager::Render2DtoISO()
 			if (monster == nullptr)
 			{
 				return;
+			}
+			if (monster->GetDisplayName().find(L"미믹") != wstring::npos)
+			{
+				if (Mimic* mimic = dynamic_cast<Mimic*>(monster))
+				{
+					if (!mimic->IsDiscovered())
+						return;
+				}
 			}
 
 			wstring label = L"LV." + to_wstring(monster->GetLevel()) + L" " + monster->GetDisplayName();
@@ -1027,42 +1088,6 @@ void ViewportManager::Render2DtoISO()
 				// 	}
 				// }
 			}
-		};
-
-	auto drawIsoChest = [&](Vector iso)
-		{
-			WORD bodyAttribute = MakeAttribute(CC_DARKYELLOW);
-			WORD lidAttribute = MakeAttribute(CC_YELLOW);
-			WORD bandAttribute = MakeAttribute(CC_DARKRED);
-			WORD lockAttribute = MakeAttribute(CC_WHITE);
-			WORD shadowAttribute = MakeAttribute(CC_DARKGRAY);
-
-			// 그림자
-			for (int dx = -3; dx <= 3; ++dx)
-				renderManager->PutCell(iso.Y + 1, iso.X + dx, L'_', shadowAttribute);
-
-			// 뚜껑
-			renderManager->PutCell(iso.Y - 3, iso.X - 3, L'/', lidAttribute);
-			renderManager->PutCell(iso.Y - 3, iso.X + 3, L'\\', lidAttribute);
-			for (int dx = -2; dx <= 2; ++dx)
-				renderManager->PutCell(iso.Y - 3, iso.X + dx, L'=', lidAttribute);
-
-			// 금속 띠
-			renderManager->PutCell(iso.Y - 2, iso.X - 3, L'|', bodyAttribute);
-			renderManager->PutCell(iso.Y - 2, iso.X + 3, L'|', bodyAttribute);
-			for (int dx = -2; dx <= 2; ++dx)
-				renderManager->PutCell(iso.Y - 2, iso.X + dx, L'-', bandAttribute);
-
-			// 몸통 + 자물쇠
-			renderManager->PutCell(iso.Y - 1, iso.X - 3, L'|', bodyAttribute);
-			renderManager->PutCell(iso.Y - 1, iso.X + 3, L'|', bodyAttribute);
-			renderManager->PutCell(iso.Y - 1, iso.X, L'o', lockAttribute);
-
-			// 바닥
-			renderManager->PutCell(iso.Y, iso.X - 3, L'|', bodyAttribute);
-			renderManager->PutCell(iso.Y, iso.X + 3, L'|', bodyAttribute);
-			for (int dx = -2; dx <= 2; ++dx)
-				renderManager->PutCell(iso.Y, iso.X + dx, L'_', bodyAttribute);
 		};
 
 	vector<Vector> shopPositions;
