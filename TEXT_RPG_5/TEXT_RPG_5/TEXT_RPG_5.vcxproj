@@ -1145,6 +1145,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Manager\CraftingManager.cpp" />
     <ClCompile Include="Manager\InputManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1786,6 +1787,7 @@
     <ClInclude Include="Item\MiscItem.h" />
     <ClInclude Include="Item\UsableItem.h" />
     <ClInclude Include="Manager\BattleManager.h" />
+    <ClInclude Include="Manager\CraftingManager.h" />
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\ItemManager.h" />
     <ClInclude Include="Manager\MapManager.h" />
