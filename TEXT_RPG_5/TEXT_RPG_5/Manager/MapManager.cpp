@@ -16,6 +16,7 @@
 #include "../Mimic.h"
 #include "../Player.h"
 #include "../Projectile.h"
+#include "../QueenSpider.h"
 #include "../Map/Map.h"
 #include "../Enum/Boss.h"
 
@@ -151,7 +152,7 @@ void MapManager::MapParsing(int CurrentStage)
 						break;
 					case BossType::KING_SPIDER:
 						{
-							Dragon* boss = SceneManager::GetInstance()->SpawnObject<Dragon>(CurrentStage + 2);
+							QueenSpider* boss = SceneManager::GetInstance()->SpawnObject<QueenSpider>(CurrentStage + 2);
 							boss->ConfigureForStage(CurrentStage + 2, true);
 							boss->SetPosition(CurrentPos);
 							boss->SetPrevPosition(CurrentPos);
