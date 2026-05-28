@@ -52,7 +52,7 @@ void MapManager::MapParsing(int CurrentStage)
 		for (int j = 0 ; j < MAP_MAX_X; ++j)
 		{
 			char ch = StringMap[CurrentStage][i][j];
-			Vector CurrentPos = {i, j};
+			Vector CurrentPos = {j, i};
 			switch (ch)
 			{
 			case '.': // Path
@@ -115,7 +115,7 @@ void MapManager::MapParsing(int CurrentStage)
 					Map[CurrentPos.Y][CurrentPos.X] = {MapObjectType::Shop, NO_ID};
 				}
 				break;
-			case 'T': // Monster Spawn Trigger
+			case 'T': // Mimmic or Box
 				{
 					
 				}
