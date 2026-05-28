@@ -75,7 +75,7 @@ void InventoryUI::InventoryRender()
 	}
 
 	DrawBackground(1, 1, backgroundWidth, SCREEN_HEIGHT / 2);
-	Renderer->AddRender(2, 3, bChest ? L"(Z)교환  (X)버리기 (TAB/ESC)닫기" : L"(Z)적용/착용 (X)버리기 (A)조합  (C)강화  (I/ESC)닫기");
+	Renderer->AddRender(2, 3, bChest ? L"(Z)교환  (X)버리기 (TAB/ESC)닫기" : L"(Z)적용/착용 (X)버리기 (A)조합  (C)강화  (I/TAB/ESC)닫기");
 	DrawInventoryPanel(inventoryY, inventoryX, container, L"인벤토리", slotWidth, slotHeight);
 	if (bChest)
 		DrawChestPanel(equipmentY, equipmentX, slotWidth, slotHeight);

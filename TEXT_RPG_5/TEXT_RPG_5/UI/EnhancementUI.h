@@ -5,9 +5,8 @@ class Player;
 class DisplayManager;
 class UInventoryComponent;
 class UItem;
-struct FRecipe;
 
-class CraftingUI
+class EnhancementUI
 {
 public:
 	void Render();
@@ -17,7 +16,7 @@ private:
 	void DrawBackground(int Y, int X, int Width, int Height);
 	void DrawItemSlot(int Y, int X, int Width, int Height, const UItem* Item, bool bSelected = false);
 	void DrawItemPanel(int Y, int X, const vector<vector<UItem*>>& Items, const wstring& Title);
-	void DrawRecipeInfo(int Y, int X, const FRecipe* Recipe);
+	void DrawEnhancementInfo(int Y, int X, const UItem* Material);
 	wstring GetDisplayItemName(const UItem* Item);
 	wchar_t GetItemIcon(const UItem* Item);
 

@@ -743,7 +743,7 @@ void UInventoryComponent::Tick(float DeltaTime)
         if (Input->IsKeyTap(KeyCode::_2)) UseQuickSlot(1);
         if (Input->IsKeyTap(KeyCode::_3)) UseQuickSlot(2);
         if (Input->IsKeyTap(KeyCode::_4)) UseQuickSlot(3);
-        if (Input->IsKeyTap(KeyCode::I)) OpenInventory();
+        if (Input->IsKeyTap(KeyCode::I) || Input->IsKeyTap(KeyCode::TAB)) OpenInventory();
         // if (!IsChestAdjust() && ViewportManager::GetInstance()->IsChestUIOpen())
         // {
         //     ViewportManager::GetInstance()->CloseChest();
@@ -755,10 +755,11 @@ void UInventoryComponent::Tick(float DeltaTime)
 
     //이 밑으로는 다 bOpenedInventory가 true일 때만(인벤토리 열었을 경우에만) 작동.
 
-    if (Input->IsKeyTap(KeyCode::I)) CloseInventory();
-
-    //상자 닫기 (열려있을 때 TAB)
-    if (Input->IsKeyTap(KeyCode::TAB) && bOnChest) CloseInventory();
+    if (Input->IsKeyTap(KeyCode::I) || Input->IsKeyTap(KeyCode::TAB))
+    {
+        CloseInventory();
+        return;
+    }
 
     //크래프팅 모드 전환/복귀 (커서 아이템을 재료로 쓰는 레시피 나열)
     if (Input->IsKeyTap(KeyCode::A)) ToggleCrafting();

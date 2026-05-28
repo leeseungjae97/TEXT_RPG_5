@@ -4,6 +4,7 @@
 #include "../UI/HUDUI.h"
 #include "../UI/ShopUI.h"
 #include "../UI/CraftingUI.h"
+#include "../UI/EnhancementUI.h"
 #include "../UI/DialogUI.h"
 #include "../UI/BattleUI.h"
 #include "../UI/ItemLogUI.h"
@@ -105,6 +106,7 @@ private:
 	EnterShopUI EnterShop;
 	ChestOpenUI Chest;
 	CraftingUI Crafting;
+	EnhancementUI Enhancement;
 	DialogUI Dialog;
 	BattleUI Battle;
 	ItemLogUI ItemLog;
