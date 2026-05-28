@@ -12,6 +12,7 @@ public:
 	InventoryUI();
 	~InventoryUI();
 	void Render();
+	void ResetCache();
 	
 private:
 	void InventoryRender();

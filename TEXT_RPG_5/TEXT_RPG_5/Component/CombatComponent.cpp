@@ -13,21 +13,6 @@
 #include "EquipmentComponent.h"
 #include "InventoryComponent.h"
 
-/*UCombatComponent::UCombatComponent(AObject* InOwner)
-	: UComponent(InOwner), Weapon(WeaponType::Sword)
-{
-	PlayerPtr = dynamic_cast<Player*>(InOwner);
-	MoveComponentPtr = PlayerPtr != nullptr ? PlayerPtr->GetComponent<UMoveComponent>() : nullptr;
-	AttackElapsedTime = 999.0f;
-	AttackInterval = 1.0f;
-	AttackVisibleTime = 0.0f;
-	AttackVisibleDuration = 0.18f;
-	bAttackRequested = false;
-	ProjectileTotalTime = 0.0f;
-	ProjectileDelayTime = 0.0f;
-	CurrentAttackInterval = AttackInterval;
-}*/
-
 UCombatComponent::UCombatComponent(AObject* InOwner)
 	: UComponent(InOwner), Weapon(WeaponType::Sword)
 {
@@ -36,7 +21,6 @@ UCombatComponent::UCombatComponent(AObject* InOwner)
 
 	AttackVisibleTime = 0.0f;
 	AttackVisibleDuration = 0.18f;
-	bAttackRequested = false;
 
 	RockInterval = 0.8f;
 	SwordInterval = 1.3f;
@@ -60,11 +44,6 @@ vector<Vector> UCombatComponent::GetAttackValue()
 {
 	return AttackValue;
 }
-
-/*bool UCombatComponent::IsAttackCoolingDown() const
-{
-	return AttackElapsedTime < AttackInterval;
-}*/
 
 bool UCombatComponent::IsAttackCoolingDown() const
 {
@@ -102,17 +81,6 @@ bool UCombatComponent::IsAttackCoolingDown() const
 	}
 }
 
-/*
-float UCombatComponent::GetAttackCooldownAlpha() const
-{
-	if (AttackInterval <= 0.0f)
-	{
-		return 1.0f;
-	}
-
-	return min(max(AttackElapsedTime / AttackInterval, 0.0f), 1.0f);
-}
-*/
 float UCombatComponent::GetAttackCooldownAlpha() const
 {
 	WeaponType CurrentWeapon = WeaponType::NONE;
@@ -277,90 +245,6 @@ void UCombatComponent::ProjectileAttack()
 	NewProjectile->Fire();
 }
 
-void UCombatComponent::HandleAttack()
-{
-	if (!bAttackRequested)
-	{
-		return;
-	}
-
-	if (!PlayerPtr)
-	{
-		PlayerPtr = dynamic_cast<Player*>(GetOwner());
-		return;
-	}
-
-	UEquipmentComponent* EquipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>();
-
-	if (EquipmentComponent == nullptr)
-	{
-		bAttackRequested = false;
-		return;
-	}
-
-	WeaponType CurrentWeapon = EquipmentComponent->GetCurrentWeaponType();
-
-	switch (CurrentWeapon)
-	{
-	case WeaponType::NONE:
-		{
-			Attack();
-		}
-		break;
-		
-	case WeaponType::Sword:
-		{
-			Attack();
-		}
-		break;
-
-	case WeaponType::Axe:
-		{
-			Attack();
-		}
-		break;
-
-	case WeaponType::Bow:
-		{
-			LaunchProjectile();
-		}
-		break;
-
-	case WeaponType::Magic:
-		{
-			Attack();
-		}
-		break;
-
-	default:
-		break;
-	}
-
-	bAttackRequested = false;
-}
-
-void UCombatComponent::LaunchProjectile()
-{
-	ProjectileInfo Info;
-	Info.Range = 10;
-	Info.Damage = 40;
-	Info.Speed = 0.1f;
-
-	EDirection Direction = MoveComponentPtr->GetFacingDirection();
-
-		Projectile* ProjectileAttack = ObjectPoolManager::GetInstance()->Get<Projectile>();
-
-		if (ProjectileAttack != nullptr)
-		{
-			SceneManager::GetInstance()->AddObject(ProjectileAttack);
-			ProjectileAttack->BeginPlay(PlayerPtr, Direction, Info);
-			ProjectileAttack->Fire();
-		}
-			
-	/*ProjectileTotalTime = 0.0f;
-	ProjectileDelayTime = 0.5f;*/
-}
-
 void UCombatComponent::MakeSwordRange()
 {
 	AttackValue.clear();
@@ -398,7 +282,6 @@ void UCombatComponent::MakeSwordRange()
 		AttackValue.push_back({ Pos.X + 1, Pos.Y });
 		AttackValue.push_back({ Pos.X, Pos.Y + 1 });
 	}
-	bAttackRequested = true;
 	AttackVisibleTime = AttackVisibleDuration;
 }
 
@@ -434,7 +317,6 @@ void UCombatComponent::MakeAxeRange()
 		AttackValue.push_back({ Pos.X - 3, Pos.Y });
 	}
 
-	bAttackRequested = true;
 	AttackVisibleTime = AttackVisibleDuration;
 }
 
@@ -462,7 +344,6 @@ void UCombatComponent::MakeRockRange()
 		AttackValue.push_back({ Pos.X - 1, Pos.Y });
 	}
 
-	bAttackRequested = true;
 	AttackVisibleTime = AttackVisibleDuration;
 }
 
@@ -522,7 +403,6 @@ void UCombatComponent::MakeMagicRange()
 		AttackValue.push_back({ Pos.X - 3, Pos.Y + 2 });
 	}
 
-	bAttackRequested = true;
 	AttackVisibleTime = AttackVisibleDuration;
 }
 
@@ -543,7 +423,14 @@ void UCombatComponent::AttackEffectTimeAcc(float DeltaTime)
 	}
 }
 
-void UCombatComponent::HandleAttackInput(float DeltaTime)
+void UCombatComponent::PlayTeleportEffect(Vector StartPosition, Vector EndPosition, float Duration)
+{
+	Duration = max(0.01f, Duration);
+	TeleportEffects.push_back({ StartPosition, 0.0f, Duration });
+	TeleportEffects.push_back({ EndPosition, 0.0f, Duration });
+}
+
+void UCombatComponent::HandleAttack(float DeltaTime)
 {
 	RockElapsedTime += DeltaTime;
 	SwordElapsedTime += DeltaTime;
@@ -582,81 +469,87 @@ void UCombatComponent::HandleAttackInput(float DeltaTime)
 	
 	WeaponType CurrentWeapon = EquipmentComponent->GetCurrentWeaponType();
 	
-	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::Z))
+	if (!InputManager::GetInstance()->IsKeyPressed(KeyCode::Z))
 	{
-		switch (CurrentWeapon)
-		{
-		case WeaponType::NONE:
-			{
-				if (RockElapsedTime >= RockInterval && !PlayerPtr->GetIsAttack())
-				{
-					MakeRockRange();
-					RockElapsedTime = 0.0f;
-				}
-			}
-			break;
+		return;
+	}
 
-		case WeaponType::Sword:
-			{
-				if (SwordElapsedTime >= SwordInterval && !PlayerPtr->GetIsAttack())
-				{
-					MakeSwordRange();
-					SwordElapsedTime = 0.0f;
-				}
-			}
-			break;
+	float* ElapsedTime = nullptr;
+	float Interval = 0.0f;
+	void (UCombatComponent::*MakeRange)() = nullptr;
+	bool bProjectileAttack = false;
 
-		case WeaponType::Axe:
-			{
-				if (AxeElapsedTime >= AxeInterval && !PlayerPtr->GetIsAttack())
-				{
-					MakeAxeRange();
-					AxeElapsedTime = 0.0f;
-				}
-			}
-			break;
+	switch (CurrentWeapon)
+	{
+	case WeaponType::NONE:
+		ElapsedTime = &RockElapsedTime;
+		Interval = RockInterval;
+		MakeRange = &UCombatComponent::MakeRockRange;
+		break;
 
-		case WeaponType::Bow:
-			{
-				if (BowElapsedTime >= BowInterval)
-				{
-					PlayerPtr->SetIsAttack(true);
-					AttackVisibleTime = AttackVisibleDuration;
-					LaunchProjectile();
-					BowElapsedTime = 0.0f;
-				}
-			}
-			break;
+	case WeaponType::Sword:
+		ElapsedTime = &SwordElapsedTime;
+		Interval = SwordInterval;
+		MakeRange = &UCombatComponent::MakeSwordRange;
+		break;
 
-		case WeaponType::Magic:
-			{
-				if (MagicElapsedTime >= MagicInterval && !PlayerPtr->GetIsAttack())
-				{
-					MakeMagicRange();
-					MagicElapsedTime = 0.0f;
-				}
-			}
-			break;
+	case WeaponType::Axe:
+		ElapsedTime = &AxeElapsedTime;
+		Interval = AxeInterval;
+		MakeRange = &UCombatComponent::MakeAxeRange;
+		break;
 
-		default:
-			break;
-		}
+	case WeaponType::Bow:
+		ElapsedTime = &BowElapsedTime;
+		Interval = BowInterval;
+		bProjectileAttack = true;
+		break;
+
+	case WeaponType::Magic:
+		ElapsedTime = &MagicElapsedTime;
+		Interval = MagicInterval;
+		MakeRange = &UCombatComponent::MakeMagicRange;
+		break;
+
+	default:
+		return;
+	}
+
+	if (ElapsedTime == nullptr || *ElapsedTime < Interval)
+	{
+		return;
+	}
+
+	if (bProjectileAttack)
+	{
+		PlayerPtr->SetIsAttack(true);
+		AttackVisibleTime = AttackVisibleDuration;
+		ProjectileAttack();
+		*ElapsedTime = 0.0f;
+		return;
+	}
+
+	if (MakeRange != nullptr && !PlayerPtr->GetIsAttack())
+	{
+		(this->*MakeRange)();
+		Attack();
+		*ElapsedTime = 0.0f;
 	}
 }
 
-/*if (!PlayerPtr->GetIsAttack())
-		{
-			MakeSwordRange();
-		}
-		AttackElapsedTime = 0.0f;
-	}
-	if (InputManager::GetInstance()->IsKeyPressed(KeyCode::X) && (ProjectileTotalTime >= ProjectileDelayTime))
-	{
-		LaunchProjectile();
-	}*/
-
 void UCombatComponent::Tick(float DeltaTime)
 {
-	HandleAttackInput(DeltaTime);
-	HandleAttack();
+	for (FTeleportEffect& Effect : TeleportEffects)
+	{
+		Effect.Elapsed += DeltaTime;
+	}
+
+	TeleportEffects.erase(
+		remove_if(TeleportEffects.begin(), TeleportEffects.end(), [](const FTeleportEffect& Effect)
+			{
+				return Effect.Elapsed >= Effect.Duration;
+			}),
+		TeleportEffects.end());
+
+	HandleAttack(DeltaTime);
 }

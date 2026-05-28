@@ -8,6 +8,19 @@
 
 class Player;
 
+enum class EItemUseEffectType
+{
+    None,
+    Consume,
+    Buff
+};
+
+struct FBuffDisplayInfo
+{
+    wstring Text;
+    float RemainingTime = 0.0f;
+};
+
 class UEffectComponent : public UComponent
 {
     friend class AObject;
@@ -22,6 +35,11 @@ protected:
 public:
     void AddBuff(StatType Stat, int Amount, float Duration);
     void AddPeriodicAttackBuff(int Damage, float Period, float Duration);
+    void PlayItemUseEffect(EItemUseEffectType Type, float Duration = 0.8f);
+    bool ShouldShowItemUseEffect() const { return ItemUseEffectTime > 0.0f && ItemUseEffectType != EItemUseEffectType::None; }
+    EItemUseEffectType GetItemUseEffectType() const { return ItemUseEffectType; }
+    float GetItemUseEffectAlpha() const;
+    vector<FBuffDisplayInfo> GetBuffDisplayInfos() const;
     virtual void Tick(float DeltaTime) override;
 
 private:
@@ -29,4 +47,7 @@ private:
 
     Player* PlayerPtr = nullptr;
     vector<FBuff> ActiveBuffs;
+    EItemUseEffectType ItemUseEffectType = EItemUseEffectType::None;
+    float ItemUseEffectTime = 0.0f;
+    float ItemUseEffectDuration = 0.8f;
 };

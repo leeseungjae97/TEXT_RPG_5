@@ -1,6 +1,7 @@
 #include "MoveComponent.h"
 
 #include "InventoryComponent.h"
+#include "CombatComponent.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/MapManager.h"
 #include "../Manager/ShopManager.h"
@@ -66,6 +67,21 @@ float UMoveComponent::GetTurnAlpha() const
 
 	float Alpha = min(TurnElapsedTime / TurnDuration, 1.0f);
 	return Alpha * Alpha * (3.0f - 2.0f * Alpha);
+}
+
+float UMoveComponent::GetTeleportCooldownAlpha() const
+{
+	if (TeleportInterval <= 0.0f)
+	{
+		return 1.0f;
+	}
+
+	return min(max(TeleportElapsedTime / TeleportInterval, 0.0f), 1.0f);
+}
+
+float UMoveComponent::GetTeleportRemainingTime() const
+{
+	return max(0.0f, TeleportInterval - TeleportElapsedTime);
 }
 
 void UMoveComponent::OpenShop()
@@ -204,6 +220,10 @@ void UMoveComponent::Teleport()
 	}
 	
 	// 이런 느낌
+	if (UCombatComponent* CombatComponent = PlayerPtr->GetComponent<UCombatComponent>())
+	{
+		CombatComponent->PlayTeleportEffect(CurrentPosition, FinalPosition);
+	}
 	PlayerPtr->SetPrevPosition(CurrentPosition);
 	PlayerPtr->SetPosition(FinalPosition);
 	/*// 이런 느낌

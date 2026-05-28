@@ -47,6 +47,6 @@ void USubActionComponent::UseSlotItem(int NumKey)
 	if (IC->GetItemFromQuickSlot(NumKey) != nullptr) // 퀵슬롯 비어있지 않으면 작동
 	{
 		TimeCheck = 0.0f;
-		IC->UseItem(IC->GetItemFromQuickSlot(NumKey)); //use->remove->clearQucislot 이어짐
+		IC->UseQuickSlot(NumKey); //use->remove->clearQucislot 이어짐
 	}
 }

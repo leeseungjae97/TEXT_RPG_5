@@ -4,7 +4,9 @@
 #include "MapManager.h"
 #include "DisplayManager.h"
 #include "SceneManager.h"
+#include "StageManager.h"
 #include "../Component/CombatComponent.h"
+#include "../Component/EffectComponent.h"
 #include "../Component/EquipmentComponent.h"
 #include "../Component/InventoryComponent.h"
 #include "../Component/LevelComponent.h"
@@ -17,6 +19,11 @@
 namespace
 {
 	constexpr float PI = 3.14159f;
+
+	float Clamp01(float Value)
+	{
+		return min(max(Value, 0.0f), 1.0f);
+	}
 
 	enum class WallFace
 	{
@@ -303,6 +310,22 @@ void ViewportManager::Render2DtoISO()
 			renderManager->PutCell(iso.Y, iso.X - 5, L'/', darkWoodAttribute);
 			renderManager->PutCell(iso.Y, iso.X + 5, L'\\', darkWoodAttribute);
 			renderManager->PutCell(iso.Y, iso.X + 6, L'o', woodAttribute);
+		};
+
+	auto drawIsoCrystal = [&](Vector iso)
+		{
+			WORD crystalAttribute = MakeAttribute(StageManager::GetInstance()->GetCrystalColor());
+			WORD shineAttribute = MakeAttribute(CC_WHITE);
+			renderManager->PutCell(iso.Y - 5, iso.X, L'*', shineAttribute);
+			renderManager->PutCell(iso.Y - 4, iso.X - 1, L'/', crystalAttribute);
+			renderManager->PutCell(iso.Y - 4, iso.X, L'C', crystalAttribute);
+			renderManager->PutCell(iso.Y - 4, iso.X + 1, L'\\', crystalAttribute);
+			renderManager->PutCell(iso.Y - 3, iso.X - 2, L'<', crystalAttribute);
+			renderManager->PutCell(iso.Y - 3, iso.X, L'|', shineAttribute);
+			renderManager->PutCell(iso.Y - 3, iso.X + 2, L'>', crystalAttribute);
+			renderManager->PutCell(iso.Y - 2, iso.X - 1, L'\\', crystalAttribute);
+			renderManager->PutCell(iso.Y - 2, iso.X, L'V', crystalAttribute);
+			renderManager->PutCell(iso.Y - 2, iso.X + 1, L'/', crystalAttribute);
 		};
 
 	auto drawIsoActor = [&](Vector iso, wchar_t icon, WORD attribute, bool player)
@@ -691,6 +714,76 @@ void ViewportManager::Render2DtoISO()
 			}
 		};
 
+	auto drawItemUseEffect = [&](Vector iso, Player* player)
+		{
+			if (player == nullptr)
+			{
+				return;
+			}
+
+			UEffectComponent* effectComponent = player->GetComponent<UEffectComponent>();
+			if (effectComponent == nullptr || !effectComponent->ShouldShowItemUseEffect())
+			{
+				return;
+			}
+
+			const float alpha = effectComponent->GetItemUseEffectAlpha();
+			const int rise = static_cast<int>(roundf(alpha * 3.0f));
+
+			if (effectComponent->GetItemUseEffectType() == EItemUseEffectType::Buff)
+			{
+				WORD auraAttribute = MakeAttribute(alpha < 0.5f ? CC_YELLOW : CC_MAGENTA);
+				const int radiusX = 4 + static_cast<int>(roundf(alpha * 3.0f));
+				const int radiusY = 1 + static_cast<int>(roundf(alpha * 2.0f));
+				for (int i = 0; i < 12; ++i)
+				{
+					float angle = 2.0f * PI * static_cast<float>(i) / 12.0f + alpha * PI;
+					int x = iso.X + static_cast<int>(roundf(cosf(angle) * radiusX));
+					int y = iso.Y - 2 + static_cast<int>(roundf(sinf(angle) * radiusY));
+					renderManager->PutCell(y, x, L'*', auraAttribute);
+				}
+				renderManager->PutCell(iso.Y - 5 - rise, iso.X, L'^', auraAttribute);
+				return;
+			}
+
+			WORD consumeAttribute = MakeAttribute(alpha < 0.5f ? CC_GREEN : CC_WHITE);
+			renderManager->PutCell(iso.Y - 5 - rise, iso.X, L'+', consumeAttribute);
+			renderManager->PutCell(iso.Y - 4 - rise, iso.X - 1, L'+', consumeAttribute);
+			renderManager->PutCell(iso.Y - 4 - rise, iso.X + 1, L'+', consumeAttribute);
+		};
+
+	auto drawTeleportEffects = [&](UCombatComponent* combatComponent)
+		{
+			if (combatComponent == nullptr)
+			{
+				return;
+			}
+
+			for (const FTeleportEffect& effect : combatComponent->GetTeleportEffects())
+			{
+				if (fabsf(static_cast<float>(effect.Position.X) - 0.5f - cameraPosition.X) > viewRadiusX ||
+					fabsf(static_cast<float>(effect.Position.Y) - 0.5f - cameraPosition.Y) > viewRadiusY)
+				{
+					continue;
+				}
+
+				Vector iso = WorldToIso(
+					static_cast<float>(effect.Position.X) - 0.5f - cameraPosition.X,
+					static_cast<float>(effect.Position.Y) - 0.5f - cameraPosition.Y,
+					originX,
+					originY
+				);
+
+				const float alpha = effect.Duration <= 0.0f ? 1.0f : effect.Elapsed / effect.Duration;
+				WORD attribute = MakeAttribute(alpha < 0.5f ? CC_MAGENTA : CC_CYAN);
+				renderManager->PutCell(iso.Y - 2, iso.X, L'*', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X - 2, L'/', attribute);
+				renderManager->PutCell(iso.Y - 1, iso.X + 2, L'\\', attribute);
+				renderManager->PutCell(iso.Y, iso.X - 4, L'<', attribute);
+				renderManager->PutCell(iso.Y, iso.X + 4, L'>', attribute);
+			}
+		};
+
 	auto drawIsoTile = [&](int mapX, int mapY, bool wall)
 		{
 			Vector iso = WorldToIso(
@@ -822,6 +915,7 @@ void ViewportManager::Render2DtoISO()
 		};
 
 	vector<Vector> shopPositions;
+	vector<Vector> crystalPositions;
 
 	const int startY = max(0, static_cast<int>(cameraPosition.Y) - viewRadiusY);
 	const int endY = min(static_cast<int>(MAP_MAX_Y) - 1, static_cast<int>(cameraPosition.Y) + viewRadiusY);
@@ -843,12 +937,26 @@ void ViewportManager::Render2DtoISO()
 					originY
 				));
 			}
+			else if (mapType == MapObjectType::Crystal)
+			{
+				crystalPositions.push_back(WorldToIso(
+					static_cast<float>(x) - cameraPosition.X,
+					static_cast<float>(y) - cameraPosition.Y,
+					originX,
+					originY
+				));
+			}
 		}
 	}
 
 	for (const Vector& shopPosition : shopPositions)
 	{
 		drawIsoShop(shopPosition);
+	}
+
+	for (const Vector& crystalPosition : crystalPositions)
+	{
+		drawIsoCrystal(crystalPosition);
 	}
 
 	drawAttackPositions();
@@ -963,6 +1071,7 @@ void ViewportManager::Render2DtoISO()
 		{
 			if (Player* player = dynamic_cast<Player*>(object))
 			{
+				drawTeleportEffects(player->GetComponent<UCombatComponent>());
 				drawIsoPlayerActor(iso, objectIcon, objectAttribute, player);
 			}
 			else
@@ -972,6 +1081,7 @@ void ViewportManager::Render2DtoISO()
 		}
 		drawPlayerBars(iso, playerForBars);
 		drawLevelUpEffect(iso, playerForBars);
+		drawItemUseEffect(iso, playerForBars);
 		drawMonsterNameLabel(iso, monsterForHpBar);
 		drawMonsterHpBar(iso, monsterForHpBar);
 		drawObjectHitEffect(iso, object);
@@ -1022,6 +1132,87 @@ void ViewportManager::ShowMessageDialog(const wstring& Message, float Duration)
 	Dialog.OpenMessage(Message, Duration);
 }
 
+void ViewportManager::AddItemLog(const UItem* Item)
+{
+	ItemLog.AddItemLog(Item);
+}
+
+void ViewportManager::StartFadeOut(float Duration)
+{
+	FadeState = ViewportFadeState::FadeOut;
+	FadeDuration = max(0.01f, Duration);
+	FadeElapsed = 0.0f;
+}
+
+void ViewportManager::StartFadeIn(float Duration)
+{
+	FadeState = ViewportFadeState::FadeIn;
+	FadeDuration = max(0.01f, Duration);
+	FadeElapsed = 0.0f;
+}
+
+void ViewportManager::TickFade(float DeltaTime)
+{
+	if (FadeState == ViewportFadeState::None)
+	{
+		return;
+	}
+
+	FadeElapsed += DeltaTime;
+	if (FadeElapsed >= FadeDuration)
+	{
+		FadeElapsed = FadeDuration;
+		FadeState = ViewportFadeState::None;
+	}
+}
+
+void ViewportManager::RenderFade()
+{
+	if (FadeState == ViewportFadeState::None)
+	{
+		return;
+	}
+
+	DisplayManager* renderer = DisplayManager::GetInstance();
+	float alpha = Clamp01(FadeElapsed / FadeDuration);
+	if (FadeState == ViewportFadeState::FadeIn)
+	{
+		alpha = 1.0f - alpha;
+	}
+
+	int step = 6;
+	wchar_t fadeCharacter = L'\x2591';
+	if (alpha >= 0.8f)
+	{
+		step = 1;
+		fadeCharacter = L' ';
+	}
+	else if (alpha >= 0.6f)
+	{
+		step = 2;
+		fadeCharacter = L'\x2593';
+	}
+	else if (alpha >= 0.4f)
+	{
+		step = 3;
+		fadeCharacter = L'\x2592';
+	}
+	else if (alpha >= 0.2f)
+	{
+		step = 4;
+		fadeCharacter = L'\x2591';
+	}
+
+	const WORD attribute = renderer->MakeConsoleAttribute(CC_BLACK, CC_BLACK);
+	for (int y = 0; y < SCREEN_HEIGHT; ++y)
+	{
+		for (int x = (y + step) % step; x < SCREEN_WIDTH; x += step)
+		{
+			renderer->PutCell(y, x, fadeCharacter, attribute);
+		}
+	}
+}
+
 Vector ViewportManager::WorldToIso(float WorldX, float WorldY, int OriginX, int OriginY)
 {
 	constexpr int TileHalfWidth = 8;
@@ -1068,6 +1259,8 @@ void ViewportManager::Tick(float DeltaTime)
 	}
 	if (!inventoryComponent)
 		inventoryComponent = PlayerPtr != nullptr ? PlayerPtr->GetComponent<UInventoryComponent>() : nullptr;
+
+	ItemLog.Tick(DeltaTime);
 
 	if (Dialog.IsOpen())
 	{
@@ -1136,8 +1329,23 @@ void ViewportManager::RenderUI()
 		}
 	}
 
+	ItemLog.Render();
 	Battle.Render();
 	Dialog.Render();
+}
+
+void ViewportManager::ResetRuntimeCache()
+{
+	PlayerPtr = nullptr;
+	moveComponent = nullptr;
+	combatComponent = nullptr;
+	inventoryComponent = nullptr;
+	bIsInvenOpen = false;
+
+	PlayerStatus.ResetCache();
+	Inventory.ResetCache();
+	Shop.ResetCache();
+	ItemLog.Reset();
 }
 
 void ViewportManager::Render2Dto3D()

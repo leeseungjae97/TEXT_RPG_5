@@ -8,6 +8,12 @@
 #include "../Manager/ShopManager.h"
 #include "../Player.h"
 
+void ShopUI::ResetCache()
+{
+	PlayerPtr = nullptr;
+	InventoryComponent = nullptr;
+}
+
 void ShopUI::Render()
 {
 	if (!Renderer)

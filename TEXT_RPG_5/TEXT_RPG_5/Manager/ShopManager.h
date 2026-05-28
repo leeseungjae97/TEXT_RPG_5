@@ -34,6 +34,7 @@ private:
 public:
     vector<Vector>& GetShopPoses() { return ShopPoses; }
     void SetPlayerInventory(UInventoryComponent* Inventory);
+    void ResetRuntimeCache();
     void RestoreShop();
     void BeginPlay();
 
