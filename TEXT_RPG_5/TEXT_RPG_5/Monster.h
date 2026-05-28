@@ -58,6 +58,10 @@ public:
 	bool IsDead();
 	void TransitionAttackTelegraphToAttack(float DeltaTime);
 
+	
+	//부활테스트
+	virtual bool Revive() { return false; }
+	
 	bool IsShiny() const;
 	void TrySetShiny();
 	bool IsBoss() const { return bIsBoss; }

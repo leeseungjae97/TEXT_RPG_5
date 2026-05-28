@@ -1061,6 +1061,7 @@
       <AdditionalOptions>/utf-8 </AdditionalOptions>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="KingSlime.cpp" />
     <ClCompile Include="Manager\BattleManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1791,6 +1792,7 @@
     <ClInclude Include="Item\ItemDB.h" />
     <ClInclude Include="Item\MiscItem.h" />
     <ClInclude Include="Item\UsableItem.h" />
+    <ClInclude Include="KingSlime.h" />
     <ClInclude Include="Manager\BattleManager.h" />
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\ItemManager.h" />
