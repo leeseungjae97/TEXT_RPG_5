@@ -27,12 +27,8 @@ private:
     
     bool bSellMode = false;
     int LastVisitedShopId = -1;
-
-    vector<Vector> ShopPoses;
-
     
 public:
-    vector<Vector>& GetShopPoses() { return ShopPoses; }
     void SetPlayerInventory(UInventoryComponent* Inventory);
     void ResetRuntimeCache();
     void RestoreShop();
