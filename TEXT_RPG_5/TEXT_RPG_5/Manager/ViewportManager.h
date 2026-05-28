@@ -64,6 +64,7 @@ public:
 	bool IsFadeFinished() const { return FadeState == ViewportFadeState::None; }
 	bool Is3DMode() const { return RenderMode == ViewportRenderMode::ThreeD; }
 	ViewportRenderMode GetRenderMode() const { return RenderMode; }
+	void SetRenderMode(ViewportRenderMode InRenderMode){ RenderMode = InRenderMode;}
 
 	Vector WorldToIso(float WorldX, float WorldY, int OriginX, int OriginY);
 	Vector GetISOPosition();
