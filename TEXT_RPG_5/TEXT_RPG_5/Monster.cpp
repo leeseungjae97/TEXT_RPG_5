@@ -224,7 +224,10 @@ void Monster::Destroy()
 		}
 	}
 	
-	DropItemToPlayer();
+	if (rand() % 6 == 0)
+	{
+		DropItemToPlayer();	
+	}
 	
 	MapManager::GetInstance()->SetMapObjectCoordinate(Position.Y, Position.X, {MapObjectType::Path, NO_ID});
 	if (bIsBoss)
