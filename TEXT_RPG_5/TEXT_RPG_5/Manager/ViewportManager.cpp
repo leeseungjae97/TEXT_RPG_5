@@ -5,6 +5,7 @@
 #include "DisplayManager.h"
 #include "SceneManager.h"
 #include "StageManager.h"
+#include "ChestManager.h"
 #include "../Component/CombatComponent.h"
 #include "../Component/EffectComponent.h"
 #include "../Component/EquipmentComponent.h"
@@ -1028,6 +1029,42 @@ void ViewportManager::Render2DtoISO()
 			}
 		};
 
+	auto drawIsoChest = [&](Vector iso)
+		{
+			WORD bodyAttribute = MakeAttribute(CC_DARKYELLOW);
+			WORD lidAttribute = MakeAttribute(CC_YELLOW);
+			WORD bandAttribute = MakeAttribute(CC_DARKRED);
+			WORD lockAttribute = MakeAttribute(CC_WHITE);
+			WORD shadowAttribute = MakeAttribute(CC_DARKGRAY);
+
+			// 그림자
+			for (int dx = -3; dx <= 3; ++dx)
+				renderManager->PutCell(iso.Y + 1, iso.X + dx, L'_', shadowAttribute);
+
+			// 뚜껑
+			renderManager->PutCell(iso.Y - 3, iso.X - 3, L'/', lidAttribute);
+			renderManager->PutCell(iso.Y - 3, iso.X + 3, L'\\', lidAttribute);
+			for (int dx = -2; dx <= 2; ++dx)
+				renderManager->PutCell(iso.Y - 3, iso.X + dx, L'=', lidAttribute);
+
+			// 금속 띠
+			renderManager->PutCell(iso.Y - 2, iso.X - 3, L'|', bodyAttribute);
+			renderManager->PutCell(iso.Y - 2, iso.X + 3, L'|', bodyAttribute);
+			for (int dx = -2; dx <= 2; ++dx)
+				renderManager->PutCell(iso.Y - 2, iso.X + dx, L'-', bandAttribute);
+
+			// 몸통 + 자물쇠
+			renderManager->PutCell(iso.Y - 1, iso.X - 3, L'|', bodyAttribute);
+			renderManager->PutCell(iso.Y - 1, iso.X + 3, L'|', bodyAttribute);
+			renderManager->PutCell(iso.Y - 1, iso.X, L'o', lockAttribute);
+
+			// 바닥
+			renderManager->PutCell(iso.Y, iso.X - 3, L'|', bodyAttribute);
+			renderManager->PutCell(iso.Y, iso.X + 3, L'|', bodyAttribute);
+			for (int dx = -2; dx <= 2; ++dx)
+				renderManager->PutCell(iso.Y, iso.X + dx, L'_', bodyAttribute);
+		};
+
 	vector<Vector> shopPositions;
 	vector<Vector> crystalPositions;
 
@@ -1071,6 +1108,23 @@ void ViewportManager::Render2DtoISO()
 	for (const Vector& crystalPosition : crystalPositions)
 	{
 		drawIsoCrystal(crystalPosition);
+	}
+
+	for (const Vector& chestPos : ChestManager::GetInstance()->GetChestPoses())
+	{
+		if (fabsf(static_cast<float>(chestPos.X) - cameraPosition.X) > viewRadiusX ||
+			fabsf(static_cast<float>(chestPos.Y) - cameraPosition.Y) > viewRadiusY)
+		{
+			continue;
+		}
+
+		Vector iso = WorldToIso(
+			static_cast<float>(chestPos.X) - cameraPosition.X,
+			static_cast<float>(chestPos.Y) - cameraPosition.Y,
+			originX,
+			originY
+		);
+		drawIsoChest(iso);
 	}
 
 	drawAttackPositions();

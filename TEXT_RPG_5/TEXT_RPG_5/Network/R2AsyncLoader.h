@@ -1,4 +1,5 @@
-﻿# pragma once
+﻿/*
+# pragma once
 #include <future>
 
 #include "../pch.h"
@@ -43,3 +44,4 @@ private:
 	R2LoadResult m_Result;
 	future<R2LoadResult> m_Future;
 };
+*/
