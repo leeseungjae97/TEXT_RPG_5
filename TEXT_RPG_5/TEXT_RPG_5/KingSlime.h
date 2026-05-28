@@ -8,7 +8,7 @@ public:
     KingSlime(int Playerlevel);
     
 protected:
-    virtual void Attackplayer(Player* player) override;
+    virtual void BuildAttackValue(Player* player) override;
     virtual vector<FItemWeight> GetDropTable() override;
     
 private:

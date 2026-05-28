@@ -89,9 +89,9 @@ void Dragon::BuildAttackValue(Player* player)
     }
     
     
-    // AttackVisibleTime = AttackVisibleDuration;
+    AttackVisibleTime = AttackVisibleDuration;
     
-    // AttackElapsedtime = 0.0f;
+    AttackElapsedtime = 0.0f;
 }
 
 void Dragon::BreathAttack(Player* player)
@@ -140,7 +140,7 @@ void Dragon::BreathAttack(Player* player)
         AttackValue.push_back(AttackPosition);
     }
 
-    player->TakeDamage(Attack);
+    // player->TakeDamage(Attack);
 }
 
 
@@ -161,7 +161,7 @@ void Dragon::FireballAttack(Player* player)
         }
     }
 
-    player->TakeDamage(Attack);
+    // player->TakeDamage(Attack);
 }
 
 
@@ -227,7 +227,7 @@ bool Dragon::RushAttack(Player* player)
         
         if (CheckPosition.X == PlayerPosition.X && CheckPosition.Y == PlayerPosition.Y)
         {
-            player->TakeDamage(Attack);
+            // player->TakeDamage(Attack);
             break;
         }
         
@@ -259,7 +259,7 @@ void Dragon::PhaseThreeAttack(Player* player)
         }
     }
 
-    player->TakeDamage(Attack + 10);
+    // player->TakeDamage(Attack + 10);
 }
 
 
