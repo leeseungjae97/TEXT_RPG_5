@@ -106,6 +106,8 @@ protected:
 	virtual void BuildAttackValue(Player* player);
 	void ExecutePendingAttack(Player* player);
 	
+	int GetRandomAttackDamage() const;
+	
 	void MoveTowardPlayer(Player* player);
 	
 	void MoveTowardPlayerBfs();
