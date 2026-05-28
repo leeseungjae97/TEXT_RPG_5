@@ -35,7 +35,7 @@ void EnterShopUI::Tick(float DeltaTime)
 	{
 		if (UInventoryComponent* InventoryComponent = PlayerPtr->GetComponent<UInventoryComponent>())
 		{
-			InventoryComponent->OpenShop(StageManager::GetInstance()->GetStageCount());
+			InventoryComponent->OpenShop(StageManager::GetInstance()->GetMaxStageCount());
 			Close();
 		}
 		

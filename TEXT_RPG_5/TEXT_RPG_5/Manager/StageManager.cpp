@@ -20,6 +20,7 @@ void StageManager::Reset()
 	bPromptOpen = false;
 	bPromptDismissedUntilLeave = false;
 	bGameClearRequested = false;
+	bBossIntroPlayed = false;
 	CrystalPosition = { 0, 0 };
 	CrystalColorElapsed = 0.0f;
 	CrystalColorIndex = 0;
@@ -112,6 +113,7 @@ bool StageManager::AdvanceStage()
 	bHasCrystal = false;
 	bPromptOpen = false;
 	bPromptDismissedUntilLeave = false;
+	bBossIntroPlayed = false;
 	CrystalPosition = { 0, 0 };
 	return true;
 }

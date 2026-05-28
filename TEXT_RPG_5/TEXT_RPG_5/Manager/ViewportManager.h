@@ -9,11 +9,12 @@
 #include "../UI/ItemLogUI.h"
 #include "../UI/EnterShopUI.h"
 #include "../UI/ChestOpenUI.h"
+#include "../Struct/Vector.h"
 
-struct Vector;
 class UCombatComponent;
 class UMoveComponent;
 class UItem;
+class Monster;
 
 enum class ViewportFadeState
 {
@@ -26,6 +27,19 @@ enum class ViewportRenderMode
 {
 	ISO,
 	ThreeD
+};
+
+enum class BossIntroState
+{
+	None,
+	FadeOutStart,
+	FadeInStart,
+	CameraMoveToBoss,
+	BossReveal3D,
+	BossNameHold,
+	BossNameHide,
+	FadeOutReturn,
+	FadeInReturn
 };
 
 class ViewportManager : public Singleton<ViewportManager>
@@ -63,14 +77,25 @@ public:
 	void RenderFade();
 	bool IsFadeFinished() const { return FadeState == ViewportFadeState::None; }
 	bool Is3DMode() const { return RenderMode == ViewportRenderMode::ThreeD; }
+	bool IsBossIntroPlaying() const { return BossIntroStateValue != BossIntroState::None; }
 	ViewportRenderMode GetRenderMode() const { return RenderMode; }
 	void SetRenderMode(ViewportRenderMode InRenderMode){ RenderMode = InRenderMode;}
+	bool StartBossIntro(Monster* BossMonster);
 
 	Vector WorldToIso(float WorldX, float WorldY, int OriginX, int OriginY);
 	Vector GetISOPosition();
+	void SwitchRenderMode();
+
 private:
 	void RenderObject();
 	void RenderUI();
+	void TickBossIntro(float DeltaTime);
+	void TryStartBossIntroFromTrigger();
+	void RenderBossIntroOverlay();
+	void RenderBossHpBar();
+	Monster* FindStageBoss();
+	float GetBossIntroStateDuration() const;
+	void AdvanceBossIntroState(BossIntroState NextState);
 
 private:
 	bool bIsInvenOpen = false;
@@ -85,6 +110,17 @@ private:
 	ItemLogUI ItemLog;
 	ViewportFadeState FadeState = ViewportFadeState::None;
 	ViewportRenderMode RenderMode = ViewportRenderMode::ISO;
+	ViewportRenderMode PreviousRenderMode = ViewportRenderMode::ISO;
+	BossIntroState BossIntroStateValue = BossIntroState::None;
+	Monster* BossIntroTarget = nullptr;
+	bool bHideHUD = false;
+	bool bUseCinematicCamera = false;
+	bool bBossHpBarEnabled = false;
+	float BossIntroElapsed = 0.0f;
+	FVector CinematicCameraPosition = { 0.0f, 0.0f };
+	FVector BossIntroCameraStart = { 0.0f, 0.0f };
+	FVector BossIntroCameraEnd = { 0.0f, 0.0f };
+	float CinematicCameraAngle = 0.0f;
 	float FadeElapsed = 0.0f;
 	float FadeDuration = 0.7f;
 	Player* PlayerPtr;

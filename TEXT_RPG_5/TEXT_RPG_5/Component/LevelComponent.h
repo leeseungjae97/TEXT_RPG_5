@@ -15,7 +15,7 @@ public:
 
     static constexpr ComponentType Type = ComponentType::LevelComponent;
 
-    const int MaxLevel = 10;    
+    const int MaxLevel = 999;    
     void AddExp(int InExp);
     void StatsUpdate(int LevelUpCount);
     bool ShouldShowLevelUpText() const { return LevelUpDisplayTime > 0.0f; }
