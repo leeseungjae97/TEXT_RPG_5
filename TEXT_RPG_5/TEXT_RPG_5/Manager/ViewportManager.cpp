@@ -164,6 +164,69 @@ namespace
 		if (name.find(L"미믹") != wstring::npos) return CC_DARKYELLOW;
 		return CC_MAGENTA;
 	}
+
+	bool IsSlimeMonster(Monster* MonsterPtr)
+	{
+		if (MonsterPtr == nullptr)
+		{
+			return false;
+		}
+
+		return MonsterPtr->GetDisplayName().find(L"슬라임") != wstring::npos;
+	}
+
+	const vector<string>& GetSlimeSpriteRows()
+	{
+		static const vector<string> Rows =
+		{
+			"............OOOOO............",
+			".........OOOBBBBBOOO.........",
+			".......OOBBBBBBBBBBBOO.......",
+			".....OOBBHHHHHBBBBBBBBOO.....",
+			"...OOBBBHHHHHHHBBBBEEBBBOO...",
+			"..OBBBBBHHHHHBBBBEEEBBBBBBO..",
+			".OBBBBBBBBBBBBBBBBEEBBBBBBBO.",
+			"OBBBBBBBBBBBBBBBBBBBBBBBBBBBO",
+			"OBBBBBBBBBBBBBBBBBBBBBBBBBBBO",
+			"OBBBSSSBBBBBBBBBBBBBBBBBSSSBO",
+			".OBSSSSBBBBBBBBBBBBBBBBSSSSO.",
+			"..OOOSSSSSSSSSSSSSSSSSSSOOO..",
+			"....OOOOOOOOOOOOOOOOOOOOO...."
+		};
+
+		return Rows;
+	}
+
+	WORD GetSlimeSpriteAttribute(Monster* MonsterPtr, char Pixel)
+	{
+		if (MonsterPtr != nullptr && MonsterPtr->IsHitFlashActive())
+		{
+			return MakeAttribute(CC_WHITE, CC_WHITE);
+		}
+
+		const bool shiny = MonsterPtr != nullptr && MonsterPtr->IsShiny();
+		const int outlineColor = shiny ? CC_DARKRED : CC_DARKGREEN;
+		const int bodyColor = shiny ? CC_RED : CC_GREEN;
+		const int highlightColor = CC_YELLOW;
+		const int shadowColor = shiny ? CC_DARKRED : CC_DARKGREEN;
+		const int eyeColor = shiny ? CC_DARKRED : CC_DARKGREEN;
+
+		switch (Pixel)
+		{
+		case 'O':
+			return MakeAttribute(outlineColor, outlineColor);
+		case 'H':
+			return MakeAttribute(highlightColor, highlightColor);
+		case 'S':
+			return MakeAttribute(shadowColor, shadowColor);
+		case 'E':
+			return MakeAttribute(eyeColor, eyeColor);
+		case 'B':
+		default:
+			return MakeAttribute(bodyColor, bodyColor);
+		}
+	}
+
 	wchar_t GetDirectionArrow(EDirection Direction)
 	{
 		switch (Direction)
@@ -1805,33 +1868,77 @@ void ViewportManager::Render2Dto3D()
 		}
 
 		int enemyScreenX = static_cast<int>((0.5f + enemyAngle / fov) * SCREEN_WIDTH);
+		const bool bUseSlimeSprite = monster != nullptr && IsSlimeMonster(monster);
 		const int renderScale = monster != nullptr ? max(1, monster->GetRenderScale()) : 1;
 		int enemyHeight = monster != nullptr
 			? max(1, static_cast<int>((SCREEN_HEIGHT / distanceFromPlayer) * renderScale))
 			: 1;
-		int enemyWidth = max(1, enemyHeight / 2);
+		int enemyWidth = bUseSlimeSprite ? max(4, static_cast<int>(enemyHeight * 2.4f)) : max(1, enemyHeight / 2);
 		int enemyTop = max(0, SCREEN_HEIGHT / 2 - enemyHeight / 2);
 		int enemyBottom = min(SCREEN_HEIGHT - 1, SCREEN_HEIGHT / 2 + enemyHeight / 2);
 		int enemyLeft = max(0, enemyScreenX - enemyWidth / 2);
 		int enemyRight = min(SCREEN_WIDTH - 1, enemyScreenX + enemyWidth / 2);
 
-		for (int x = enemyLeft; x <= enemyRight; ++x)
+		if (bUseSlimeSprite)
 		{
-			if (distanceFromPlayer >= wallDepths[x])
+			const vector<string>& spriteRows = GetSlimeSpriteRows();
+			const int sourceHeight = static_cast<int>(spriteRows.size());
+			const int sourceWidth = sourceHeight > 0 ? static_cast<int>(spriteRows[0].length()) : 0;
+			const int targetHeight = max(1, enemyBottom - enemyTop + 1);
+			const int targetWidth = max(1, enemyRight - enemyLeft + 1);
+
+			if (sourceHeight > 0 && sourceWidth > 0)
 			{
-				continue;
+				for (int x = enemyLeft; x <= enemyRight; ++x)
+				{
+					if (distanceFromPlayer >= wallDepths[x])
+					{
+						continue;
+					}
+
+					bool bDrewColumn = false;
+					const int sourceX = min(sourceWidth - 1, (((x - enemyLeft) * 2 + 1) * sourceWidth) / (targetWidth * 2));
+
+					for (int y = enemyTop; y <= enemyBottom; ++y)
+					{
+						const int sourceY = min(sourceHeight - 1, (((y - enemyTop) * 2 + 1) * sourceHeight) / (targetHeight * 2));
+						const char pixel = spriteRows[sourceY][sourceX];
+						if (pixel == '.')
+						{
+							continue;
+						}
+
+						renderManager->PutCell(y, x, L' ', GetSlimeSpriteAttribute(monster, pixel));
+						bDrewColumn = true;
+					}
+
+					if (bDrewColumn)
+					{
+						wallDepths[x] = distanceFromPlayer;
+					}
+				}
 			}
-
-			wallDepths[x] = distanceFromPlayer;
-
-			wchar_t objectCharacter = monster != nullptr ? GetMonsterIcon(monster) : GetDirectionArrow(projectile->GetDirection());
-			WORD objectAttribute = monster != nullptr
-				? MakeAttribute(monster->IsHitFlashActive() ? CC_WHITE : GetMonsterColor(monster))
-				: MakeAttribute(CC_CYAN);
-
-			for (int y = enemyTop; y <= enemyBottom; ++y)
+		}
+		else
+		{
+			for (int x = enemyLeft; x <= enemyRight; ++x)
 			{
-				renderManager->PutCell(y, x, objectCharacter, objectAttribute);
+				if (distanceFromPlayer >= wallDepths[x])
+				{
+					continue;
+				}
+
+				wallDepths[x] = distanceFromPlayer;
+
+				wchar_t objectCharacter = monster != nullptr ? GetMonsterIcon(monster) : GetDirectionArrow(projectile->GetDirection());
+				WORD objectAttribute = monster != nullptr
+					? MakeAttribute(monster->IsHitFlashActive() ? CC_WHITE : GetMonsterColor(monster))
+					: MakeAttribute(CC_CYAN);
+
+				for (int y = enemyTop; y <= enemyBottom; ++y)
+				{
+					renderManager->PutCell(y, x, objectCharacter, objectAttribute);
+				}
 			}
 		}
 
