@@ -152,7 +152,7 @@ void MapManager::MapParsing(int CurrentStage)
 				break;
 			case 'C': // 보스 연출 트리거
 				{
-					
+					Map[i][j] = {MapObjectType::Path, NO_ID};
 				}
 				break;
 			case 'K': // Monster Spawner
