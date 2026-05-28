@@ -162,6 +162,45 @@ float UMoveComponent::GetTeleportRemainingTime() const
 
 void UMoveComponent::OpenShop()
 {
+	Vector ShopPosition;
+	const bool bNearShop = GetAdjacentShop(ShopPosition);
+
+	if (!bNearShop)
+	{
+		ViewportManager::GetInstance()->CloseEnterShop();
+		bWasOnShop = false;
+		bShopPromptDismissed = false;
+		DismissedShopPosition = { -1, -1 };
+		return;
+	}
+
+	const bool bDismissedSameShop =
+		bShopPromptDismissed &&
+		DismissedShopPosition.X == ShopPosition.X &&
+		DismissedShopPosition.Y == ShopPosition.Y;
+
+	if (bDismissedSameShop)
+	{
+		ViewportManager::GetInstance()->CloseEnterShop();
+		bWasOnShop = true;
+		return;
+	}
+
+	if (!bWasOnShop && !ViewportManager::GetInstance()->IsEnterShopUIOpen())
+	{
+		ViewportManager::GetInstance()->OpenEnterShop();
+	}
+
+	bWasOnShop = true;
+}
+
+bool UMoveComponent::GetAdjacentShop(Vector& OutPosition)
+{
+	if (PlayerPtr == nullptr)
+	{
+		return false;
+	}
+
 	Vector Vec = PlayerPtr->GetPosition();
 	const Vector checkPositions[] = {
 		{ Vec.X, Vec.Y - 1 },
@@ -170,7 +209,6 @@ void UMoveComponent::OpenShop()
 		{ Vec.X + 1, Vec.Y }
 	};
 
-	bool bNearShop = false;
 	for (const Vector& checkPosition : checkPositions)
 	{
 		if (checkPosition.X < 0 || checkPosition.X >= MAP_MAX_X || checkPosition.Y < 0 || checkPosition.Y >= MAP_MAX_Y)
@@ -180,23 +218,23 @@ void UMoveComponent::OpenShop()
 
 		if (MapManager::GetInstance()->GetType(checkPosition) == MapObjectType::Shop)
 		{
-			bNearShop = true;
-			break;
+			OutPosition = checkPosition;
+			return true;
 		}
 	}
 
-	if (!bNearShop)
-	{
-		bWasOnShop = false;
-		return;
-	}
+	return false;
+}
 
-	if (!bWasOnShop)
+void UMoveComponent::DismissShopPrompt()
+{
+	Vector ShopPosition;
+	if (GetAdjacentShop(ShopPosition))
 	{
-		ViewportManager::GetInstance()->OpenEnterShop();
+		bShopPromptDismissed = true;
+		DismissedShopPosition = ShopPosition;
+		bWasOnShop = true;
 	}
-
-	bWasOnShop = true;
 }
 
 void UMoveComponent::HandleMoveInput()
