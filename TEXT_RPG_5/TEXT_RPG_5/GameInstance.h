@@ -1,13 +1,17 @@
 #pragma once
+#include <future>
+
 #include "Singleton.h"
 #include "UI/MainMenuUI.h"
 #include "UI/GameOverUI.h"
 #include "UI/GameClearUI.h"
 #include "UI/NameInputUI.h"
+#include "UI/LeaderboardUI.h"
 
 enum class GameFlowState
 {
 	MainMenu,
+	Leaderboard,
 	NameInput,
 	FadeOutToGame,
 	Game,
@@ -19,7 +23,11 @@ enum class GameFlowState
 	GameOver,
 	FadeOutToGameClear,
 	FadeInGameClear,
-	GameClear
+	GameClear,
+	RankNameConfirm,
+	RankNameInput,
+	RankSubmitting,
+	RankSubmitted
 };
 
 class GameInstance : public Singleton<GameInstance>
@@ -43,6 +51,7 @@ public:
 
 private:
 	void TickMainMenu(float DeltaTime);
+	void TickLeaderboard(float DeltaTime);
 	void TickNameInput(float DeltaTime);
 	void TickFadeOutToGame(float DeltaTime);
 	void TickFadeInGame(float DeltaTime);
@@ -54,15 +63,29 @@ private:
 	void TickFadeOutToGameClear(float DeltaTime);
 	void TickFadeInGameClear(float DeltaTime);
 	void TickGameClear(float DeltaTime);
+	void TickRankNameConfirm(float DeltaTime);
+	void TickRankNameInput(float DeltaTime);
+	void TickRankSubmitting(float DeltaTime);
+	void TickRankSubmitted(float DeltaTime);
 	void TickStagePrompt(float DeltaTime);
 	void RenderStagePrompt();
+	void RenderStoredTime();
+	void RenderRankNameConfirm();
+	void RenderRankLoading(const wstring& Message);
+	void RenderRankSubmitted();
+	void StartRankSubmit(const string& Name);
 	void ResetGameWorld();
 
 private:
 	bool bQuitRequested = false;
 	GameFlowState FlowState = GameFlowState::MainMenu;
 	MainMenuUI MainMenu;
+	LeaderboardUI Leaderboard;
 	NameInputUI NameInput;
+	NameInputUI RankNameInput;
 	GameOverUI GameOver;
 	GameClearUI GameClear;
+	future<bool> RankSubmitFuture;
+	float RankLoadingTimer = 0.0f;
+	int RankLoadingDotCount = 1;
 };

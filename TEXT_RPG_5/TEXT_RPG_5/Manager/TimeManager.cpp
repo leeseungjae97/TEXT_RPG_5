@@ -3,7 +3,7 @@
 #include "DisplayManager.h"
 
 TimeManager::TimeManager()
-	: DeltaTime(0.f), StoreSecond(0.0f), FrameCount(0), LastFPS(0),
+	: DeltaTime(0.f), StoreSecond(0.0f), StoredTime(0.0f), FrameCount(0), LastFPS(0),
 	CpuFrequency(), PrevFrequency(), CurFrequency()
 {
 }
@@ -50,4 +50,24 @@ void TimeManager::CalcFPS()
 		FrameCount = 0;
 	}
 	DisplayManager::GetInstance()->AddRender(1, 1, "FPS : " + to_string(LastFPS));
+}
+
+wstring TimeManager::FormatSeconds(double Seconds)
+{
+	Seconds = max(0.0, Seconds);
+	const int hours = static_cast<int>(Seconds / 3600.0);
+	Seconds -= static_cast<double>(hours * 3600);
+	const int minutes = static_cast<int>(Seconds / 60.0);
+	Seconds -= static_cast<double>(minutes * 60);
+	const int seconds = static_cast<int>(Seconds);
+	const int milliseconds = static_cast<int>((Seconds - static_cast<double>(seconds)) * 1000.0);
+
+	wstringstream stream;
+	stream << setfill(L'0')
+		<< setw(2) << hours << L":"
+		<< setw(2) << minutes << L":"
+		<< setw(2) << seconds << L"."
+		<< setw(3) << milliseconds;
+
+	return stream.str();
 }

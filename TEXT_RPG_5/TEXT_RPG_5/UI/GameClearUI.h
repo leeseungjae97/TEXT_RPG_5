@@ -8,7 +8,8 @@ enum class GameClearAction
 {
 	None,
 	Retry,
-	MainMenu
+	MainMenu,
+	RegisterRank
 };
 
 class GameClearUI

@@ -183,7 +183,7 @@ void MapManager::MapParsing(int CurrentStage)
 							boss->SetNextPosition(CurrentPos);
 						}
 						break;
-					case BossType::KING_SPIDER:
+					case BossType::QUEEN_SPIDER:
 						{
 							QueenSpider* boss = SceneManager::GetInstance()->SpawnObject<QueenSpider>(CurrentStage + 2);
 							boss->ConfigureForStage(CurrentStage + 2, true);

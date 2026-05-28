@@ -1,5 +1,4 @@
-﻿/*
-#include "R2Connector.h"
+﻿#include "R2Connector.h"
 
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentials.h>
@@ -62,55 +61,13 @@ string R2Connector::ReadLeaderboard()
     if (!GetTextFromR2(s3Client, config, ObjectKey, readBackText))
     {
         Aws::ShutdownAPI(options);
+        return "";
     }
-    
-    R2AsyncLoader loader;
-
-    loader.StartLoadIni(
-        s3Client,
-        config,
-        ObjectKey);
-    
-    while (true)
-    {
-        loader.Tick();
-
-        if (loader.IsLoading())
-        {
-            std::cout << "Loading R2 object";
-            std::cout << ".\n";
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
-            continue;
-        }
-
-        if (loader.HasResult())
-        {
-            const R2LoadResult& result = loader.GetResult();
-
-            // if (result.Success)
-            // {
-            //     std::cout << "\nR2 Load Success\n";
-            //     std::cout << "ObjectKey: " << result.ObjectKey << '\n';
-            //     std::cout << "\n========== Content ==========\n";
-            //     std::cout << result.Text << '\n';
-            //     std::cout << "=============================\n";
-            // }
-            // else
-            // {
-            //     std::cout << "\nR2 Load Failed\n";
-            //     std::cout << "ObjectKey: " << result.ObjectKey << '\n';
-            //     std::cout << "Error: " << result.ErrorMessage << '\n';
-            // }
-
-            break;
-        }
-    }
-    
+    Aws::ShutdownAPI(options);
     return readBackText;
 }
 
-void R2Connector::WriteLeaderboard(string Name, float Time)
+void R2Connector::WriteLeaderboard(string Name, float Time, int Level)
 {
     R2Config config;
 
@@ -142,11 +99,14 @@ void R2Connector::WriteLeaderboard(string Name, float Time)
     // 2. 있으면 기존 내용 기반으로 수정한다.
     // 3. 없으면 새 ini 내용을 만든다.
     // 4. PutObject로 R2에 저장한다.
-    if (!WriteOrUpdateIniOnR2(s3Client, config, ObjectKey))
+    if (!WriteOrUpdateIniOnR2(s3Client, config, ObjectKey, Name, Time, Level))
     {
         Aws::ShutdownAPI(options);
         // 쓰기 실패
+        return;
     }
+
+    Aws::ShutdownAPI(options);
 }
 
 
@@ -314,43 +274,27 @@ bool R2Connector::GetTextFromR2(
     return true;
 }
 
-string R2Connector::CreateNewPlayerIniText()
+string R2Connector::CreateLeaderboardText(const string& oldText, const string& Name, float Time, int Level)
 {
     ostringstream oss;
-
-    oss << "[Player]\n";
-    oss << "Name=Knight\n";
-    oss << "Level=1\n";
-    oss << "HP=100\n";
-    oss << "Gold=0\n";
-    oss << "\n";
-    oss << "[LastSave]\n";
-    oss << "Stage=1\n";
-    oss << "PlayTime=0\n";
-
-    return oss.str();
-}
-
-string R2Connector::UpdatePlayerIniText(const string& oldText)
-{
-    ostringstream oss;
-
-    // 단순 예시:
-    // 기존 내용을 보존하고 아래에 새 저장 섹션을 추가합니다.
-    // 실제 게임에서는 ini 파서를 만들어 특정 key만 교체하는 방식이 더 좋습니다.
     oss << oldText;
-
-    if (!oldText.empty() && oldText[oldText.size() - 1] != '\n')
+    if (!oldText.empty() && oldText.back() != '\n')
     {
-        oss << "\n";
+        oss << '\n';
     }
 
-    oss << "\n";
-    oss << "; Updated by C++ Client\n";
-    oss << "[LastSave]\n";
-    oss << "Stage=3\n";
-    oss << "PlayTime=120\n";
-    oss << "Gold=5000\n";
+    int nextRank = 1;
+    stringstream stream(oldText);
+    string line;
+    while (getline(stream, line))
+    {
+        if (!Trim(line).empty())
+        {
+            ++nextRank;
+        }
+    }
+
+    oss << nextRank << ". " << fixed << setprecision(3) << Time << ", " << Level << ", " << Name << '\n';
 
     return oss.str();
 }
@@ -358,7 +302,10 @@ string R2Connector::UpdatePlayerIniText(const string& oldText)
 bool R2Connector::WriteOrUpdateIniOnR2(
     Aws::S3::S3Client& s3Client,
     const R2Config& config,
-    const string& objectKey)
+    const string& objectKey,
+    const string& Name,
+    float Time,
+    int Level)
 {
     string oldText;
     string newText;
@@ -369,14 +316,7 @@ bool R2Connector::WriteOrUpdateIniOnR2(
         objectKey,
         oldText);
 
-    if (readSuccess)
-    {
-        newText = UpdatePlayerIniText(oldText);
-    }
-    else
-    {
-        newText = CreateNewPlayerIniText();
-    }
+    newText = CreateLeaderboardText(readSuccess ? oldText : "", Name, Time, Level);
 
     return PutTextToR2(
         s3Client,
@@ -384,5 +324,3 @@ bool R2Connector::WriteOrUpdateIniOnR2(
         objectKey,
         newText);
 }
-*/
-

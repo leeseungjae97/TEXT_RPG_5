@@ -1415,6 +1415,7 @@
     <ClCompile Include="UI\GameClearUI.cpp" />
     <ClCompile Include="UI\InventoryUI.cpp" />
     <ClCompile Include="UI\ItemLogUI.cpp" />
+    <ClCompile Include="UI\LeaderboardUI.cpp" />
     <ClCompile Include="UI\MainMenuUI.cpp" />
     <ClCompile Include="UI\NameInputUI.cpp" />
     <ClCompile Include="UI\EnterShopUI.cpp" />
@@ -1858,6 +1859,7 @@
     <ClInclude Include="UI\GameClearUI.h" />
     <ClInclude Include="UI\InventoryUI.h" />
     <ClInclude Include="UI\ItemLogUI.h" />
+    <ClInclude Include="UI\LeaderboardUI.h" />
     <ClInclude Include="UI\MainMenuUI.h" />
     <ClInclude Include="UI\NameInputUI.h" />
     <ClInclude Include="UI\EnterShopUI.h" />

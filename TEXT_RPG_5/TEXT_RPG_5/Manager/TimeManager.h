@@ -11,6 +11,7 @@ public:
 private:
 	double DeltaTime;
 	double StoreSecond;
+	double StoredTime;
 	UINT FrameCount;
 	UINT LastFPS;
 	
@@ -19,6 +20,11 @@ private:
 	LARGE_INTEGER CurFrequency;
 public:
 	double GetDeltaTime() { return DeltaTime; }
+	double GetStoredTime() const { return StoredTime; }
+	void ResetStoredTime() { StoredTime = 0.0; }
+	void AddStoredTime(double InDeltaTime) { StoredTime += max(0.0, InDeltaTime); }
+	wstring GetFormattedStoredTime() const { return FormatSeconds(StoredTime); }
+	static wstring FormatSeconds(double Seconds);
 
 public:
 	void Tick();

@@ -82,9 +82,19 @@ void NameInputUI::Render()
 	const int x = max(1, (SCREEN_WIDTH - width) / 2);
 	const int y = max(1, (SCREEN_HEIGHT - height) / 2);
 
+	const WORD background = Renderer->MakeConsoleAttribute(CC_BLACK, CC_BLACK);
+
+	for (int row = 0; row < height; ++row)
+	{
+		for (int col = 0; col < width; ++col)
+		{
+			Renderer->PutCell(y + row, x + col, L' ', background);
+		}
+	}
+	
 	Renderer->DrawBox(y, x, width, height);
 	Renderer->AddRender(y + 3, x + 6, L"당신의 이름을 입력하세요", CC_DARKYELLOW);
-	Renderer->AddRender(y + 5, x + 6, L"Enter 시작 / Backspace 삭제 / ESC 돌아가기", CC_DARKGRAY);
+	Renderer->AddRender(y + 5, x + 6, L"Enter 입력 / Backspace 삭제 / ESC 돌아가기", CC_DARKGRAY);
 
 	const int inputWidth = 44;
 	const int inputX = x + 18;
@@ -106,5 +116,5 @@ void NameInputUI::Render()
 		Renderer->AddRender(inputY, inputX, displayName, CC_WHITE);
 	}
 
-	Renderer->AddRender(y + 15, x + 6, L"Chronos Realm에 기록될 이름입니다.", CC_GRAY);
+	Renderer->AddRender(y + 15, x + 6, L"DIABL5에 기록될 이름입니다.", CC_GRAY);
 }
