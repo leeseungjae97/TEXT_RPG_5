@@ -2,8 +2,8 @@
 #include "../Singleton.h"
 #include "../pch.h"
 #include "../Struct/Coordinate.h"
+#include "../Struct/Vector.h"
 
-struct Vector;
 class Player;
 class AObject;
 
@@ -16,6 +16,7 @@ public:
 public:
 	void BeginPlay();
 	void Tick(float DeltaTime);
+	void MapParsing(int CurrentStage);
 
 private:
 	bool IsValidPosition(Vector Pos) const;
@@ -38,7 +39,9 @@ public:
 	MapObjectType GetType(int Y, int X);
 	AObject* GetMapObject(Vector Pos, MapObjectType Type);
 	AObject* GetMapObject(int Y, int X, MapObjectType Type);
-
+	Vector GetPlayerPosition() { return PlayerPosition;}
+	
 private:
 	vector<vector<Coordinate>> Map;
+	Vector PlayerPosition;
 };
