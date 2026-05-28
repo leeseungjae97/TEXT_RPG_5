@@ -12,8 +12,9 @@ static string StringMap[4][MAP_MAX_Y] =
 	// G : Goblin
 	// D : Spider
 	// S : Shop
-	// T : Monster 스폰 위치
+	// T : Mimmic, Box
 	// C : Cinema -> 보스 연출이 나오는 트리거 위치
+	// K : Monster 스포너 위치
 	// 주문서 맵 함정...
 	// B : Boss {킹슬라임, 오크메이지, 킹스파이더, 드래곤}
 	// STAGE 1

@@ -13,7 +13,6 @@ public:
 
 	int GetCurrentStage() const { return CurrentStage; }
 	int GetStageCount() const { return StageCount; }
-	Vector GetPlayerStartPosition() const;
 	Vector GetCrystalPosition() const { return CrystalPosition; }
 	bool IsBossDefeated() const { return bBossDefeated; }
 	bool HasCrystal() const { return bHasCrystal; }
@@ -29,7 +28,7 @@ public:
 	bool AdvanceStage();
 
 private:
-	static constexpr int StageCount = 3;
+	static constexpr int StageCount = 4;
 	int CurrentStage = 0;
 	bool bBossDefeated = false;
 	bool bHasCrystal = false;

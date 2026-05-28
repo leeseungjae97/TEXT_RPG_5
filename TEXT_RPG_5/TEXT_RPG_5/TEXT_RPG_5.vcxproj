@@ -1782,6 +1782,7 @@
     <ClInclude Include="Component\MoveComponent.h" />
     <ClInclude Include="Component\SubActionComponent.h" />
     <ClInclude Include="Define.h" />
+    <ClInclude Include="Enum\Boss.h" />
     <ClInclude Include="Enum\EquipmentTypeEnum.h" />
     <ClInclude Include="Dragon.h" />
     <ClInclude Include="Enum\ItemIdEnum.h" />

@@ -106,70 +106,13 @@ void SceneManager::LoadCurrentStage()
 	{
 		CurrentPlayer = SpawnObject<Player>("player", 100, 30);
 	}
-
-	Vector playerStart = StageManager::GetInstance()->GetPlayerStartPosition();
+	const int stage = StageManager::GetInstance()->GetCurrentStage();
+	MapManager::GetInstance()->MapParsing(stage);
+	
+	Vector playerStart = MapManager::GetInstance()->GetPlayerPosition(); 
 	CurrentPlayer->SetPosition(playerStart);
 	CurrentPlayer->SetPrevPosition(playerStart);
 	CurrentPlayer->SetNextPosition(playerStart);
-	
-	const int stage = StageManager::GetInstance()->GetCurrentStage();
-	const int monsterLevel = stage + 1;
-	const int offset = stage * 5;
-	for (int i = 1; i <= 3; ++i)
-	{
-		Goblin* Gob = SpawnObject<Goblin>(monsterLevel);
-		Gob->ConfigureForStage(monsterLevel);
-		Gob->SetPosition(i + offset, i + offset);
-		Gob->SetPrevPosition(i + offset, i + offset);
-		
-		Orc* Or = SpawnObject<Orc>(monsterLevel);
-		Or->ConfigureForStage(monsterLevel);
-		Or->SetPosition(i * 2 + offset, i * 2 + offset);
-		Or->SetPrevPosition(i * 2 + offset, i * 2 + offset);
-		
-		Slime* Sli = SpawnObject<Slime>(monsterLevel);
-		Sli->ConfigureForStage(monsterLevel);
-		Sli->SetPosition(i * 2 + 1 + offset, i * 2 + 1 + offset);
-		Sli->SetPrevPosition(i * 2 + 1 + offset, i * 2 + 1 + offset);
-		
-		Spider* spi = SpawnObject<Spider>(monsterLevel);
-		spi->ConfigureForStage(monsterLevel);
-		spi->SetPosition(i * 3 + offset, i * 3 + offset);
-		spi->SetPrevPosition(i * 3 + offset, i * 3 + offset);
-	}
-  //보스테스트
-	Vector bossPosition = { min(MAP_MAX_X - 4, 28 + offset), min(MAP_MAX_Y - 4, 14 + offset) };
-	
-	if (stage == 0)
-	{
-		KingSlime* boss = SpawnObject<KingSlime>(monsterLevel + 2);
-		boss->ConfigureForStage(monsterLevel + 2, true);
-		boss->SetPosition(bossPosition);
-		boss->SetPrevPosition(bossPosition);
-		// Mimic* boss = SpawnObject<Mimic>(monsterLevel + 2);
-		// boss->ConfigureForStage(monsterLevel + 2, true);
-		// boss->SetPosition(bossPosition);
-		// boss->SetPrevPosition(bossPosition);
-	}
-	else if (stage == 1)
-	{
-		OrcMage* boss = SpawnObject<OrcMage>(monsterLevel + 2);
-		boss->ConfigureForStage(monsterLevel + 2, true);
-		boss->SetPosition(bossPosition);
-		boss->SetPrevPosition(bossPosition);
-	}
-	else
-	{
-		Dragon* boss = SpawnObject<Dragon>(monsterLevel + 2);
-		boss->ConfigureForStage(monsterLevel + 2, true);
-		boss->SetPosition(bossPosition);
-		boss->SetPrevPosition(bossPosition);
-	}
-	
-	// Mimic* boss = SpawnObject<Mimic>(monsterLevel + 2);
-	// boss->ConfigureForStage(monsterLevel + 2, true);
-	// boss->SetPosition(bossPosition);
-	// boss->SetPrevPosition(bossPosition);
 }
 
 void SceneManager::Reset()

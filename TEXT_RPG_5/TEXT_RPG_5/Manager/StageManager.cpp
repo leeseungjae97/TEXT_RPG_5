@@ -59,17 +59,6 @@ void StageManager::Tick(float DeltaTime)
 	bPromptDismissedUntilLeave = false;
 }
 
-Vector StageManager::GetPlayerStartPosition() const
-{
-	switch (CurrentStage)
-	{
-	case 0: return { 20, 20 };
-	case 1: return { 8, 8 };
-	case 2: return { 12, 35 };
-	default: return { 20, 20 };
-	}
-}
-
 int StageManager::GetCrystalColor() const
 {
 	static const int Colors[] = { CC_RED, CC_YELLOW, CC_GREEN, CC_CYAN, CC_BLUE, CC_MAGENTA };
