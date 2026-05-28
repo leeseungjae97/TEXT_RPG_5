@@ -1421,6 +1421,7 @@
     <ClCompile Include="UI\ChestOpenUI.cpp" />
     <ClCompile Include="UI\ShopUI.cpp" />
     <ClCompile Include="UI\CraftingUI.cpp" />
+    <ClCompile Include="UI\EnhancementUI.cpp" />
     <ClCompile Include="UI\HUDUI.cpp" />
     <ClCompile Include="Manager\DisplayManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1863,6 +1864,7 @@
     <ClInclude Include="UI\ChestOpenUI.h" />
       <ClInclude Include="UI\ShopUI.h" />
       <ClInclude Include="UI\CraftingUI.h" />
+      <ClInclude Include="UI\EnhancementUI.h" />
       <ClInclude Include="UI\RarityColor.h" />
       <ClInclude Include="UI\HUDUI.h" />
   </ItemGroup>

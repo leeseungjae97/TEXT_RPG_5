@@ -58,6 +58,14 @@ void ShopUI::Render()
 	DrawBackground(y - 2, x - 3, panelWidth + 6, panelHeight + 6);
 	DrawItemPanel(y, x, items, bSellMode ? L"Inventory" : L"Shop");
 
+	Vector cursor = InventoryComponent->GetCursor();
+	const UItem* hoveredItem = bSellMode
+		? InventoryComponent->GetItem(cursor)
+		: shopManager->GetItem(cursor);
+	const int hoverY = y + 2 + cursor.Y * (slotHeight - 1);
+	const int hoverX = x + cursor.X * (slotWidth - 1) + slotWidth + 2;
+	DrawHoverDialog(hoverY, hoverX, hoveredItem, bSellMode);
+
 	Renderer->AddRender(y - 1, x, L"(Z)구매/판매  (C)모드전환  (ESC)닫기");
 }
 
@@ -150,6 +158,77 @@ void ShopUI::DrawItemPanel(int Y, int X, const vector<vector<UItem*>>& Items, co
 			DrawItemSlot(Y + 2 + row * (slotHeight - 1), X + col * (slotWidth - 1), slotWidth, slotHeight, Items[row][col], bSelected);
 		}
 	}
+}
+
+void ShopUI::DrawHoverDialog(int Y, int X, const UItem* Item, bool bSellMode)
+{
+	if (Item == nullptr)
+	{
+		return;
+	}
+
+	const int width = 30;
+	const int height = 8;
+	X = min(max(1, X), max(1, SCREEN_WIDTH - width - 1));
+	Y = min(max(1, Y), max(1, SCREEN_HEIGHT - height - 1));
+
+	DrawBackground(Y, X, width, height);
+
+	FItemInfo itemInfo = Item->GetItemInfo();
+	wstring itemName = Renderer->ToWideString(itemInfo.Name);
+	if (itemInfo.Type == ItemType::Equipment && Item->GetEnhancementCount() > 0)
+	{
+		itemName += L" +" + to_wstring(Item->GetEnhancementCount());
+	}
+	itemName = Renderer->TrimTextToDisplayWidth(itemName, width - 4);
+
+	wstring typeText = L"";
+	wstring amountContent = L"";
+	switch (itemInfo.Type)
+	{
+	case ItemType::Equipment:
+		typeText = L"장비";
+		switch (itemInfo.EquipSlot)
+		{
+		case EquipmentType::Body:
+		case EquipmentType::Head:
+		case EquipmentType::Boots:
+			amountContent = L"MAX HP: +";
+			break;
+		case EquipmentType::Weapon:
+			amountContent = L"POWER: +";
+			break;
+		default:
+			break;
+		}
+		break;
+	case ItemType::Usable:
+		typeText = L"소모품";
+		amountContent = L"체력 회복: +";
+		break;
+	case ItemType::Misc:
+		typeText = L"재료";
+		break;
+	default:
+		break;
+	}
+
+	Renderer->PutCell(Y + 1, X + 2, GetItemIcon(Item), Renderer->MakeConsoleAttribute(CC_YELLOW));
+	Renderer->AddRender(Y + 1, X + 4, itemName, GetRarityColor(itemInfo.Rarity));
+	if (itemInfo.Type == ItemType::Equipment)
+	{
+		Renderer->AddRender(Y + 2, X + 2, wstring(L"등급: ") + GetRarityName(itemInfo.Rarity), GetRarityColor(itemInfo.Rarity));
+	}
+	Renderer->AddRender(Y + 3, X + 2, typeText);
+
+	const int shownPrice = bSellMode ? Item->GetPrice() / 2 : Item->GetPrice();
+	Renderer->AddRender(Y + 4, X + 2, wstring(bSellMode ? L"Sell: " : L"Price: ") + to_wstring(shownPrice));
+	if (itemInfo.EffectAmount)
+	{
+		int shownAmount = static_cast<int>(round(itemInfo.EffectAmount * GetRarityStatMultiplier(itemInfo.Rarity)));
+		Renderer->AddRender(Y + 5, X + 2, amountContent + to_wstring(shownAmount));
+	}
+	Renderer->AddRender(Y + 6, X + 2, bSellMode ? L"(Z) 판매" : L"(Z) 구매");
 }
 
 wchar_t ShopUI::GetItemIcon(const UItem* Item)

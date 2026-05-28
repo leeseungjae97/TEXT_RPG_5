@@ -34,6 +34,9 @@ static const vector<FItemWeight> ShopItemPool =
     { ItemId::PLATE_HELMET,     2 },
     { ItemId::PLATE_ARMOR,      2 },
     { ItemId::BOOTS_OF_WIND,      2 },
+    { ItemId::FIRE_WALL_SCROLL,  20 },
+    { ItemId::LIGHTNING_STRIKE_SCROLL,  20 },
+    { ItemId::FLAME_POTION,  20 },
 };
 
 static const vector<FItemWeight> ShopBonusPool =

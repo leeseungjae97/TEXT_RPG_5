@@ -165,6 +165,597 @@ namespace
 		if (name.find(L"미믹") != wstring::npos) return CC_DARKYELLOW;
 		return CC_MAGENTA;
 	}
+
+	bool IsSlimeMonster(Monster* MonsterPtr)
+	{
+		if (MonsterPtr == nullptr)
+		{
+			return false;
+		}
+
+		return MonsterPtr->GetDisplayName().find(L"슬라임") != wstring::npos;
+	}
+
+	bool IsKingSlimeMonster(Monster* MonsterPtr)
+	{
+		if (MonsterPtr == nullptr)
+		{
+			return false;
+		}
+
+		return MonsterPtr->GetDisplayName().find(L"킹슬라임") != wstring::npos;
+	}
+
+	bool IsDragonMonster(Monster* MonsterPtr)
+	{
+		if (MonsterPtr == nullptr)
+		{
+			return false;
+		}
+
+		return MonsterPtr->GetDisplayName().find(L"드래곤") != wstring::npos;
+	}
+
+	bool IsOrcMageMonster(Monster* MonsterPtr)
+	{
+		if (MonsterPtr == nullptr)
+		{
+			return false;
+		}
+
+		const wstring& displayName = MonsterPtr->GetDisplayName();
+		return displayName.find(L"오크메이지") != wstring::npos
+			|| displayName.find(L"오크주술사") != wstring::npos
+			|| displayName.find(L"오크 주술사") != wstring::npos;
+	}
+
+	bool IsQueenSpiderMonster(Monster* MonsterPtr)
+	{
+		if (MonsterPtr == nullptr)
+		{
+			return false;
+		}
+
+		return MonsterPtr->GetDisplayName().find(L"퀸스파이더") != wstring::npos;
+	}
+
+	const vector<string>& GetSlimeSpriteRows()
+	{
+		static const vector<string> Rows =
+		{
+			"............OOOOO............",
+			".........OOOBBBBBOOO.........",
+			".......OOBBBBBBBBBBBOO.......",
+			".....OOBBHHHHHBBBBBBBBOO.....",
+			"...OOBBBHHHHHHHBBBBEEBBBOO...",
+			"..OBBBBBHHHHHBBBBEEEBBBBBBO..",
+			".OBBBBBBBBBBBBBBBBEEBBBBBBBO.",
+			"OBBBBBBBBBBBBBBBBBBBBBBBBBBBO",
+			"OBBBBBBBBBBBBBBBBBBBBBBBBBBBO",
+			"OBBBSSSBBBBBBBBBBBBBBBBBSSSBO",
+			".OBSSSSBBBBBBBBBBBBBBBBSSSSO.",
+			"..OOOSSSSSSSSSSSSSSSSSSSOOO..",
+			"....OOOOOOOOOOOOOOOOOOOOO...."
+		};
+
+		return Rows;
+	}
+
+	WORD GetSlimeSpriteAttribute(Monster* MonsterPtr, char Pixel)
+	{
+		if (MonsterPtr != nullptr && MonsterPtr->IsHitFlashActive())
+		{
+			return MakeAttribute(CC_WHITE, CC_WHITE);
+		}
+
+		const bool shiny = MonsterPtr != nullptr && MonsterPtr->IsShiny();
+		const int outlineColor = shiny ? CC_DARKRED : CC_DARKGREEN;
+		const int bodyColor = shiny ? CC_RED : CC_GREEN;
+		const int highlightColor = CC_YELLOW;
+		const int shadowColor = shiny ? CC_DARKRED : CC_DARKGREEN;
+		const int eyeColor = shiny ? CC_DARKRED : CC_DARKGREEN;
+
+		switch (Pixel)
+		{
+		case 'O':
+			return MakeAttribute(outlineColor, outlineColor);
+		case 'H':
+			return MakeAttribute(highlightColor, highlightColor);
+		case 'S':
+			return MakeAttribute(shadowColor, shadowColor);
+		case 'E':
+			return MakeAttribute(eyeColor, eyeColor);
+		case 'B':
+		default:
+			return MakeAttribute(bodyColor, bodyColor);
+		}
+	}
+
+	const vector<string>& GetKingSlimeSpriteRows()
+	{
+		static const vector<string> Rows =
+		{
+			"................................................................................",
+			".......................................OO.......................................",
+			"......................................OSOO......................................",
+			"......................................OSGO......................................",
+			"......................................OSSO......................................",
+			".....................................OSSOG......................................",
+			".....................................OGOOGG.....................................",
+			"....................................GOGOOGG.....................................",
+			"....................................OGOOOOGG....................................",
+			"...................................SOGOOOOGG..............GO....................",
+			"..................OO...............OSGO..OGGO.............GG....................",
+			"..................OO...............OGSO..OGGG............GGG....................",
+			"..................OSG..............OSOOOOOGGG...........GGGG....................",
+			"...................OGGS......OO...OOSSS.GGGGGG..........SGGG....................",
+			"...................OSGGG.....OOO.OOSSSS.GGGGGG....G...OOGGGG....................",
+			"....................SSGGS....O.OOOO.SSSSGGGGGG.GG.O..OOGGGG.....................",
+			"....................SSGGGG...O..OO.SSSSSGGGGGG.S..OOOOGGGGG.....................",
+			"....................SSSGGGGOOOOOOSSSSGOOOOGGGGOOOOOOOGGGGG......................",
+			"....................OSSGGGGGOOOOSSSSGOO...OGGGGGOOSOGGGGGG......................",
+			"....................OSS.GGGGGSSSSSSSSO.....OGGGGGGGGGGGGGGG.....................",
+			".....................OS..GGGGGSSSSSS........OGGGGGGGGGGGGG......................",
+			".....................OS..GGGGGSSSSSO...SS...OGGGGGGGGGGGGG......................",
+			".....................OSS..GGGOSSSS.O...S....OGGGGGGOGGGGGG......................",
+			"......................OSS..O..OSS..O........OGGGGGO.OGGGGG......................",
+			"......................OS.GS....O...GO.......GGGGGO...OGGGO......................",
+			"......................O.SGSO...OO..GGO.....OGGGGOO...OGGGO......................",
+			".....................OO..SGO...OO..SGGGOOOGGGGGGGO...OGGGB......................",
+			"....................BOBOSSGGOOOSSSSSSGSOGGGGGGGGGOOOOGGGGB......................",
+			"....................BOBO.SSGSSSSGSSSSSOOSSSOOOGSSGGGGGGGGB......................",
+			".....................BOO.SSOOSBBSSSBBBBBBBBBBBBOOOOOSGGGGB......................",
+			".......................OOOSSBBBSSBBBBBBBBBBBBBBBBBBBOOOGOO......................",
+			".....................O.OSBBBBSSSBBBBBBBBBHHHBBBBBBBBBBOOOB......................",
+			"....................OOSSSBBBSSSSBBBBBBBBBHHBBBBBBBBBBBHBB.......................",
+			"..................OOSSSS.BSSBSSSSBBBBSBBBBBBBBBBB.BBB...BBOO....................",
+			".................OOBSSS.SBBBBSSSBBBBS..BHBBBBBBHB.BHH....BBOOO..................",
+			"...............BSOBBSSBBBBBBBBSBBBBB...BBBBBBBHHBBBHHH....BHBBO.................",
+			"..............OOBBBBSBBBBBBBBBBBBBBB.BBBBBBBBBHHHHHHH.......HOOO................",
+			".............OOBBBBBBBBBBBBBBBBBBBBBBSBBHB..BHHHHHHHH.........HBOOO.............",
+			"............OOBBBBBBBBBBBBBBBBBBBBBBBSBBBB.BHHHHHHHHHH.........HHOOO............",
+			"...........OOBBBBBBBBBBBBBBBBBBBBBBBBBBBB.BHHHHHHHHHHHH.........HHBBO...........",
+			"..........OOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHHHHHHHHH...HHH...HHBBO..........",
+			".........OOBSBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHHHHBHHHHHH..HHHH..HHHBOB.........",
+			".........OOBOBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHBBBBBBHHHHHHHHHHHHHHHHHHOB.........",
+			"........OOBSOBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHBBBBBHHHHHHHHHHHHHHHHHHHBBO........",
+			".......OBBBOSBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHBBHHHHHHHHHHHHHHHHHHHHHHHHBOO.......",
+			"......SOBBBOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHHHHHHHHHHHHHHHBHBHHHBO.......",
+			".....BOOBBBSBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHHHHHHHHBHHHBBBBHHHBO.......",
+			"....OOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHHHHHHBBBBBBBBBHHHHHO......",
+			"...OBOOOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHHHHBBBBBHHHHHHHHOB.....",
+			"..OBBBOOOSBBBBBBBBOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHHHHBBBBHHHHHHHBB.....",
+			"..OBBBOOOOBBBBBBBOOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHHHHHBBHHHHHHHHSO....",
+			"..BOSBOOOOBBBBBOOOOOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHBBBBHHHHHHHHOOB...",
+			"...OBOOOOOOBBBOOOOOOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHHHHHBOO...",
+			"..OOOOOOOOSBBBOOOOOSBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHHHHHHHOO...",
+			"..OOOOOSOOSSSBOOOOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHBBBHHHHOO...",
+			"..OOOSOSSOSSSSSOOOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHBOO..",
+			"..OOOOSSSOOOOOSBOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHHHBOO..",
+			"..OOSSSSSOOOOOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBHHBBOO..",
+			".BOOSSSSSOOOOOOBBBBBBBBSOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBOO..",
+			"..SSSSSSSOOOOOOOBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBOOBB",
+			"..OOSSOOOOOOOOOOBBBBBBBBBBBBBBBBBSOOOBBBBBBBBBBBBBBBOOSBBBSOBBOOBBBBBBBBBBOSBOOB",
+			"..OOSSOOOOOOOSOOSBBBBBBBBBBBBBBBBBOOBSBBBBBBBBBBBBBBBOOBBSOOOOOBBBBBBBBBBBOBBO.O",
+			"OOOSSSSOOOOBSSSSSSSSBBBBBBBBBBBBBBBBBBSBBBBSBBBBBBBBBBOOOOBBSSBBBBBBBBBBBSBBBOO.",
+			"..OSSSSOOS.SSSSS.SSSSBBBBB.BOOOOOOOOO.OOOOOO.OO.OOOOOOOOBBBBBBBBBBBBBBBOOBBBBO..",
+			"OOOOSSS.OOO.OOO.OOOOOOOOO.........................BBBBBOOOOOOOOSOBBBBBBBBBBBBOOO",
+			"..OOOOO..........................................................OOOOOSOOOOBOB.."
+		};
+
+		return Rows;
+	}
+
+	WORD GetKingSlimeSpriteAttribute(Monster* MonsterPtr, char Pixel)
+	{
+		if (MonsterPtr != nullptr && MonsterPtr->IsHitFlashActive())
+		{
+			return MakeAttribute(CC_WHITE, CC_WHITE);
+		}
+
+		const bool shiny = MonsterPtr != nullptr && MonsterPtr->IsShiny();
+		const int outlineColor = CC_BLACK;
+		const int crownColor = shiny ? CC_RED : CC_DARKYELLOW;
+		const int crownHighlightColor = CC_YELLOW;
+		const int redGemColor = CC_RED;
+		const int bodyColor = shiny ? CC_MAGENTA : CC_BLUE;
+		const int shadowColor = shiny ? CC_RED : CC_DARKBLUE;
+		const int highlightColor = CC_CYAN;
+
+		switch (Pixel)
+		{
+		case 'O':
+			return MakeAttribute(outlineColor, outlineColor);
+		case 'G':
+			return MakeAttribute(crownColor, crownColor);
+		case 'R':
+			return MakeAttribute(redGemColor, redGemColor);
+		case 'H':
+			return MakeAttribute(highlightColor, highlightColor);
+		case 'S':
+			return MakeAttribute(shadowColor, shadowColor);
+		case 'B':
+			return MakeAttribute(bodyColor, bodyColor);
+		default:
+			return MakeAttribute(crownHighlightColor, crownHighlightColor);
+		}
+	}
+
+	const vector<string>& GetDragonSpriteRows()
+	{
+		static const vector<string> Rows =
+		{
+			"OOO..................................OOO.......................OOOOOO...",
+			"OOOO................................OOOO...................OOOOORROO....",
+			"OOOOO.................OOO...........OOOO.................OOOOOORROOO....",
+			"OOOOOOO............OOOOOO..........OOOOO...............OOOOOORRROO......",
+			".OOOROOO..........OOOOOOO.........OOOHOO..............OOOOORRRROO.......",
+			".OOOBOOO..........OOHBOO..........OOHHOO.............OOORRBRRROOO.......",
+			".OOOBBOOO........OOOHOOO..........OOHHOO...........OOOORBBRRROOO........",
+			".OOOBBROOO.....DOOOOOOO..........OOOHBOO..........OOORBBRRRROOOO........",
+			".OOOBRBROO.....DOOOOOO.........OOOOOHBOO.......OOOOORBRRRRRROOO.........",
+			"..OORRRBOOO...OOOHHOOO.........OOOOOBOOO......OOOOORBRRRRRROOO..........",
+			"..OOORRROOOO..OOOBBOOO.........OOHOOOOOO.....OOOOOBBRRRORROOOO..........",
+			"...OORRRBROOOOOOOODOO.........OOHHBOOO.......OOORRBRRRORRROO............",
+			"...OORORRBROOOOHHOOOO...OOOOOOOOHBBOOO......OOOPRBRROORRRROO............",
+			"...OORROORBOOOOHHBOOO.OOOROOOOOOBBBOOOOOO.OOODPRRRROORRRROOO............",
+			"...OORRDRRBOOOOHHBOOOOOORROOOOOOOOBOOOOOOOOOOPRRRROODRRRPOOO............",
+			"...OORRRRRRROOOHBBOOOOORBROOHHBOOOOOOOOOOOOORRRRRRODRRRRROOO............",
+			"...OORRROORROOOBBBOOOORRRROHHBBBBOOOOROO.OOORRRRROODRRRRROOO............",
+			"...OORRROORROOOOOOOOBRBOOOOHBBBBBOOOBROOOOOBRRROOOODRRRRRPOOOO..........",
+			"...OORROOOOROOOBBBRRRRRRROOOOOOOOOOOOBOOOOORRRROOOODRRRRRPRROOOO........",
+			"...OORRROOOOOORRRRRRRRRRRDOOODOOOOOOOOOORRRRRROOOOODRRRRRRPRROOOOO......",
+			"...OORRROOOOORBRRRORRRRRRROOHBOOOORROOORRRRRRROOOOOOODRRRRRRROOOOO......",
+			"...OORRROOOOBBRRROOORRRRRRROBOOOORRROOORRRRRRROOOOOOOORRRRRRBROOOO......",
+			"...OORRROOORBRRRORPBBBROORROOOOORRRROOOORRRRRROOOOORRRRRRRRBBOOOO.......",
+			"...OORRROORRRRRORRPBRROOORRRRRRRRRRROOOORRRRROOOORRRRRRRRRBROOOO........",
+			"..OOORRROORPRRRORPRRRROORRRRRRRRRRRROOOOOORRROORRRRRRRORRBBROOOO........",
+			"..OOORRROOOORRROPROOOOORRRRRRRRRRRRROOOOOORRROORRRROOOORRBROOOO.........",
+			"..OOORRROOOORRRBRROOOOORRRRRRRRRRRROOOOOOORRRORRRRROOORRBROOO...........",
+			"...OOORROOOORBBRROOOOOORRRRRRRRRRROOOOOOOOORRRRRROODRRRRBOOO............",
+			"....DORROOORRBRRROOOOORRRRRORRRRROOOOROO.OORRRROOORRRRRBOOO.............",
+			"....DOOOOORRRBRROOOOORRRRROORRRRORRRRROOOOORRROOOORRRRBBOOO.............",
+			".....OOOORRRBRROOOOODRRRRROORRRROORRRROOROORRROOOORRRRBBOOO.............",
+			".....OOORRPRRROOORRRRRRRRROORRRROODRRRORROOORROOOORRRRBBOOO.............",
+			"...OOOORPPBRRRORRRRRRRRRROORRRRRROORRRDRROOORROOOORRRRRBOOOO............",
+			"...OOOBBBBBRRRRRRRRRROOOOORRRRRRRBOORRORROOORROOOORRRRRBBOOOD...........",
+			"..OOORBBBBBRRRRRRRROOORRRRRRRRRRRROOORORBBRORRROOORRRRRRBBOOOO..........",
+			"..OOORRRRRRRROORRRROORRRRRRRRRROOOOORROOOOOORRRRROODRRRRRRBROOO.........",
+			"..OOOORRRRROOORRRROOORRRRRRRROOOOOORRROOOOOORRRRROOOOOOORRRROOOOO.......",
+			"..OOOOORRROOOOBBRROOORRRRRRRROOORRRRRROOOOORPRRRRRROOOOOORRBROOOO.......",
+			"...OOOOORROOOOBBRODRRRRRRRRRROORRRRRRROOOOORRRRRRRRRRROOORBBBROOO.O.....",
+			"...OOOOORROORRRRRODRRRRROORRROOORRRRRRBOOORBROOOOOOOORRRBBBBBOOOODOO....",
+			"...OORRRRRRRRRRROODRRRRROORRBBOOOROOOOOOOORBROOOOOROOORBBBOOOOOOOOOO....",
+			"...OOOOOOOORRRROODRRRRRROOOOOOOOORROOORROORROOOORRRRRRRBOOOOOOOOOROO....",
+			"...OOOOOOOOOOOOOORRRRRRROOOOOOOOORRROOOBRRROOOODRRRRRRROOOOOOOOORROO....",
+			"...OOORRRBROOOOORRRROORROOBBBOOORRRBROORRRROOODRRRRBBRROORROOOORRROO....",
+			"...OOBBRRRRBBRRRRRROOOROOOBBBOORRRRRBBOBRRRORRRRRRRROORRRRRBOORBRROO..OO",
+			"...OORROOOORBRROORROOOOBBBBBOOORRRRRRBBRROORRRRRRRODRRRRRRRBBORRROOO.OOO",
+			"...OOROOOOORRRROOOOOOOBBBBBBOORRRRRRRRRROORRRRRRRORRRRBBRRRRRROOOOO.OOOO",
+			"...OOROOOOOORRROOOOOODBBBBBODRRRRRRRRRRROORRRRRROORRRRRBBRRRRBROOOOOOOOO",
+			"...OOOOOO..ORRRO..OOOHBHBBBORRRRRRRRRRRROORRRRROOORRRRRRBRRORRBROOOOOOOO",
+			"...OOOOO...OOROO.OOOOHHHBBBORRRRRRRRRRRROORRRROORRRRRRRRRRRODRRBRORRRRRO",
+			"....DOOO....OOOROOOOHHHHBBBORRRRRRRRRRRRRRRRROOORRRRRRRRRRRRORRRROORRRRO",
+			"....DOOO.....OOOOOOOHHHBBDORRRRRRRRRRRRRRRRROOORRRRRRRRRRRRRRRRRBRORROO.",
+			"....DOOOO....OOOOOOOOBBBBDORROOORRROOORRRRROODRRRRRRRRRRRRRRRRRRRBROOOO.",
+			"...OOOOOO......DOOOOOBBBBBOOROOORRRROOORRRROOROORRRRRRRRRRBRRRRRRRRROOO.",
+			"..OOOOROO......DOOROOBHHHBBOROOORRRRROORRRRRRROOBRRRRRRRRRBBRRRRDRRBOOO.",
+			"OOOOBRROOO.....DOOROOHHHHHBOROORRRRRRRORRRRRRROORBRRRRRRRRRRBRROORRBBOOO",
+			"OOOBROOOOO.....DOORRROHHHHBBOOORRRRRRRORRRRRRROOOBRRRRRRRRRRBBROOORRBOOO",
+			"OOOBBOROOOOOOOOOOOOOOOOBBBBBORRRRRRRRRORRRRRROOOOBBBRRRRRRRRRBBBRORRRBBO",
+			"OOORRRRRRRRRRORBROOORRODBBHBOOORRRRRROOORRRROOOOOOORBRRRRRRORBBOOORRRRRO",
+			".OORRRORRRRRRRRRROOOPHOOBHHBOOORRRRROOOORROOOOBBOOOORRRRRROORBBOOORRRRRO",
+			".OOORROORRRRRRRRROOOHPROOHHBBOORRRRRROOOOOOOBBBBBOOOORRRRROORRBOORRRRRRO",
+			"..OORROOORRRRRRRROOORBRROOHHBBOORBRRRROOOOBBBBBBBBOOOOOOOOORRRBOORRRRRRO",
+			"..OOOOOOOOORRRRRRROOOBRRRROHBBOOOBRRRRROOOOOOOOBHBBBBDOORRRRRRROOORRRRRO",
+			"...OOOO..DDOOORRRRROORRRRROOBBBDOBRRRRRROODDOBBBHHBBBDORRRRRRRRRROOOOOOO",
+			"...OOO.....OOOORRROOORRRRROOOBBOOBRRRROROOOOOBBBHHBBBDORRRRRRRRRROOOOOOO",
+			"............OOOOOOOOOOOOODROOOOOOOORROOOOOOOOBHHHHBDOOOOOORRROORROHROOO.",
+			"..............OOOOOOOOOOOORROOOOOOOOOOOOOOOOHBHHHHBOOOOOOOORROOOBRROOOO.",
+			"...............DOO..OO..OOOOOOOOOOOOO..OOOOHHHHHHHOOOOOOOOOOOO.OOROOOO..",
+			"..............OOOO.OOO...OOOOO.OO..OOO..OOOOHHHOOOOO.OO...OO...OOOOOO...",
+			"..............OOOOOOOO..OOOOO..OO..OOO..OOOOOOOOOOO.OOO...OO...OOOOO....",
+			"..............OOOOOOOOOOOOOOOOOOO.OOOO.OOOOOOOOOOOOOOOO...OO...OOO......",
+			"....................OOOOO.OOOOOOOOOOOOOOOO.....OOOOOOO...OOOO.OOO.......",
+			"...............................OOOOOOOOOO...........OOOOOOOOOOOOO.......",
+			"....................................................OOOOOO.OOOOO........",
+			"........................................................................"
+		};
+
+		return Rows;
+	}
+
+	WORD GetDragonSpriteAttribute(Monster* MonsterPtr, char Pixel)
+	{
+		if (MonsterPtr != nullptr && MonsterPtr->IsHitFlashActive())
+		{
+			return MakeAttribute(CC_WHITE, CC_WHITE);
+		}
+
+		const bool shiny = MonsterPtr != nullptr && MonsterPtr->IsShiny();
+		const int outlineColor = CC_BLACK;
+		const int shadowColor = shiny ? CC_RED : CC_DARKRED;
+		const int membraneColor = shiny ? CC_MAGENTA : CC_RED;
+		const int bodyColor = shiny ? CC_MAGENTA : CC_RED;
+		const int bellyColor = shiny ? CC_YELLOW : CC_DARKYELLOW;
+		const int highlightColor = CC_YELLOW;
+		const int pinkColor = CC_MAGENTA;
+		const int eyeColor = CC_YELLOW;
+		const int clawColor = CC_WHITE;
+
+		switch (Pixel)
+		{
+		case 'O':
+			return MakeAttribute(outlineColor, outlineColor);
+		case 'W':
+		case 'D':
+			return MakeAttribute(shadowColor, shadowColor);
+		case 'M':
+			return MakeAttribute(membraneColor, membraneColor);
+		case 'B':
+		case 'L':
+			return MakeAttribute(bellyColor, bellyColor);
+		case 'H':
+			return MakeAttribute(highlightColor, highlightColor);
+		case 'P':
+			return MakeAttribute(pinkColor, pinkColor);
+		case 'E':
+			return MakeAttribute(eyeColor, eyeColor);
+		case 'C':
+			return MakeAttribute(clawColor, clawColor);
+		case 'R':
+		default:
+			return MakeAttribute(bodyColor, bodyColor);
+		}
+	}
+
+	const vector<string>& GetQueenSpiderSpriteRows()
+	{
+		static const vector<string> Rows =
+		{
+			"................................................................",
+			".......................BHHHHHHHHB...............................",
+			"..................BBBBBHHHHHHHHHBBBB............................",
+			".................HHHHHHHHHHHHHHHHHHHB...........................",
+			"................BHHHHHHHHHHHHHHHHHHHHHBB........................",
+			"...............BHHHHHHHHHHHHHHHHHHHHHHHHB.......................",
+			"..............HHHHHHHHHHHHHHHHHHHHHHHHHHH.......................",
+			".............BHHHHHHHHHHHHHHHHHHHHHHHHHHH.DD.................DD.",
+			"............BHHHHHHHHHHHHHHHHHHHHHHHHHHHBDDD................DDD.",
+			"............HHHHHHHHHHHHHHHHHHHHHHHHHHHBBDDD...............DDDD.",
+			"............HHHHHHHHHHHHHHHHHHHHHHHHHHHBDDH...............DDDD..",
+			"..........BHHHHHHHHHHHHHHHHHHHHHHHHHBDDDBHHBOOOOO.......DDDDD...",
+			"..........BHHHHHHHHHHHHHHHHHHHHHHHHBDDDBBHHHBOOOO.....DDDDDDD...",
+			"..........BHHHHHHHHHHHHHHHHHHHHHHHBDDDDBHHHHBOOOO.....DDDDD.....",
+			"......DOOOBHHHHHHHHHHHHHHHHHHHHHHBDDDDDBHHHHBOODDDDD.DDDDD......",
+			".....OOOOOOHHHHHHHHHHHHHHHHHHHHHBDDDDDBHHHHHBODDDDDDDDDDD.......",
+			".....OOOOOOBBHHHHHHHHHHHHHHHHHHBDDDDDBHHHHHHBODDDDDDDDD.........",
+			".....OOOOOOOBHHHHHHHHHHHHHHHHHBDDDDDBHHHHHHHBDDDDDDDDDD.........",
+			"....OOOOOOOOODHHBBBBHHHHHHHHHBDDDDDBHHHHHHHHBDDDDDDDDDDD........",
+			"...OOOOOOODDOOBHBDDBBHHHHHHHHBDDDDBHHHHHHHHBBDDDDDDDDDDDDD......",
+			"...OOOOOODDDDOOBBDDDBHHHHHHHHBDDDBHHHHHHHHHBDDDDDDDDDDDDDD......",
+			"...OOOOODDDDDDOODDDDDDBHHHHHHBDDDBHHHHHHHHHBDDDDDDDDDDDDDD......",
+			"..OOOOODDDDDDDDDDDDDDDBHHHHHHBDDBBHHHHHHHHBDDDDDDDDDDDDDDDD.....",
+			"..OOOOODDDDDDDDDDDOODDBBHHHHHBDDBHBBBBBBBBDDDDDDDDDDDDDDDDD.....",
+			"..OOOODDDDD.DDDDDDOODDDBHHHHHBDDBBBBBBBBBBDDDDDDDDDDDDDDDDD.....",
+			".OOOOODDDD...DDDDDDOODDBBHHHHBDDBBDODBBBDOBBBDDDDDDDDDDDDDD.....",
+			".OOOOODDDD...DDDDDDDODDDDBHHHBDDBBBOODBDOOBBBBDDDDDDDDDDDDD.....",
+			".OOO..DDDD...DDDDDDDDODDDDBHHBDDBBBBOOBOOBBBBBDDD.DDDDDDDDD.....",
+			".OOO..DDDD...DDDDDDDDDDDDDDBHBDDBBDODBBBOOBBBBDDD.DDDDDDDDD.....",
+			".OOO..DDDD...DDDDDDDDDDDDDDBBDDDBBBOODBDOOBBBBDDD.DDDDDDDDD.....",
+			".OOOD.DDDD...DDDDD.DDDDDDDDDDDDDBBBBOOBOOBDBBBDD..DDDDDDDDD.....",
+			".OOOOODDDD...DDDD...DDDDDDDDDDDDBBBDDDDOOOODBBDD..DDDD..DDD.....",
+			".DOOOODDDD...DDDD....DDDDDDDDDDDBBBDDDDOOOODBBDD..DDDD..DDD.....",
+			"..DOOODDDD...DDDD.....DDDDDDDDDDBBBDDDDOOOODBDDD..DDDD..DDD.....",
+			"...OOODDDD...BDDD..........DDDDDBBBDDDDOOOODDOO...DDDD...DD.....",
+			"...OOODDDD.....DDD..................DDOOOOOOOOO..DDD.....DD.....",
+			"...OODDDDD.....DDD..................DOOOODOOOOO..DDD.....DD.....",
+			"...DOODDDDD.....DD...................OOO..OODOO..DD......DD.....",
+			"........DDD.....DD...............................DD......DD.....",
+			"........DDD.....DD...............................DD.......D.....",
+			".........DD.....DD..............................................",
+			"................................................................"
+		};
+
+		return Rows;
+	}
+
+	WORD GetQueenSpiderSpriteAttribute(Monster* MonsterPtr, char Pixel)
+	{
+		if (MonsterPtr != nullptr && MonsterPtr->IsHitFlashActive())
+		{
+			return MakeAttribute(CC_WHITE, CC_WHITE);
+		}
+
+		const bool shiny = MonsterPtr != nullptr && MonsterPtr->IsShiny();
+		const int outlineColor = CC_BLACK;
+		const int darkLegColor = shiny ? CC_RED : CC_DARKRED;
+		const int bodyColor = shiny ? CC_RED : CC_DARKYELLOW;
+		const int highlightColor = CC_YELLOW;
+		const int eyeColor = CC_RED;
+		const int fangColor = CC_WHITE;
+
+		switch (Pixel)
+		{
+		case 'O':
+			return MakeAttribute(outlineColor, outlineColor);
+		case 'D':
+			return MakeAttribute(darkLegColor, darkLegColor);
+		case 'H':
+			return MakeAttribute(highlightColor, highlightColor);
+		case 'E':
+			return MakeAttribute(eyeColor, eyeColor);
+		case 'C':
+			return MakeAttribute(fangColor, fangColor);
+		case 'B':
+		default:
+			return MakeAttribute(bodyColor, bodyColor);
+		}
+	}
+
+	const vector<string>& GetOrcMageSpriteRows()
+	{
+		static const vector<string> Rows =
+		{
+			"........................................................................................",
+			"...................DDDDDDD..............................................................",
+			"..................DDDDDDDD..............................................................",
+			"..................DDDDDDDD..............................................................",
+			"...............WWWWRRRHRHRBBB...........................................................",
+			".............OOWWWWRRRHRHRBBBD..........................................................",
+			".............O.WWWWRRRRRHRRBBD..........................................................",
+			".............DDWWWWRRRHHHHHHHD..........................................................",
+			"............DDDRRRRRHHHHHHHHHD..........................................................",
+			"............DDDRRRRRRRHHHHHHHD..........................................................",
+			"............DDDRRRRRRRHHHHHHHD..........................................................",
+			"............DDDHRRRHHHHHHHHHHD..........................................................",
+			"............DDDRRRHHHHHHHHHHHD..........................................................",
+			"............DDDHRRHHHHHHHHHHHD..........................................................",
+			"............BBBHBRHHHHHHHHHHHD..........................................................",
+			"............BBBBBBBRRRHHHHHHHD..........................................................",
+			"............BBBBBBBRRRHHHHHHHD..........................................................",
+			".........OODBBBBBBBRRRHHHHHHH...........................................................",
+			"........BBBBDDDDDDDDDDDDDDDDO...........................................................",
+			"........BBBBDBDDDDDD.......O............................................................",
+			"........BBBBDDDDDDD.....................................................................",
+			"........BBBBDDDDDDDD..........................BRRRRRBD..................................",
+			"........BBBBD..DDDD..........................DBRRRRRBD..................................",
+			"........BBBBD..DDDDD..DDD....................DBRRRRRRD..................................",
+			"........BBBBDD.DDDD..D....................BBBBRRRRRRRDDD................................",
+			"........BBBBD....DD....OO.................BBRRRRRRRRRDDDD...............................",
+			"........BBBBD..........O.O................BRRRRRRRRRRDDDD...............................",
+			"........BBBBD.............................BRRRRRRRRRBDDDD...............................",
+			"........BBBBD.............................BRRRRRRRBBBDDDD...............................",
+			"........BBBBD.DO..........................BRRRRRRRBBBDDDD...D...........................",
+			"........BBBBDDD...........................BRRRRRRBBBBDDDD...D...........................",
+			"........BBBBDDDD.......................BBBBRRRBBBBBBBDDD...OD.DBBBBBBB..................",
+			"........BBBBBDDD.......................BBBBRRRBBBBBBBD.....O.DDBBBBBBB..................",
+			"........BBBBDDDD.......................BBBBRRRBBBBBBBD........DBBBBBBBD.................",
+			"........BBBBDDDD....................BBBBBBBRRRBBBBBBBO........DBBBBBBBD.................",
+			"........BBBBDDD....................DBRRBBBBRRRBBBBO...O.......OBBBBDDDDDDD..............",
+			"........BBBBD......................DBRRBBBBRRRBBBB............OBBBBDDDDDDD..............",
+			"........BBBBD.D...................DDRRRBBBBRRRBBBB.OO.........OBBBBDDDDDDD..............",
+			"........BBBBD.D.................BBBRRRRBBBBBBBBBBB............DDDDDDDDDDDD..............",
+			"........BBBBDD..................BRRRRRRBBBBDD..................DDDDDDDDDDD..............",
+			"........BBBBDD.O................BRRRRRRBBBBD.........D.........DDDDDDDDDDD..............",
+			".....BBBBBBB.O...............BBBBRRRRHHBHBBOOOOOOO.......OOOOOOBBBDDDBDDD...............",
+			".....BBBBBBBO...............DBRRRRRRHHHHHHHOOOOOOO....OOOOOOOOOBBBBBBBOO................",
+			".....BBBBBBBO...............DBRRRRRRHHHHHHHOOOOOOO.D.O.OOOOOOOOBBBBBBBO.................",
+			".....BBBBBBBO...............DBRRRRRRHHHHHHHOOOOOOODD...OOOOOOOOBBBBBBB..................",
+			".....BBBBDDD................DBBBRRRRBBBHHHH..DWHHWOOOOOOWHHWD..BBBBOOO..................",
+			".....BBBBDDDO................BBBBRRRBBBHHHGD.DHHHWOOOOOOHHHHD.DBBBB.....................",
+			".....BBBBDDDO...............DBBBRRRRBBBHHHHD.DHHHWOOOOOOWHHHDKDBBBB.....................",
+			".....BBBBDDD................OHHHBRRRRRBWWWW...WHWWOOOOOOWHHGWWWBBBB.....................",
+			".....BBBB...O.O.............OHHHHRRRRRRWWWW......KKK...K...WGHG.........................",
+			".....BBBB...OOO............ODHHHHRRRRRRWWWW...K..K.........GHHH.........................",
+			".....BBBBBBBBBB...........HHHHHHHRRRRRRWWWWHHHHHHGBBBBBBBBBGWHG.........................",
+			".....BRRRRRRRRBB.........HHHHHHHHRRRRRRWWWWHHHHHHHBBBBBBBBBBHHG.........................",
+			"....DRRRRRRRRRRB.........HHHHHHHHRRRRRRWWWWHHHHHHHBBBBBBBBBBHHG.........................",
+			"....DRRRRRRRRRRBD........HHHHHHHHRRRRRRWWWWHHHHHHHBBBBBBBBBHHHG........O................",
+			"....DRRRRBBBRRRBBBB......HHHHGGGBRRRRRRHHHHHHHDDDD......BBBBBBBO......DDDKKKK...........",
+			"....DBRRRBBBRRRBBBB......HHHHGGGBRRRRRRHHHHHHHD.........BBBBBBBO......DKKKKKK...........",
+			"...DDBRRRBBBRRRBBBB......HHHHGGGBRRRRRRHHHHHHHD.........BBBBBBBO.....OKKKKKKK...........",
+			".BBBBRRRBBBBRRRBBBB......HHHHGGGBBBBRRRRHHHHHHBBBDDD..O.BBBBBBBO.....OGGGGGGK...........",
+			".BBRRRRRRBBBRRRBBBBD.....HHHHGGGGGGBBRRRRRBBBBBBBBDDDO.......OOO..O...GGGGGGG...........",
+			".BBRRRRRRBBBRRRBBBBD.....HHHHGGGGGGBBRRRRRBBBBBBBBDDD.....OO.O........GGGKKGG...........",
+			".BRRRRRRRBBBBRRBBBBD...OOHHHHGGGGGGGBRRRRRBBBBBBBBDDDO.....OOOOO......GGGGGGG...........",
+			".BRRRRRRRBBBDDDDDDDD.DGGGGGGGGGGGGGGBBBHHHHBBBBBBBBBBO....OHHHHD......GGGGGGG...........",
+			".BBRRRRRBBBBDDD......DGGGGGGKGGGGGGKGGGHHHHBBBBBBBBBBO.....HHHHK......GGGGGGG...........",
+			".BBBRRRRBBBBDDD.D....DGGGGGGKGGGGGGKKGGHHHHBBBBBBBBBBDO..ODHHHHK.....KGGGGGGG...........",
+			"..BBBBBBBBBBD.D.D....DGGGGGGKGGGGGGKGGGHHHHHHHHHHBRRBHHHBBBBGGGKK.....GGGGKKK...........",
+			"....DBBBBBBBD.D.......BGGGGGGGKGG...GGGHHHHHHHHHHHRRRHHHHRRBGGGK.........KKKK...........",
+			"....DBBBBBBBD.D.......BGGGGGGGGKG...GGGHHHHHHHHHHHRRRHHHHRRBGGGK.........KKKK...........",
+			".....BBBBBBB.......BBBBKGGGGKKGGK...GGGHHHHHHHHHHHBBBHGHBBBGGGGK.........KKKKK..........",
+			".....O....O.......BBBBKGGGGKG.......GGGGGGGGGGGGGGGGGGGGGGGGK...........................",
+			".....O.O.OO.......BBGGGGGGGGGK......GGGGGGGGGGGGGGGGGGGGGGGGK...............KK..D.......",
+			".....O.OO.........BGGGGGGGGGG.......BBGGGGGGGGGGGGGGGGGGGGGG............................",
+			"........O.........BGGGGGGGKKK...O..OOO.BBBKGGKGGGGGGGGKGKKKK.......OOOGGGGGGG...KDDD....",
+			".....D.D..OO......GGGGGGGG.K....O.O....BBGGGGGGGGGGGGKGGKKKK.......OOOGGGGGGG...KKKD....",
+			"........OO.O......GGGGGGKG.......O..O..BGGGGGGGGGGGGGGGGKKKK.K.K.....OBGGGGGG..KKKKK....",
+			"........BBBBO.....KKKKKKKG......ODDDBBBHGHGBGGGGGGGGGGGGKKKK..DO.....OGGGGGGKKKGKKKK....",
+			"........BBBB...............O...ODDDDBBBHHHHBKGGGGGGGGKKGGKKK...O.....OGGGGGGGGGGKKKK....",
+			"........BBBB....................DDDDBBBHHHHBGGGGGGGGGGGGKKKKK.DO....OOBGGGGGGGGGKKKK....",
+			"........BBBB..................OODDDDBBBHHHHBBBBBBBBBBBBBBDDDD.DO......BBBGGGGGGGGDDD....",
+			"........BBBB.................DDDWWWWBBBHHHHHHHWWWWWWWWWWWBBBBBBO.........BGGGGGGG.O.....",
+			"........BBBB.................DDDWWWWBBBHHHHHHHWWWWWWWWWWWBBBBBBO.......D.BGGGGGGG.......",
+			"........BBBB................ODDDWWWWBBBHHHHHHHWWWWWWWWWWWBBBBBBOO......D.BGGGGGGB.......",
+			"........BBBB..............DDDBBBWWWWBBBWWWWBBBWWWWWWWWWWBBBBBBBWWWW......BBGBBBB........",
+			"........BBBB.............DDDDBBBWWWW.DDWWWWBBBDDDWWWWD.DBBBBO.OWWWWD....................",
+			"........BBBB.............DDDDBBBWWWW...WWWWBBBDDDWWWWDDDBBBBO.OWWWWD....................",
+			".....BBBBBBB.............DDDDBBBWWWWHHHWWWWBBBBBBWWWWDDDBBBBD.DWWWWD.DDDDDBBBBBDD....D..",
+			".....BBBBBDD.............BBBBRRRRRRBHHHWWWWRRRRRRHHWWBBBBDDDDDDWWWWD.DDDDBBBBBBBDD...D..",
+			".....BBBBBDD.............BBBBRRRRRRRHHHWWWWRRRRRRHWWWBBBDDDDDDDWWWWD.DDDDBBBBBBBDD...D..",
+			".....BBBBDDD.............BBBBRRRRRBBHHHWWWWRRRRRRHWWWBBBDDDDDDDWWWW.DDDDDBBBBBBBDDD.....",
+			".....BBBBOO..............BRRRRRRHHHHHHHHDDBRRRRRRBBBBBBBD.....DKDDD.DDDDDBBBBDDDDDDD....",
+			".....BBBBO..O............BRRRRRRHHHHHHHHDDDRRRRRRRBBBBBBB....K.KKD...DDDDBBBBDDDDDDD....",
+			".....BBBB..O.............BBRRRRRHHHHHHHHDDDRRRRRRBBBBBBBB............DDDDBBBBDDDDDDD....",
+			".....DBBB.................BBBRRRHHHHHHHH.DDBBBRRRRBBBDDDD..KKKK......DDDDBBBBDDDDDDD....",
+			".....DBDD...................DBRRHHHHHHHH.....DRRRRBBBDDDD..KKKK......DDDDBBBBDD..DD.....",
+			".....DDDD...................DBRRHHHHHHHG......RRRRBBBDDDD..KKKK.....DDDDDBBBBD....D.....",
+			".....DDDD...................DBRBHHHHHGGGKKK...BBBBBBBDDDDKKKKKK....DDDDDDDBBBDD.........",
+			".....DDDD.......................HHHHGGGGKKK...BBBBBBBDDDDKKKKKK...DDDDDDDDOOD...........",
+			".....DDDD.......................HHHHGGGGKKK...BBBBBBBDDDDKKKKKK...DDDDDDDD..............",
+			".....DDDD.......................HHHHGGGGKKK...BBBBBBBDDDDKKKKKK...DDDDDDDD..............",
+			".....OOO........................GGGGKGGGGGKOOOOODBBBBOOODKKKKKK...OO.ODDDD..............",
+			"................................GGGGGGGGGGGOO.O.OBBBBO.OKKKKKKK...OO.ODDDD..............",
+			"................................GGGGKGGGGGGO.....BBBBOOOKKKKKKKK..OOOODDD...............",
+			".............................WHHGHHHGGGGGGG.....OOBBDOOOGKGKKKK.........................",
+			"............................DHHHHHHHGGGGGGGO.....OOOOO.OGKGG..........OO....OO..........",
+			"............................DHHHHHHHGGGGGGG............OGGKKK.........OO................",
+			"............................OWHHHHHHGGGGGBG...........OOGGGGK...........................",
+			"..............................ODDDOO...OOOO............OOOOOO.......OOO.................",
+			"....................................................................O..................."
+		};
+
+		return Rows;
+	}
+
+	int GetOrcMageSpriteColor(Monster* MonsterPtr, char Pixel)
+	{
+		if (MonsterPtr != nullptr && MonsterPtr->IsHitFlashActive())
+		{
+			return CC_WHITE;
+		}
+
+		const bool shiny = MonsterPtr != nullptr && MonsterPtr->IsShiny();
+		const int outlineColor = CC_BLACK;
+		const int darkSkinColor = shiny ? CC_DARKRED : CC_DARKGREEN;
+		const int skinColor = shiny ? CC_RED : CC_GREEN;
+		const int darkLeatherColor = CC_DARKRED;
+		const int leatherColor = shiny ? CC_MAGENTA : CC_DARKYELLOW;
+		const int fireColor = CC_RED;
+		const int fireHighlightColor = CC_YELLOW;
+		const int boneColor = CC_WHITE;
+
+		switch (Pixel)
+		{
+		case 'O':
+			return outlineColor;
+		case 'K':
+			return darkSkinColor;
+		case 'G':
+			return skinColor;
+		case 'D':
+			return darkLeatherColor;
+		case 'B':
+			return leatherColor;
+		case 'R':
+			return fireColor;
+		case 'H':
+			return fireHighlightColor;
+		case 'W':
+			return boneColor;
+		default:
+			return leatherColor;
+		}
+	}
+
+	WORD GetOrcMageSpriteAttribute(Monster* MonsterPtr, char Pixel)
+	{
+		const int color = GetOrcMageSpriteColor(MonsterPtr, Pixel);
+		return MakeAttribute(color, color);
+	}
+
 	wchar_t GetDirectionArrow(EDirection Direction)
 	{
 		switch (Direction)
@@ -1952,9 +2543,13 @@ void ViewportManager::RenderUI()
 		{
 			Shop.Render();
 		}
-		else if (inventoryComponent != nullptr && (inventoryComponent->GetOnCrafting() || inventoryComponent->GetOnEnhancement()))
+		else if (inventoryComponent != nullptr && inventoryComponent->GetOnCrafting())
 		{
 			Crafting.Render();
+		}
+		else if (inventoryComponent != nullptr && inventoryComponent->GetOnEnhancement())
+		{
+			Enhancement.Render();
 		}
 		else
 		{
@@ -1994,6 +2589,7 @@ void ViewportManager::ResetRuntimeCache()
 	Inventory.ResetCache();
 	Shop.ResetCache();
 	Crafting.ResetCache();
+	Enhancement.ResetCache();
 	ItemLog.Reset();
 }
 
@@ -2168,33 +2764,188 @@ void ViewportManager::Render2Dto3D()
 		}
 
 		int enemyScreenX = static_cast<int>((0.5f + enemyAngle / fov) * SCREEN_WIDTH);
+		const bool bUseKingSlimeSprite = monster != nullptr && IsKingSlimeMonster(monster);
+		const bool bUseSlimeSprite = monster != nullptr && !bUseKingSlimeSprite && IsSlimeMonster(monster);
+		const bool bUseDragonSprite = monster != nullptr && IsDragonMonster(monster);
+		const bool bUseQueenSpiderSprite = monster != nullptr && IsQueenSpiderMonster(monster);
+		const bool bUseOrcMageSprite = monster != nullptr && IsOrcMageMonster(monster);
+		const vector<string>* monsterSpriteRows = nullptr;
+		if (bUseKingSlimeSprite)
+		{
+			monsterSpriteRows = &GetKingSlimeSpriteRows();
+		}
+		else if (bUseSlimeSprite)
+		{
+			monsterSpriteRows = &GetSlimeSpriteRows();
+		}
+		else if (bUseDragonSprite)
+		{
+			monsterSpriteRows = &GetDragonSpriteRows();
+		}
+		else if (bUseQueenSpiderSprite)
+		{
+			monsterSpriteRows = &GetQueenSpiderSpriteRows();
+		}
+		else if (bUseOrcMageSprite)
+		{
+			monsterSpriteRows = &GetOrcMageSpriteRows();
+		}
+
 		const int renderScale = monster != nullptr ? max(1, monster->GetRenderScale()) : 1;
 		int enemyHeight = monster != nullptr
 			? max(1, static_cast<int>((SCREEN_HEIGHT / distanceFromPlayer) * renderScale))
 			: 1;
+		if (bUseOrcMageSprite)
+		{
+			enemyHeight = max(1, static_cast<int>(enemyHeight * 1.35f));
+		}
+
 		int enemyWidth = max(1, enemyHeight / 2);
-		int enemyTop = max(0, SCREEN_HEIGHT / 2 - enemyHeight / 2);
-		int enemyBottom = min(SCREEN_HEIGHT - 1, SCREEN_HEIGHT / 2 + enemyHeight / 2);
+		if (bUseSlimeSprite)
+		{
+			enemyWidth = max(4, static_cast<int>(enemyHeight * 2.4f));
+		}
+		else if (bUseKingSlimeSprite)
+		{
+			enemyWidth = max(8, static_cast<int>(enemyHeight * 2.0f));
+		}
+		else if (bUseDragonSprite)
+		{
+			enemyWidth = max(8, static_cast<int>(enemyHeight * 2.0f));
+		}
+		else if (bUseQueenSpiderSprite)
+		{
+			enemyWidth = max(8, static_cast<int>(enemyHeight * 2.2f));
+		}
+		else if (bUseOrcMageSprite)
+		{
+			enemyWidth = max(12, static_cast<int>(enemyHeight * 1.45f));
+		}
+
+		int enemyTop = 0;
+		int enemyBottom = 0;
+		if (bUseKingSlimeSprite || bUseDragonSprite || bUseQueenSpiderSprite || bUseOrcMageSprite)
+		{
+			const int floorAnchor = static_cast<int>(SCREEN_HEIGHT / 2.0f + SCREEN_HEIGHT / distanceFromPlayer);
+			const int groundSink = (bUseQueenSpiderSprite || bUseOrcMageSprite) ? max(1, enemyHeight / 24) : max(1, enemyHeight / 16);
+			enemyBottom = min(SCREEN_HEIGHT - 1, floorAnchor + groundSink);
+			enemyTop = max(0, enemyBottom - enemyHeight + 1);
+		}
+		else
+		{
+			enemyTop = max(0, SCREEN_HEIGHT / 2 - enemyHeight / 2);
+			enemyBottom = min(SCREEN_HEIGHT - 1, SCREEN_HEIGHT / 2 + enemyHeight / 2);
+		}
+
 		int enemyLeft = max(0, enemyScreenX - enemyWidth / 2);
 		int enemyRight = min(SCREEN_WIDTH - 1, enemyScreenX + enemyWidth / 2);
 
-		for (int x = enemyLeft; x <= enemyRight; ++x)
+		if (monsterSpriteRows != nullptr)
 		{
-			if (distanceFromPlayer >= wallDepths[x])
+			const vector<string>& spriteRows = *monsterSpriteRows;
+			const int sourceHeight = static_cast<int>(spriteRows.size());
+			const int sourceWidth = sourceHeight > 0 ? static_cast<int>(spriteRows[0].length()) : 0;
+			const int targetHeight = max(1, enemyBottom - enemyTop + 1);
+			const int targetWidth = max(1, enemyRight - enemyLeft + 1);
+
+			if (sourceHeight > 0 && sourceWidth > 0)
 			{
-				continue;
+				for (int x = enemyLeft; x <= enemyRight; ++x)
+				{
+					if (distanceFromPlayer >= wallDepths[x])
+					{
+						continue;
+					}
+
+					bool bDrewColumn = false;
+					const int sourceX = min(sourceWidth - 1, (((x - enemyLeft) * 2 + 1) * sourceWidth) / (targetWidth * 2));
+
+					for (int y = enemyTop; y <= enemyBottom; ++y)
+					{
+						if (bUseOrcMageSprite)
+						{
+							const int relativeY = y - enemyTop;
+							const int sourceTopY = min(sourceHeight - 1, ((((relativeY * 2) * 2 + 1) * sourceHeight) / (targetHeight * 4)));
+							const int sourceBottomY = min(sourceHeight - 1, ((((relativeY * 2 + 1) * 2 + 1) * sourceHeight) / (targetHeight * 4)));
+							const char topPixel = spriteRows[sourceTopY][sourceX];
+							const char bottomPixel = spriteRows[sourceBottomY][sourceX];
+							if (topPixel == '.' && bottomPixel == '.')
+							{
+								continue;
+							}
+
+							if (topPixel != '.' && bottomPixel != '.')
+							{
+								const int topColor = GetOrcMageSpriteColor(monster, topPixel);
+								const int bottomColor = GetOrcMageSpriteColor(monster, bottomPixel);
+								renderManager->PutCell(
+									y,
+									x,
+									topColor == bottomColor ? L' ' : L'\u2580',
+									MakeAttribute(topColor, bottomColor));
+							}
+							else if (topPixel != '.')
+							{
+								const int topColor = GetOrcMageSpriteColor(monster, topPixel);
+								renderManager->PutCell(y, x, L'\u2580', MakeAttribute(topColor, CC_BLACK));
+							}
+							else
+							{
+								const int bottomColor = GetOrcMageSpriteColor(monster, bottomPixel);
+								renderManager->PutCell(y, x, L'\u2584', MakeAttribute(bottomColor, CC_BLACK));
+							}
+
+							bDrewColumn = true;
+							continue;
+						}
+
+						const int sourceY = min(sourceHeight - 1, (((y - enemyTop) * 2 + 1) * sourceHeight) / (targetHeight * 2));
+						const char pixel = spriteRows[sourceY][sourceX];
+						if (pixel == '.')
+						{
+							continue;
+						}
+
+						const WORD pixelAttribute = bUseDragonSprite
+							? GetDragonSpriteAttribute(monster, pixel)
+							: (bUseQueenSpiderSprite
+								? GetQueenSpiderSpriteAttribute(monster, pixel)
+								: (bUseKingSlimeSprite
+									? GetKingSlimeSpriteAttribute(monster, pixel)
+									: (bUseOrcMageSprite
+										? GetOrcMageSpriteAttribute(monster, pixel)
+										: GetSlimeSpriteAttribute(monster, pixel))));
+						renderManager->PutCell(y, x, L' ', pixelAttribute);
+						bDrewColumn = true;
+					}
+
+					if (bDrewColumn)
+					{
+						wallDepths[x] = distanceFromPlayer;
+					}
+				}
 			}
-
-			wallDepths[x] = distanceFromPlayer;
-
-			wchar_t objectCharacter = monster != nullptr ? GetMonsterIcon(monster) : GetDirectionArrow(projectile->GetDirection());
-			WORD objectAttribute = monster != nullptr
-				? MakeAttribute(monster->IsHitFlashActive() ? CC_WHITE : GetMonsterColor(monster))
-				: MakeAttribute(CC_CYAN);
-
-			for (int y = enemyTop; y <= enemyBottom; ++y)
+		}
+		else
+		{
+			for (int x = enemyLeft; x <= enemyRight; ++x)
 			{
-				renderManager->PutCell(y, x, objectCharacter, objectAttribute);
+				if (distanceFromPlayer >= wallDepths[x])
+				{
+					continue;
+				}
+
+				wallDepths[x] = distanceFromPlayer;
+
+				wchar_t objectCharacter = monster != nullptr ? GetMonsterIcon(monster) : GetDirectionArrow(projectile->GetDirection());
+				WORD objectAttribute = monster != nullptr
+					? MakeAttribute(monster->IsHitFlashActive() ? CC_WHITE : GetMonsterColor(monster))
+					: MakeAttribute(CC_CYAN);
+
+				for (int y = enemyTop; y <= enemyBottom; ++y)
+				{
+					renderManager->PutCell(y, x, objectCharacter, objectAttribute);
+				}
 			}
 		}
 
