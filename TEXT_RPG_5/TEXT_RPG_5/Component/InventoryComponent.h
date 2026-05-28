@@ -38,6 +38,7 @@ protected:
 	bool bOnShop = false;
 	bool bOnEquipment = false;
 	bool bOpenedInventory = false;
+	bool bOnCrafting = false;
 	
 
 
@@ -60,10 +61,12 @@ public:
 	UItem* GetItem(Vector Index);
 	bool IsFull();
 	bool AddItem(UItem* Item);
+	bool AcquireItem(UItem* Item);   // 소유권을 넘김. 가득 차면 Item을 delete하고 false (AddItem과 계약이 다름)
 	bool RemoveItem(UItem* Item);
 	bool UseRandomItem();
 	bool UseItem(UItem* Item, bool bShowDialog = false);
 	UItem* FindItemById(ItemId Id);
+	int CountItemById(ItemId Id);
 	
 	void SelectCursor();
 	void ExpandRow(int Amount){MaxRow += Amount;}
@@ -88,6 +91,9 @@ public:
 	bool GetOnShop(){return bOnShop;}
 	bool BuyItem(UItem* Item);
 	void SellItem(UItem* Item);
+
+	void ToggleCrafting();
+	bool GetOnCrafting(){return bOnCrafting;}
 
 	vector<vector<UItem*>>& GetFocusedContainer();
 
