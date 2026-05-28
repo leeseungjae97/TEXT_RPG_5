@@ -27,4 +27,7 @@ private:
     void FireballAttack(Player* player);
     bool RushAttack(Player* player);
     void PhaseThreeAttack(Player* player);
+    
+    void AddAttackCell(Vector Pos);
+    void AddPattern(Vector Center, const vector<Vector>& Offsets);
 };

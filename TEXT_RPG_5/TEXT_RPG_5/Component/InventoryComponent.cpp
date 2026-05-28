@@ -7,6 +7,7 @@
 #include "../Manager/DisplayManager.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/ShopManager.h"
+#include "../Manager/CraftingManager.h"
 #include "../Manager/ItemManager.h"
 #include "../Manager/ViewportManager.h"
 #include "../Player.h"
@@ -22,13 +23,13 @@ UInventoryComponent::UInventoryComponent(AObject* InOwner)
     QuickSlot.resize(4, nullptr);
     
     
-    AddItem(new UsableItem(ItemDB::HP_POTION));
-    AddItem(new UsableItem(ItemDB::STRENGTH_POTION));
-    AddItem(new UsableItem(ItemDB::LONGSWORD));
-    AddItem(new UsableItem(ItemDB::LONGSWORD));
-    AddItem(new UsableItem(ItemDB::GOBLIN_LEATHER));
-    AddItem(new UsableItem(ItemDB::HP_POTION));
-    AddItem(new UsableItem(ItemDB::HP_POTION));
+    AcquireItem(new UsableItem(ItemDB::HP_POTION));
+    AcquireItem(new UsableItem(ItemDB::STRENGTH_POTION));
+    AcquireItem(new UsableItem(ItemDB::LONGSWORD));
+    AcquireItem(new UsableItem(ItemDB::LONGSWORD));
+    AcquireItem(new UsableItem(ItemDB::GOBLIN_LEATHER));
+    AcquireItem(new UsableItem(ItemDB::HP_POTION));
+    AcquireItem(new UsableItem(ItemDB::HP_POTION));
 }
 
 UInventoryComponent::~UInventoryComponent()
@@ -63,6 +64,7 @@ void UInventoryComponent::CloseInventory()
 {
     bOpenedInventory = false;
     bOnEquipment = false;
+    bOnCrafting = false;
     if (bOnShop)
     {
         bOnShop = false;
@@ -146,6 +148,15 @@ bool UInventoryComponent::AddItem(UItem* Item)
     NewRow[0] = Item;
     Container.push_back(NewRow);
     return true;
+}
+
+bool UInventoryComponent::AcquireItem(UItem* Item)
+{
+    if (AddItem(Item))
+        return true;
+
+    delete Item;
+    return false;
 }
 
 bool UInventoryComponent::RemoveItem(UItem* Item)
@@ -260,6 +271,16 @@ void UInventoryComponent::SelectCursor()
         return;
     }
 
+    if (bOnCrafting)
+    {
+        if (CraftingManager::GetInstance()->SelectCursor())
+        {
+            bOnCrafting = false;
+            ResetCursor();
+        }
+        return;
+    }
+
     UItem* Item = GetItem(GetCursor());
     if (Item == nullptr) return;
 
@@ -271,7 +292,7 @@ void UInventoryComponent::SelectCursor()
         {
             DetachItem(Item);
             if (Displaced != nullptr)
-                AddItem(Displaced);
+                AcquireItem(Displaced);
         }
     }
     else
@@ -344,7 +365,7 @@ Vector UInventoryComponent::CursorRight()
     {
         CurrentCursor.X += 1;
     }
-    else if (!bOnShop)
+    else if (!bOnShop && !bOnCrafting)
     {
         bOnEquipment = true;
         CurrentCursor = { 0, 0 };
@@ -448,7 +469,52 @@ vector<vector<UItem*>>& UInventoryComponent::GetFocusedContainer()
 {
     if (bOnShop && !ShopManager::GetInstance()->GetSellMode())
         return ShopManager::GetInstance()->GetContainerRef();
+    if (bOnCrafting)
+        return CraftingManager::GetInstance()->GetContainerRef();
     return Container;
+}
+
+int UInventoryComponent::CountItemById(ItemId Id)
+{
+    int Count = 0;
+    for (int y = 0; y < (int)Container.size(); ++y)
+    {
+        for (int x = 0; x < MaxColumn; ++x)
+        {
+            if (Container[y][x] != nullptr && Container[y][x]->GetItemInfo().Id == Id)
+                ++Count;
+        }
+    }
+
+    return Count;
+}
+
+void UInventoryComponent::ToggleCrafting()
+{
+    if (bOnShop)
+        return;
+
+    if (bOnCrafting)
+    {
+        bOnCrafting = false;
+        ResetCursor();
+        return;
+    }
+
+    if (bOnEquipment)
+        return;
+
+    UItem* Material = GetItem(GetCursor());
+    if (Material == nullptr)
+        return;
+
+    CraftingManager* Crafting = CraftingManager::GetInstance();
+    Crafting->SetPlayerInventory(this);
+    if (Crafting->OpenCraftingFor(Material->GetItemInfo().Id))
+    {
+        bOnCrafting = true;
+        ResetCursor();
+    }
 }
 
 void UInventoryComponent::Tick(float DeltaTime)
@@ -476,30 +542,33 @@ void UInventoryComponent::Tick(float DeltaTime)
     //이 밑으로는 다 bOpenedInventory가 true일 때만(인벤토리 열었을 경우에만) 작동.
     
     if (Input->IsKeyTap(KeyCode::I)) CloseInventory();
-    
+
+    //크래프팅 모드 전환/복귀 (커서 아이템을 재료로 쓰는 레시피 나열)
+    if (Input->IsKeyTap(KeyCode::A)) ToggleCrafting();
+
     //장비 아이템 지급(디버그용)
     if (Input->IsKeyTap(KeyCode::B))
     {
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LONGSWORD));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::BOW));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::AXE));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::STAFF));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_HELMET));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_ARMOR));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_BOOTS));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_HELMET));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_ARMOR));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_BOOTS));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LONGSWORD));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::BOW));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::AXE));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::STAFF));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_HELMET));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_ARMOR));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LEATHER_BOOTS));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_HELMET));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_ARMOR));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_BOOTS));
     }
 
     //추가 아이템 지급 소모품 및 골드
     if (Input->IsKeyTap(KeyCode::V))
     {
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::HP_POTION));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::STRENGTH_POTION));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::LIGHTNING_STRIKE_SCROLL));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::FLAME_POTION));
-        AddItem(ItemManager::GetInstance()->CreateItem(ItemId::FIRE_WALL_SCROLL));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::HP_POTION));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::STRENGTH_POTION));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LIGHTNING_STRIKE_SCROLL));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::FLAME_POTION));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::FIRE_WALL_SCROLL));
         AddGold(500);
     }
 
@@ -510,12 +579,12 @@ void UInventoryComponent::Tick(float DeltaTime)
     if (Input->IsKeyTap(KeyCode::DOWN))  CursorDown();
     if (Input->IsKeyTap(KeyCode::LEFT))  CursorLeft();
     if (Input->IsKeyTap(KeyCode::RIGHT)) CursorRight();
-    if (Input->IsKeyTap(KeyCode::E))     SelectCursor();
+    if (Input->IsKeyTap(KeyCode::Z))     SelectCursor();
     
     
     //아이템 버리기
     bool bBuyMode = bOnShop && !ShopManager::GetInstance()->GetSellMode();
-    if (Input->IsKeyTap(KeyCode::X) && !bOnEquipment && !bBuyMode)
+    if (Input->IsKeyTap(KeyCode::X) && !bOnEquipment && !bBuyMode && !bOnCrafting)
     {
         RemoveItem(GetItem(GetCursor()));
     }

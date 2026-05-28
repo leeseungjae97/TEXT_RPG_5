@@ -1146,6 +1146,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Manager\CraftingManager.cpp" />
     <ClCompile Include="Manager\InputManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1402,6 +1403,8 @@
     <ClCompile Include="Manager\ViewportManager.cpp" />
     <ClCompile Include="Network\R2AsyncLoader.cpp" />
     <ClCompile Include="Network\R2Connector.cpp" />
+    <ClCompile Include="Mimic.cpp" />
+    <ClCompile Include="OrcMage.cpp" />
     <ClCompile Include="Spider.cpp" />
     <ClCompile Include="UI\BattleUI.cpp" />
     <ClCompile Include="UI\DialogUI.cpp" />
@@ -1412,6 +1415,7 @@
     <ClCompile Include="UI\MainMenuUI.cpp" />
     <ClCompile Include="UI\NameInputUI.cpp" />
     <ClCompile Include="UI\ShopUI.cpp" />
+    <ClCompile Include="UI\CraftingUI.cpp" />
     <ClCompile Include="UI\HUDUI.cpp" />
     <ClCompile Include="Manager\DisplayManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1796,6 +1800,7 @@
     <ClInclude Include="Item\UsableItem.h" />
     <ClInclude Include="KingSlime.h" />
     <ClInclude Include="Manager\BattleManager.h" />
+    <ClInclude Include="Manager\CraftingManager.h" />
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\ItemManager.h" />
     <ClInclude Include="Manager\MapManager.h" />
@@ -1809,8 +1814,10 @@
     <ClInclude Include="Map\Map.h" />
     <ClInclude Include="Network\R2AsyncLoader.h" />
     <ClInclude Include="Network\R2Connector.h" />
+    <ClInclude Include="Mimic.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="OrcMage.h" />
     <ClInclude Include="PlayerStat.h" />
     <ClInclude Include="GameInstance.h" />
     <ClInclude Include="Goblin.h" />
@@ -1824,6 +1831,7 @@
     <ClInclude Include="Spider.h" />
     <ClInclude Include="Struct\ItemInfo.h" />
     <ClInclude Include="Struct\ItemWeight.h" />
+    <ClInclude Include="Struct\Recipe.h" />
     <ClInclude Include="Struct\Buff.h" />
     <ClInclude Include="Struct\R2Config.h" />
     <ClInclude Include="Struct\R2Result.h" />
@@ -1842,6 +1850,7 @@
     <ClInclude Include="UI\MainMenuUI.h" />
     <ClInclude Include="UI\NameInputUI.h" />
       <ClInclude Include="UI\ShopUI.h" />
+      <ClInclude Include="UI\CraftingUI.h" />
       <ClInclude Include="UI\HUDUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
