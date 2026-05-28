@@ -1604,9 +1604,13 @@ void ViewportManager::RenderUI()
 		{
 			Shop.Render();
 		}
-		else if (inventoryComponent != nullptr && (inventoryComponent->GetOnCrafting() || inventoryComponent->GetOnEnhancement()))
+		else if (inventoryComponent != nullptr && inventoryComponent->GetOnCrafting())
 		{
 			Crafting.Render();
+		}
+		else if (inventoryComponent != nullptr && inventoryComponent->GetOnEnhancement())
+		{
+			Enhancement.Render();
 		}
 		else
 		{
@@ -1633,6 +1637,7 @@ void ViewportManager::ResetRuntimeCache()
 	Inventory.ResetCache();
 	Shop.ResetCache();
 	Crafting.ResetCache();
+	Enhancement.ResetCache();
 	ItemLog.Reset();
 }
 

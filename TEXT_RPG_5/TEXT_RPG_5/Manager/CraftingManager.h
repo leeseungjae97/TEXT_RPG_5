@@ -23,6 +23,7 @@ private:
     int MaxColumn = 4;
     int MaxRow = 4;
     vector<vector<UItem*>> Container;
+    vector<vector<const FRecipe*>> RecipeContainer;
     UInventoryComponent* PlayerInventory = nullptr;
 
     void ClearContainer();
@@ -38,10 +39,8 @@ public:
     vector<vector<UItem*>>& GetContainerRef() { return Container; }
     const vector<vector<UItem*>>& GetContainerRef() const { return Container; }
     UItem* GetItem(Vector Index);
+    const FRecipe* GetRecipe(Vector Index);
 
-    // UI를 위한 반환용
-    const FRecipe* GetRecipeByResult(ItemId Result);
-    
     bool OpenCraftingFor(ItemId Material);
 
     bool SelectCursor();
