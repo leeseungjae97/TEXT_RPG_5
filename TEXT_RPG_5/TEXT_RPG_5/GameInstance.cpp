@@ -10,6 +10,7 @@
 #include "Manager/InputManager.h"
 #include "Manager/ShopManager.h"
 #include "Manager/CraftingManager.h"
+#include "Manager/ChestManager.h"
 #include "Manager/StageManager.h"
 #include "Player.h"
 
@@ -48,6 +49,7 @@ void GameInstance::BeginPlay()
 	
 	ShopManager::GetInstance()->BeginPlay();
 	StageManager::GetInstance()->BeginPlay();
+	ChestManager::GetInstance()->BeginPlay();
 	MapManager::GetInstance()->BeginPlay();
 	SceneManager::GetInstance()->BeginPlay();
 	BattleManager::GetInstance()->BeginPlay();
@@ -283,6 +285,7 @@ void GameInstance::TickFadeOutToNextStage(float DeltaTime)
 	if (ViewportManager::GetInstance()->IsFadeFinished())
 	{
 		StageManager::GetInstance()->AdvanceStage();
+		ChestManager::GetInstance()->BeginPlay();
 		MapManager::GetInstance()->BeginPlay();
 		SceneManager::GetInstance()->LoadCurrentStage();
 		ViewportManager::GetInstance()->ResetRuntimeCache();
@@ -431,6 +434,7 @@ void GameInstance::ResetGameWorld()
 	ShopManager::GetInstance()->ResetRuntimeCache();
 	ShopManager::GetInstance()->RestoreShop();
 	CraftingManager::GetInstance()->ResetRuntimeCache();
+	ChestManager::GetInstance()->ResetRuntimeCache();
 	BattleManager::GetInstance()->Reset();
 	StageManager::GetInstance()->Reset();
 	SceneManager::GetInstance()->Reset();
@@ -443,6 +447,7 @@ void GameInstance::RestartGame()
 {
 	ShopManager::GetInstance()->BeginPlay();
 	StageManager::GetInstance()->BeginPlay();
+	ChestManager::GetInstance()->BeginPlay();
 	MapManager::GetInstance()->BeginPlay();
 	SceneManager::GetInstance()->BeginPlay();
 	BattleManager::GetInstance()->BeginPlay();

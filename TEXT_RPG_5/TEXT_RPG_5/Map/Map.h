@@ -12,7 +12,7 @@ static string StringMap[4][MAP_MAX_Y] =
 	// G : Goblin
 	// D : Spider
 	// S : Shop
-	// T : Monster 스폰 위치
+	// T : Chest 상자
 	// C : Cinema -> 보스 연출이 나오는 트리거 위치
 	// 주문서 맵 함정...
 	// B : Boss {1, 2, 3, Dragon}
@@ -67,7 +67,7 @@ static string StringMap[4][MAP_MAX_Y] =
 	// G : Goblin
 	// D : Spider
 	// S : Shop
-	// T : Monster 스폰 위치
+	// T : Chest 상자
 	// C : Cinema -> 보스 연출이 나오는 트리거 위치
 	// B : Boss {1, 2, 3, Dragon}
 	// STAGE 2
@@ -121,7 +121,7 @@ static string StringMap[4][MAP_MAX_Y] =
 	// G : Goblin
 	// D : Spider
 	// S : Shop
-	// T : Monster 스폰 위치
+	// T : Chest 상자
 	// C : Cinema -> 보스 연출이 나오는 트리거 위치
 	// B : Boss {1, 2, 3, Dragon}
 	// STAGE 3 3D Maze 
@@ -175,7 +175,7 @@ static string StringMap[4][MAP_MAX_Y] =
 	// G : Goblin
 	// D : Spider
 	// S : Shop
-	// T : Monster 스폰 위치
+	// T : Chest 상자
 	// C : Cinema -> 보스 연출이 나오는 트리거 위치
 	// B : Boss {1, 2, 3, Dragon}
 	// STAGE 4 Final
