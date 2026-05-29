@@ -59,7 +59,7 @@ UItem* ItemManager::CreateRandomItemWithRarity(const vector<FItemWeight>& Pool, 
 ERarity ItemManager::RollEquipmentRarity()
 {
     int Roll = rand() % 100;   // 0~99
-    if (Roll < 1)  return ERarity::Unique;   // 2%
+    if (Roll < 2)  return ERarity::Unique;   // 2%
     if (Roll < 10) return ERarity::Rare;     // 8%
     return ERarity::Common;                  // 90%
 }
