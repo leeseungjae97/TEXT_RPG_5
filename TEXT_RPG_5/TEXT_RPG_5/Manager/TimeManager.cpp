@@ -50,7 +50,7 @@ void TimeManager::CalcFPS()
 		StoreSecond = 0.0f;
 		FrameCount = 0;
 	}
-	DisplayManager::GetInstance()->AddRender(1, 1, "FPS : " + to_string(LastFPS));
+	DisplayManager::GetInstance()->AddRender(0, 1, "FPS : " + to_string(LastFPS));
 }
 
 wstring TimeManager::FormatSeconds(double Seconds)

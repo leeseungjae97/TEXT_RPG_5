@@ -587,7 +587,7 @@ void GameInstance::RenderStagePrompt()
 
 void GameInstance::RenderStoredTime()
 {
-	DisplayManager::GetInstance()->AddRender(2, 1, L"TIME : " + TimeManager::GetInstance()->GetFormattedStoredTime(), CC_CYAN);
+	DisplayManager::GetInstance()->AddRender(1, 1, L"TIME : " + TimeManager::GetInstance()->GetFormattedStoredTime(), CC_CYAN);
 }
 
 void GameInstance::RenderRankNameConfirm()

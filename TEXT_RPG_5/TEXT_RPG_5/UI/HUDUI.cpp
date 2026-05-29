@@ -60,6 +60,12 @@ void HUDUI::StatusRender()
 	int currentExp = min(max(PlayerPtr->GetExp(), 0), maxExp);
 	int equipmentMaxHPBonus = 0;
 	int equipmentPowerBonus = 0;
+	
+	Renderer->AddRender(20, hudX, "(I) 인벤토리");
+	Renderer->AddRender(21, hudX, "(Z) 공격");
+	Renderer->AddRender(22, hudX, "(WASD) 이동");
+	Renderer->AddRender(23, hudX, "(ESC) 게임 종료");
+	
 	if (UEquipmentComponent* equipmentComponent = PlayerPtr->GetComponent<UEquipmentComponent>())
 	{
 		if (equipmentComponent->GetItem({0,0}))
