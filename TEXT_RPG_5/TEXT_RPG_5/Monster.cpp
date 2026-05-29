@@ -713,11 +713,11 @@ void Monster::ConfigureForStage(int InLevel, bool InBoss)
 	else if (typeName == "OrcMage")
 	{
 		MaxHealth = Level * 170 + rand() % (Level * 50 + 1);
-		Attack = Level * 20 + rand() % (Level * 6 + 1);
+		Attack = Level * 25 + rand() % (Level * 6 + 1);
 	}
 	else if (typeName == "QueenSpider")
 	{
-		MaxHealth = Level * 200 + rand() % (Level * 70 + 1);
+		MaxHealth = Level * 280 + rand() % (Level * 70 + 1);
 		Attack = Level * 20 + rand() % (Level * 8 + 1);
 	}
 	else if (typeName == "Dragon")

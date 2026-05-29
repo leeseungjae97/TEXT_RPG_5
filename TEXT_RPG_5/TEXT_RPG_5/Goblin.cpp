@@ -43,6 +43,7 @@ std::vector<FItemWeight> Goblin::GetDropTable()
 		{ ItemId::LEATHER_ARMOR, 5},
 		{ ItemId::LEATHER_HELMET, 5},
 		{ ItemId::EXPLORER_BOOTS, 5},
+		{ItemId::BOOTS_OF_WIND, 10}
 		
 	};
 }

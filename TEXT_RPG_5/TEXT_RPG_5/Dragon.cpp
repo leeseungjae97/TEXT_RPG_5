@@ -320,8 +320,8 @@ void Dragon::UpdatePhase()
     if (bHasRevive)
     {
         CurrentPhase = 3;
-        AttackInterval = 1.3f;
-        MoveInterval = 0.7f;
+        AttackInterval = 1.8f;
+        MoveInterval = 0.6f;
         return;
     }
     
@@ -330,7 +330,7 @@ void Dragon::UpdatePhase()
     if (HealthRate <= 0.3f)
     {
         CurrentPhase = 3;
-        AttackInterval = 1.5f;
+        AttackInterval = 1.8f;
         MoveInterval = 0.8f;
     }
     else if (HealthRate <= 0.7f)
