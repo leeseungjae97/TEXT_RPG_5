@@ -27,12 +27,9 @@ UInventoryComponent::UInventoryComponent(AObject* InOwner)
     
     
     AcquireItem(new UsableItem(ItemDB::HP_POTION));
-    AcquireItem(new UsableItem(ItemDB::STRENGTH_POTION));
-    AcquireItem(new UsableItem(ItemDB::LONGSWORD));
-    AcquireItem(new UsableItem(ItemDB::LONGSWORD));
-    AcquireItem(new UsableItem(ItemDB::GOBLIN_LEATHER));
     AcquireItem(new UsableItem(ItemDB::HP_POTION));
     AcquireItem(new UsableItem(ItemDB::HP_POTION));
+    AcquireItem(new UsableItem(ItemDB::LONGSWORD));
 }
 
 UInventoryComponent::~UInventoryComponent()
