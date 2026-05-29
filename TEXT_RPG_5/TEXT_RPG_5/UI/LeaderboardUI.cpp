@@ -24,6 +24,7 @@ namespace
 	{
 		const size_t comma = Text.find(',');
 		const size_t dot = Text.find('.');
+
 		if (dot != string::npos && comma != string::npos && dot < comma)
 		{
 			return Trim(Text.substr(dot + 1));
@@ -31,14 +32,60 @@ namespace
 
 		return Trim(Text);
 	}
+
+	bool ParseTimeTextToSeconds(const string& TimeText, double& OutSeconds)
+	{
+		// Expected format:
+		// 00:03:25.142
+		if (TimeText.size() != 12)
+		{
+			return false;
+		}
+
+		if (TimeText[2] != ':' || TimeText[5] != ':' || TimeText[8] != '.')
+		{
+			return false;
+		}
+
+		try
+		{
+			const int hours = stoi(TimeText.substr(0, 2));
+			const int minutes = stoi(TimeText.substr(3, 2));
+			const int seconds = stoi(TimeText.substr(6, 2));
+			const int milliseconds = stoi(TimeText.substr(9, 3));
+
+			if (hours < 0 || minutes < 0 || minutes >= 60 ||
+				seconds < 0 || seconds >= 60 ||
+				milliseconds < 0 || milliseconds >= 1000)
+			{
+				return false;
+			}
+
+			OutSeconds =
+				static_cast<double>(hours) * 3600.0 +
+				static_cast<double>(minutes) * 60.0 +
+				static_cast<double>(seconds) +
+				static_cast<double>(milliseconds) / 1000.0;
+
+			return true;
+		}
+		catch (...)
+		{
+			return false;
+		}
+	}
 }
 
 void LeaderboardUI::Open()
 {
 	Entries.clear();
+
 	bHasLoaded = false;
+	bIsLoading = false;
+
 	DotTimer = 0.0f;
 	DotCount = 1;
+
 	StartLoad();
 }
 
@@ -58,13 +105,15 @@ LeaderboardAction LeaderboardUI::Tick(float DeltaTime)
 		DotCount = DotCount % 3 + 1;
 	}
 
-	if (bIsLoading && LoadFuture.valid() &&
+	if (bIsLoading &&
+		LoadFuture.valid() &&
 		LoadFuture.wait_for(chrono::milliseconds(0)) == future_status::ready)
 	{
 		FinishLoad(LoadFuture.get());
 	}
 
 	InputManager* input = InputManager::GetInstance();
+
 	if (input->IsKeyTap(KeyCode::ESCAPE) || input->IsKeyTap(KeyCode::X))
 	{
 		return LeaderboardAction::Back;
@@ -85,7 +134,9 @@ void LeaderboardUI::Render()
 	const int borderY = 1;
 	const int borderWidth = SCREEN_WIDTH - 4;
 	const int borderHeight = SCREEN_HEIGHT - 2;
+
 	RenderTrophy(SCREEN_WIDTH / 4, 10);
+
 	Renderer->DrawBox(borderY, borderX, borderWidth, borderHeight);
 
 	RenderTitle(28, 8);
@@ -103,9 +154,22 @@ void LeaderboardUI::Render()
 
 void LeaderboardUI::StartLoad()
 {
+	if (bIsLoading)
+	{
+		return;
+	}
+
 	bIsLoading = true;
+	bHasLoaded = false;
+	Entries.clear();
+
 	LoadFuture = async(launch::async, []()
 	{
+		// Worker 구조:
+		// R2Connector::ReadLeaderboard()
+		// -> HTTP GET /leaderboard
+		// -> Worker
+		// -> R2 Bucket
 		return R2Connector::GetInstance()->ReadLeaderboard();
 	});
 }
@@ -113,6 +177,7 @@ void LeaderboardUI::StartLoad()
 void LeaderboardUI::FinishLoad(const string& Text)
 {
 	Entries = ParseLeaderboardText(Text);
+
 	bIsLoading = false;
 	bHasLoaded = true;
 }
@@ -120,20 +185,26 @@ void LeaderboardUI::FinishLoad(const string& Text)
 vector<LeaderboardEntry> LeaderboardUI::ParseLeaderboardText(const string& Text)
 {
 	vector<LeaderboardEntry> result;
+
 	stringstream stream(Text);
 	string line;
 
 	while (getline(stream, line))
 	{
 		line = StripRankPrefix(line);
+
 		if (line.empty())
 		{
 			continue;
 		}
 
+		// Expected after StripRankPrefix:
+		// 00:03:25.142, 12, Knight
 		vector<string> tokens;
 		string token;
+
 		stringstream lineStream(line);
+
 		while (getline(lineStream, token, ','))
 		{
 			tokens.push_back(Trim(token));
@@ -144,24 +215,58 @@ vector<LeaderboardEntry> LeaderboardUI::ParseLeaderboardText(const string& Text)
 			continue;
 		}
 
-		LeaderboardEntry entry;
+		double timeSeconds = 0.0;
+
+		if (!ParseTimeTextToSeconds(tokens[0], timeSeconds))
+		{
+			continue;
+		}
+
+		int level = 0;
+
 		try
 		{
-			entry.TimeSeconds = stod(tokens[0]);
-			entry.Level = stoi(tokens[1]);
+			level = stoi(tokens[1]);
 		}
 		catch (...)
 		{
 			continue;
 		}
 
-		entry.Name = DisplayManager::GetInstance()->ToWideString(tokens[2]);
+		if (level < 0)
+		{
+			continue;
+		}
+
+		string name = tokens[2];
+
+		if (name.empty())
+		{
+			continue;
+		}
+
+		LeaderboardEntry entry;
+
+		entry.TimeSeconds = timeSeconds;
+		entry.Level = level;
+		entry.Name = DisplayManager::GetInstance()->ToWideString(name);
+
 		result.push_back(entry);
 	}
 
 	sort(result.begin(), result.end(), [](const LeaderboardEntry& Left, const LeaderboardEntry& Right)
 	{
-		return Left.TimeSeconds < Right.TimeSeconds;
+		if (Left.TimeSeconds != Right.TimeSeconds)
+		{
+			return Left.TimeSeconds < Right.TimeSeconds;
+		}
+
+		if (Left.Level != Right.Level)
+		{
+			return Left.Level > Right.Level;
+		}
+
+		return Left.Name < Right.Name;
 	});
 
 	for (int i = 0; i < static_cast<int>(result.size()); ++i)
@@ -190,10 +295,12 @@ void LeaderboardUI::RenderTitle(int X, int Y)
 
 	Renderer->AddRender(Y - 4, X + 44 + StarOffset, L"|", CC_GRAY);
 	Renderer->AddRender(Y - 2, X + 20, L"----------------<>----------------", CC_GRAY);
+
 	for (int i = 0; i < static_cast<int>(title.size()); ++i)
 	{
 		Renderer->AddRender(Y + i, X, title[i], CC_LIGHTGRAY);
 	}
+
 	Renderer->AddRender(Y + 7, X + 25, L"----  D I A B L 5  ----", CC_DARKYELLOW);
 	Renderer->AddRender(Y + 10, X + 20, L"----------------<>----------------", CC_GRAY);
 }
@@ -202,6 +309,7 @@ void LeaderboardUI::RenderTable(int X, int Y)
 {
 	const int width = 118;
 	const int height = 26;
+
 	Renderer->DrawBox(Y, X, width, height);
 
 	Renderer->AddRender(Y + 2, X + 4, L"RANK", CC_WHITE);
@@ -222,13 +330,19 @@ void LeaderboardUI::RenderTable(int X, int Y)
 	}
 
 	const int count = min(10, static_cast<int>(Entries.size()));
+
 	for (int i = 0; i < count; ++i)
 	{
 		const LeaderboardEntry& entry = Entries[i];
+
 		const int rowY = Y + 6 + i * 2;
 		const bool bTop = i == 0;
 		const int color = bTop ? CC_CYAN : CC_GRAY;
-		const int score = max(0, static_cast<int>(100000.0 - entry.TimeSeconds * 10.0 + entry.Level * 100.0));
+
+		const int score = max(
+			0,
+			static_cast<int>(100000.0 - entry.TimeSeconds * 10.0 + entry.Level * 100.0));
+
 		wstring name = Renderer->TrimTextToDisplayWidth(entry.Name, 20);
 
 		if (bTop)
@@ -246,66 +360,66 @@ void LeaderboardUI::RenderTable(int X, int Y)
 
 void LeaderboardUI::RenderTrophy(int X, int Y)
 {
-static const vector<wstring> deerSkull =
-{
-    L"                                                                                                                          ::::.",
-    L"              .::                                                                                                     --:. :-.--.",
-    L"           ..:-=:                   :-.                                                                               .-==-.:-::-:",
-    L"        .:=+--+=                  .:=-                                                                .                 -++=::=-:--.",
-    L"      .:=+=:-=+:                 .-=+.                                                               .-=:.               -++=- -+--=:",
-    L"     :-=++..-=+.                 --+-                                                                 .-+=-.              -*++- :+=--:",
-    L"    :=++*- :-++                 :-=+.                                                                   :=+=:              -*+*- -*=-=:",
-    L"   :=+**= .-=+=                .--+-                                                                     .+++=              =*+*- =*=-=:",
-    L"  .++***: .-=++                :-=+.                                                                      .==+=             .+*+*..**-=-",
-    L"  =*###+  .=+++               .--+=                                                                        .+=+=             =*+*+ =#===:",
-    L" :*####:  .=++*:              :--+-                                                                         -+=+-            -*++#::#+=+:",
-    L" :#%##*   .==+*-             .---+:                                                                          ==++:           :*++#--*+=+-",
-    L" -#%%#*    -=+++.            .--=+:                                                                          :==+=           :*++#=+*+++:",
-    L" -#%%%#-   :=++*-            :-==+.                                                                          .====.          -***%#*++*-",
-    L" .*%%##*:  .=++++            :===+.                                                                           ===+:          ++*##*+**=",
-    L"  .*%%###=. -++**-           :==++.                                                                           =+==-         -++***+*#=",
-    L"    =#%%##*=:=+***:          :===+:                                                        ..                 ===+-        -+++++*#*-",
-    L"     .=#%####****#*:         .===+=                  :=:                                   -=.               .+-=+-      :=+++**##=.",
-    L"       .=*%%#*******=:        ====+:                .=+:                                   -=-               ==-=+.   .-==++**#*=.",
-    L"          :=*###*****++-:..   :====+.               :=+=                                  .=--             .-+=+++:--=+++*##*+-",
-    L"             .-=*###***++++==-===+==+:.             :==+.                                 -+-=.       ..::-=======+++****+=:",
-    L"                 .:-+*******++++=+=====-::...       :+=+-                                :++===--------=-=====++****+=-:",
-    L"                       .:-=++****+++++=========----:-++++=                             :=****+=======+++****++==-:.",
-    L"                             .::-==+++++*+++++++=====+++**+-                         :=******+++****++==-::.",
-    L"                                      .::--==++********####*+-.                    -++****##%#*=-:.",
-    L"                                               ..-=+*#%%##%##**=:                :+#**+*#%@#+:",
-    L"                                                    .:=*%%%%%####+::.   .......:=*#***%%%#=.",
-    L"                                                        :+%%%%#*+====----=--------=+*#@%+:",
-    L"                                                          .+%%+---==-----=------:---=*#=",
-    L"                                                            -**++---===-=+----=---+***-",
-    L"                                                             :=*#+--=----=-----=-=##*:",
-    L"                                                               =+*-=#+-====---=#=-+*=",
-    L"                                                              :=++-=**---==---+*+--=+-.",
-    L"                                                            :+====-+*+----==-==++=---*%*-",
-    L"                                                           :#@%+==-===-----==-====--=%@@#:",
-    L"                                                           -#@@@+--===---==--------+#%%%#-",
-    L"                                                           :*#%@@**+==-====-==-=+*######*:",
-    L"                                                            -*#%#%#%*+====+--=+*%%#%%##*-",
-    L"                                                             :+###*#%*=-==+====**%**##*:",
-    L"                                                               =#**##*====+=-==*###**#=",
-    L"                                                               .**###*====*===+***#***-",
-    L"                                                                +****#+===+==++#**#***-",
-    L"                                                                =*+**+*+==+==+++*##**+.",
-    L"                                                                :****+++==*==+*++****=",
-    L"                                                                 +**++++==*+=+*++*+*+.",
-    L"                                                                 .***+*+==++++*++**=.",
-    L"                                                                  .****+++*+++*+**+",
-    L"                                                                   -*+##*+++=##+**:",
-    L"                                                                   .**%@#%%@*%@**+.",
-    L"                                                                    =*%@=:%@-:%#*=",
-    L"                                                                    -*%#  ##. *#*:",
-    L"                                                                    .+#+  **. *#*.",
-    L"                                                                     -**  +*. **=",
-    L"                                                                     .+#=-++==**:",
-    L"                                                                      -***+++++=",
-    L"                                                                       -*++*++=.",
-    L"                                                                        .. .."
-};
+	static const vector<wstring> deerSkull =
+	{
+		L"                                                                                                                          ::::.",
+		L"              .::                                                                                                     --:. :-.--.",
+		L"           ..:-=:                   :-.                                                                               .-==-.:-::-:",
+		L"        .:=+--+=                  .:=-                                                                .                 -++=::=-:--.",
+		L"      .:=+=:-=+:                 .-=+.                                                               .-=:.               -++=- -+--=:",
+		L"     :-=++..-=+.                 --+-                                                                 .-+=-.              -*++- :+=--:",
+		L"    :=++*- :-++                 :-=+.                                                                   :=+=:              -*+*- -*=-=:",
+		L"   :=+**= .-=+=                .--+-                                                                     .+++=              =*+*- =*=-=:",
+		L"  .++***: .-=++                :-=+.                                                                      .==+=             .+*+*..**-=-",
+		L"  =*###+  .=+++               .--+=                                                                        .+=+=             =*+*+ =#===:",
+		L" :*####:  .=++*:              :--+-                                                                         -+=+-            -*++#::#+=+:",
+		L" :#%##*   .==+*-             .---+:                                                                          ==++:           :*++#--*+=+-",
+		L" -#%%#*    -=+++.            .--=+:                                                                          :==+=           :*++#=+*+++:",
+		L" -#%%%#-   :=++*-            :-==+.                                                                          .====.          -***%#*++*-",
+		L" .*%%##*:  .=++++            :===+.                                                                           ===+:          ++*##*+**=",
+		L"  .*%%###=. -++**-           :==++.                                                                           =+==-         -++***+*#=",
+		L"    =#%%##*=:=+***:          :===+:                                                        ..                 ===+-        -+++++*#*-",
+		L"     .=#%####****#*:         .===+=                  :=:                                   -=.               .+-=+-      :=+++**##=.",
+		L"       .=*%%#*******=:        ====+:                .=+:                                   -=-               ==-=+.   .-==++**#*=.",
+		L"          :=*###*****++-:..   :====+.               :=+=                                  .=--             .-+=+++:--=+++*##*+-",
+		L"             .-=*###***++++==-===+==+:.             :==+.                                 -+-=.       ..::-=======+++****+=:",
+		L"                 .:-+*******++++=+=====-::...       :+=+-                                :++===--------=-=====++****+=-:",
+		L"                       .:-=++****+++++=========----:-++++=                             :=****+=======+++****++==-:.",
+		L"                             .::-==+++++*+++++++=====+++**+-                         :=******+++****++==-::.",
+		L"                                      .::--==++********####*+-.                    -++****##%#*=-:.",
+		L"                                               ..-=+*#%%##%##**=:                :+#**+*#%@#+:",
+		L"                                                    .:=*%%%%%####+::.   .......:=*#***%%%#=.",
+		L"                                                        :+%%%%#*+====----=--------=+*#@%+:",
+		L"                                                          .+%%+---==-----=------:---=*#=",
+		L"                                                            -**++---===-=+----=---+***-",
+		L"                                                             :=*#+--=----=-----=-=##*:",
+		L"                                                               =+*-=#+-====---=#=-+*=",
+		L"                                                              :=++-=**---==---+*+--=+-.",
+		L"                                                            :+====-+*+----==-==++=---*%*-",
+		L"                                                           :#@%+==-===-----==-====--=%@@#:",
+		L"                                                           -#@@@+--===---==--------+#%%%#-",
+		L"                                                           :*#%@@**+==-====-==-=+*######*:",
+		L"                                                            -*#%#%#%*+====+--=+*%%#%%##*-",
+		L"                                                             :+###*#%*=-==+====**%**##*:",
+		L"                                                               =#**##*====+=-==*###**#=",
+		L"                                                               .**###*====*===+***#***-",
+		L"                                                                +****#+===+==++#**#***-",
+		L"                                                                =*+**+*+==+==+++*##**+.",
+		L"                                                                :****+++==*==+*++****=",
+		L"                                                                 +**++++==*+=+*++*+*+.",
+		L"                                                                 .***+*+==++++*++**=.",
+		L"                                                                  .****+++*+++*+**+",
+		L"                                                                   -*+##*+++=##+**:",
+		L"                                                                   .**%@#%%@*%@**+.",
+		L"                                                                    =*%@=:%@-:%#*=",
+		L"                                                                    -*%#  ##. *#*:",
+		L"                                                                    .+#+  **. *#*.",
+		L"                                                                     -**  +*. **=",
+		L"                                                                     .+#=-++==**:",
+		L"                                                                      -***+++++=",
+		L"                                                                       -*++*++=.",
+		L"                                                                        .. .."
+	};
 
 	for (int i = 0; i < static_cast<int>(deerSkull.size()); ++i)
 	{
@@ -317,8 +431,10 @@ void LeaderboardUI::RenderLoading()
 {
 	const int width = 42;
 	const int height = 7;
+
 	const int x = max(1, (SCREEN_WIDTH - width) / 2);
 	const int y = max(1, (SCREEN_HEIGHT - height) / 2);
+
 	const WORD background = Renderer->MakeConsoleAttribute(CC_BLACK, CC_BLACK);
 
 	for (int row = 0; row < height; ++row)
@@ -330,7 +446,13 @@ void LeaderboardUI::RenderLoading()
 	}
 
 	Renderer->DrawBox(y, x, width, height);
+
 	wstring dots(DotCount, L'.');
 	wstring text = L"순위 불러오는중" + dots;
-	Renderer->AddRender(y + 3, x + (width - Renderer->GetTextDisplayWidth(text)) / 2, text, CC_CYAN);
+
+	Renderer->AddRender(
+		y + 3,
+		x + (width - Renderer->GetTextDisplayWidth(text)) / 2,
+		text,
+		CC_CYAN);
 }

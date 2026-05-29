@@ -1,326 +1,495 @@
 ﻿#include "R2Connector.h"
 
-#include <aws/core/Aws.h>
-#include <aws/core/auth/AWSCredentials.h>
-#include <aws/core/client/ClientConfiguration.h>
-#include <aws/core/utils/memory/stl/AWSStringStream.h>
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <Windows.h>
+#include <winhttp.h>
 
-#include <aws/s3/S3Client.h>
-#include <aws/s3/model/PutObjectRequest.h>
-#include <aws/s3/model/GetObjectRequest.h>
+#pragma comment(lib, "winhttp.lib")
 
-#include "R2AsyncLoader.h"
-
-// Windows.h를 다른 곳에서 include하고 있다면 GetObject 매크로 충돌 방지
-#ifdef GetObject
-#undef GetObject
-#endif
-
+#include <iomanip>
+#include <sstream>
 
 R2Connector::R2Connector()
 {
-	
+	SetWorkerBaseUrl("https://text-rpg-r2-worker.dltmdwo2323.workers.dev");
+	SetApiToken("text-rpg-api-key-9898");
 }
 
 R2Connector::~R2Connector()
 {
-	
 }
 
-string R2Connector::ReadLeaderboard() 
+void R2Connector::SetWorkerBaseUrl(const string& InBaseUrl)
 {
-    R2Config config;
-
-    if (!LoadR2ConfigFromIni(ConfigPath, config))
-    {
-        // 설정 실패
-    }
-
-    Aws::SDKOptions options;
-    Aws::InitAPI(options);
-
-    Aws::Client::ClientConfiguration clientConfig;
-
-    clientConfig.endpointOverride = config.Endpoint;
-    clientConfig.region = "auto";
-    clientConfig.scheme = Aws::Http::Scheme::HTTPS;
-
-    Aws::Auth::AWSCredentials credentials(
-        config.AccessKeyId.c_str(),
-        config.SecretAccessKey.c_str());
-
-    Aws::S3::S3Client s3Client(
-        credentials,
-        clientConfig,
-        Aws::Client::AWSAuthV4Signer::PayloadSigningPolicy::Never,
-        false);
-
-    string readBackText;
-    
-    // 읽어오기
-    if (!GetTextFromR2(s3Client, config, ObjectKey, readBackText))
-    {
-        Aws::ShutdownAPI(options);
-        return "";
-    }
-    Aws::ShutdownAPI(options);
-    return readBackText;
+	WorkerBaseUrl = InBaseUrl;
 }
 
-void R2Connector::WriteLeaderboard(string Name, float Time, int Level)
+void R2Connector::SetApiToken(const string& InApiToken)
 {
-    R2Config config;
-
-    if (!LoadR2ConfigFromIni(ConfigPath, config))
-    {
-        // 설정 실패
-    }
-
-    Aws::SDKOptions options;
-    Aws::InitAPI(options);
-
-    Aws::Client::ClientConfiguration clientConfig;
-
-    clientConfig.endpointOverride = config.Endpoint;
-    clientConfig.region = "auto";
-    clientConfig.scheme = Aws::Http::Scheme::HTTPS;
-
-    Aws::Auth::AWSCredentials credentials(
-        config.AccessKeyId.c_str(),
-        config.SecretAccessKey.c_str());
-
-    Aws::S3::S3Client s3Client(
-        credentials,
-        clientConfig,
-        Aws::Client::AWSAuthV4Signer::PayloadSigningPolicy::Never,
-        false);
-
-    // 1. R2의 text-rpg-leaderboard.txt를 읽어본다.
-    // 2. 있으면 기존 내용 기반으로 수정한다.
-    // 3. 없으면 새 ini 내용을 만든다.
-    // 4. PutObject로 R2에 저장한다.
-    if (!WriteOrUpdateIniOnR2(s3Client, config, ObjectKey, Name, Time, Level))
-    {
-        Aws::ShutdownAPI(options);
-        // 쓰기 실패
-        return;
-    }
-
-    Aws::ShutdownAPI(options);
+	ApiToken = InApiToken;
 }
 
+string R2Connector::ReadLeaderboard()
+{
+	R2LoadResult result = RequestLeaderboard();
+
+	if (!result.Success)
+	{
+		cout << "ReadLeaderboard failed: " << result.ErrorMessage << '\n';
+		return "";
+	}
+
+	return result.Text;
+}
+
+bool R2Connector::WriteLeaderboard(string Name, float Time, int Level)
+{
+	R2LoadResult result = PostRecord(Name, Time, Level);
+
+	if (!result.Success)
+	{
+		cout << "WriteLeaderboard failed: " << result.ErrorMessage << '\n';
+		return false;
+	}
+
+	return true;
+}
 
 string R2Connector::Trim(const string& text)
 {
-    const char* whiteSpaces = " \t\r\n";
+	const char* whiteSpaces = " \t\r\n";
 
-    const size_t begin = text.find_first_not_of(whiteSpaces);
+	const size_t begin = text.find_first_not_of(whiteSpaces);
 
-    if (begin == string::npos)
-    {
-        return "";
-    }
+	if (begin == string::npos)
+	{
+		return "";
+	}
 
-    const size_t end = text.find_last_not_of(whiteSpaces);
+	const size_t end = text.find_last_not_of(whiteSpaces);
 
-    return text.substr(begin, end - begin + 1);
+	return text.substr(begin, end - begin + 1);
 }
 
-bool R2Connector::LoadR2ConfigFromIni(const string& iniPath, R2Config& outConfig)
+string R2Connector::EscapeJsonString(const string& text)
 {
-    ifstream file(iniPath.c_str());
+	ostringstream oss;
 
-    if (!file.is_open())
-    {
-        cerr << "Failed to open config ini: " << iniPath << '\n';
-        return false;
-    }
+	for (size_t i = 0; i < text.size(); ++i)
+	{
+		const unsigned char c = static_cast<unsigned char>(text[i]);
 
-    unordered_map<string, string> values;
+		switch (c)
+		{
+		case '\"':
+			oss << "\\\"";
+			break;
 
-    string currentSection;
-    string line;
+		case '\\':
+			oss << "\\\\";
+			break;
 
-    while (getline(file, line))
-    {
-        line = Trim(line);
+		case '\b':
+			oss << "\\b";
+			break;
 
-        if (line.empty())
-        {
-            continue;
-        }
+		case '\f':
+			oss << "\\f";
+			break;
 
-        if (line[0] == ';' || line[0] == '#')
-        {
-            continue;
-        }
+		case '\n':
+			oss << "\\n";
+			break;
 
-        if (line.front() == '[' && line.back() == ']')
-        {
-            currentSection = Trim(line.substr(1, line.size() - 2));
-            continue;
-        }
+		case '\r':
+			oss << "\\r";
+			break;
 
-        if (currentSection != "R2")
-        {
-            continue;
-        }
+		case '\t':
+			oss << "\\t";
+			break;
 
-        const size_t equalPos = line.find('=');
+		default:
+			if (c < 0x20)
+			{
+				oss << "\\u"
+					<< hex
+					<< setw(4)
+					<< setfill('0')
+					<< static_cast<int>(c)
+					<< dec
+					<< setfill(' ');
+			}
+			else
+			{
+				oss << text[i];
+			}
 
-        if (equalPos == string::npos)
-        {
-            continue;
-        }
+			break;
+		}
+	}
 
-        const string key = Trim(line.substr(0, equalPos));
-        const string value = Trim(line.substr(equalPos + 1));
-
-        values[key] = value;
-    }
-
-    outConfig.AccountId = values["AccountId"];
-    outConfig.AccessKeyId = values["AccessKeyId"];
-    outConfig.SecretAccessKey = values["SecretAccessKey"];
-    outConfig.BucketName = values["BucketName"];
-    outConfig.Endpoint = values["Endpoint"];
-
-    if (outConfig.AccessKeyId.empty() ||
-        outConfig.SecretAccessKey.empty() ||
-        outConfig.BucketName.empty() ||
-        outConfig.Endpoint.empty())
-    {
-        cerr << "R2 config is incomplete.\n";
-        cerr << "Required: AccessKeyId, SecretAccessKey, BucketName, Endpoint\n";
-        return false;
-    }
-
-    return true;
+	return oss.str();
 }
 
-bool R2Connector::PutTextToR2(
-    Aws::S3::S3Client& s3Client,
-    const R2Config& config,
-    const string& objectKey,
-    const string& text)
+string R2Connector::FormatTime(float TimeSeconds)
 {
-    Aws::S3::Model::PutObjectRequest request;
+	if (TimeSeconds < 0.0f)
+	{
+		TimeSeconds = 0.0f;
+	}
 
-    request.SetBucket(config.BucketName.c_str());
-    request.SetKey(objectKey.c_str());
-    request.SetContentType("text/plain; charset=utf-8");
+	const int totalMilliseconds = static_cast<int>(TimeSeconds * 1000.0f + 0.5f);
 
-    shared_ptr<Aws::StringStream> bodyStream =
-        Aws::MakeShared<Aws::StringStream>("R2PutObjectBodyStream");
+	const int milliseconds = totalMilliseconds % 1000;
+	const int totalSeconds = totalMilliseconds / 1000;
 
-    (*bodyStream) << text;
+	const int seconds = totalSeconds % 60;
+	const int totalMinutes = totalSeconds / 60;
 
-    request.SetBody(bodyStream);
+	const int minutes = totalMinutes % 60;
+	const int hours = totalMinutes / 60;
 
-    Aws::S3::Model::PutObjectOutcome outcome = s3Client.PutObject(request);
+	ostringstream oss;
 
-    if (!outcome.IsSuccess())
-    {
-        cerr << "PutObject failed.\n";
-        cerr << "Error: "
-                  << outcome.GetError().GetExceptionName()
-                  << " - "
-                  << outcome.GetError().GetMessage()
-                  << '\n';
+	oss << setw(2) << setfill('0') << hours << ":"
+		<< setw(2) << setfill('0') << minutes << ":"
+		<< setw(2) << setfill('0') << seconds << "."
+		<< setw(3) << setfill('0') << milliseconds;
 
-        return false;
-    }
-
-    cout << "R2 write success: " << objectKey << '\n';
-
-    return true;
+	return oss.str();
 }
 
-bool R2Connector::GetTextFromR2(
-    Aws::S3::S3Client& s3Client,
-    const R2Config& config,
-    const string& objectKey,
-    string& outText)
+static wstring Utf8ToWide(const string& text)
 {
-    Aws::S3::Model::GetObjectRequest request;
+	if (text.empty())
+	{
+		return L"";
+	}
 
-    request.SetBucket(config.BucketName.c_str());
-    request.SetKey(objectKey.c_str());
+	const int requiredSize = MultiByteToWideChar(
+		CP_UTF8,
+		0,
+		text.c_str(),
+		static_cast<int>(text.size()),
+		nullptr,
+		0);
 
-    Aws::S3::Model::GetObjectOutcome outcome = s3Client.GetObject(request);
+	if (requiredSize <= 0)
+	{
+		return L"";
+	}
 
-    if (!outcome.IsSuccess())
-    {
-        cerr << "GetObject failed.\n";
-        cerr << "ObjectKey: " << objectKey << '\n';
-        cerr << "Error: "
-                  << outcome.GetError().GetExceptionName()
-                  << " - "
-                  << outcome.GetError().GetMessage()
-                  << '\n';
+	wstring result;
+	result.resize(requiredSize);
 
-        return false;
-    }
+	MultiByteToWideChar(
+		CP_UTF8,
+		0,
+		text.c_str(),
+		static_cast<int>(text.size()),
+		&result[0],
+		requiredSize);
 
-    Aws::S3::Model::GetObjectResult result = outcome.GetResultWithOwnership();
-
-    stringstream ss;
-    ss << result.GetBody().rdbuf();
-
-    outText = ss.str();
-
-    cout << "R2 read success: " << objectKey << '\n';
-
-    return true;
+	return result;
 }
 
-string R2Connector::CreateLeaderboardText(const string& oldText, const string& Name, float Time, int Level)
+static string WideToUtf8(const wstring& text)
 {
-    ostringstream oss;
-    oss << oldText;
-    if (!oldText.empty() && oldText.back() != '\n')
-    {
-        oss << '\n';
-    }
+	if (text.empty())
+	{
+		return "";
+	}
 
-    int nextRank = 1;
-    stringstream stream(oldText);
-    string line;
-    while (getline(stream, line))
-    {
-        if (!Trim(line).empty())
-        {
-            ++nextRank;
-        }
-    }
+	const int requiredSize = WideCharToMultiByte(
+		CP_UTF8,
+		0,
+		text.c_str(),
+		static_cast<int>(text.size()),
+		nullptr,
+		0,
+		nullptr,
+		nullptr);
 
-    oss << nextRank << ". " << fixed << setprecision(3) << Time << ", " << Level << ", " << Name << '\n';
+	if (requiredSize <= 0)
+	{
+		return "";
+	}
 
-    return oss.str();
+	string result;
+	result.resize(requiredSize);
+
+	WideCharToMultiByte(
+		CP_UTF8,
+		0,
+		text.c_str(),
+		static_cast<int>(text.size()),
+		&result[0],
+		requiredSize,
+		nullptr,
+		nullptr);
+
+	return result;
 }
 
-bool R2Connector::WriteOrUpdateIniOnR2(
-    Aws::S3::S3Client& s3Client,
-    const R2Config& config,
-    const string& objectKey,
-    const string& Name,
-    float Time,
-    int Level)
+R2Connector::HttpResponse R2Connector::SendHttpRequest(
+	const string& Method,
+	const string& Url,
+	const string& Body,
+	const vector<pair<string, string>>& Headers) const
 {
-    string oldText;
-    string newText;
+	HttpResponse response;
 
-    const bool readSuccess = GetTextFromR2(
-        s3Client,
-        config,
-        objectKey,
-        oldText);
+	const wstring wideUrl = Utf8ToWide(Url);
 
-    newText = CreateLeaderboardText(readSuccess ? oldText : "", Name, Time, Level);
+	URL_COMPONENTS urlComponents;
+	ZeroMemory(&urlComponents, sizeof(urlComponents));
 
-    return PutTextToR2(
-        s3Client,
-        config,
-        objectKey,
-        newText);
+	wchar_t hostName[256];
+	wchar_t urlPath[2048];
+
+	ZeroMemory(hostName, sizeof(hostName));
+	ZeroMemory(urlPath, sizeof(urlPath));
+
+	urlComponents.dwStructSize = sizeof(urlComponents);
+	urlComponents.lpszHostName = hostName;
+	urlComponents.dwHostNameLength = _countof(hostName);
+	urlComponents.lpszUrlPath = urlPath;
+	urlComponents.dwUrlPathLength = _countof(urlPath);
+
+	if (!WinHttpCrackUrl(
+		wideUrl.c_str(),
+		static_cast<DWORD>(wideUrl.length()),
+		0,
+		&urlComponents))
+	{
+		response.ErrorMessage = "WinHttpCrackUrl failed.";
+		return response;
+	}
+
+	const bool isHttps = urlComponents.nScheme == INTERNET_SCHEME_HTTPS;
+
+	HINTERNET session = WinHttpOpen(
+		L"TextRPG-Worker-Client/1.0",
+		WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+		WINHTTP_NO_PROXY_NAME,
+		WINHTTP_NO_PROXY_BYPASS,
+		0);
+
+	if (!session)
+	{
+		response.ErrorMessage = "WinHttpOpen failed.";
+		return response;
+	}
+
+	HINTERNET connection = WinHttpConnect(
+		session,
+		urlComponents.lpszHostName,
+		urlComponents.nPort,
+		0);
+
+	if (!connection)
+	{
+		response.ErrorMessage = "WinHttpConnect failed.";
+		WinHttpCloseHandle(session);
+		return response;
+	}
+
+	const DWORD requestFlags = isHttps ? WINHTTP_FLAG_SECURE : 0;
+
+	HINTERNET request = WinHttpOpenRequest(
+		connection,
+		Utf8ToWide(Method).c_str(),
+		urlComponents.lpszUrlPath,
+		nullptr,
+		WINHTTP_NO_REFERER,
+		WINHTTP_DEFAULT_ACCEPT_TYPES,
+		requestFlags);
+
+	if (!request)
+	{
+		response.ErrorMessage = "WinHttpOpenRequest failed.";
+		WinHttpCloseHandle(connection);
+		WinHttpCloseHandle(session);
+		return response;
+	}
+
+	wstring headerText;
+
+	for (size_t i = 0; i < Headers.size(); ++i)
+	{
+		headerText += Utf8ToWide(Headers[i].first);
+		headerText += L": ";
+		headerText += Utf8ToWide(Headers[i].second);
+		headerText += L"\r\n";
+	}
+
+	const void* bodyData = Body.empty() ? WINHTTP_NO_REQUEST_DATA : Body.data();
+	const DWORD bodySize = static_cast<DWORD>(Body.size());
+
+	const BOOL sendResult = WinHttpSendRequest(
+		request,
+		headerText.empty() ? WINHTTP_NO_ADDITIONAL_HEADERS : headerText.c_str(),
+		headerText.empty() ? 0 : static_cast<DWORD>(headerText.length()),
+		const_cast<void*>(bodyData),
+		bodySize,
+		bodySize,
+		0);
+
+	if (!sendResult)
+	{
+		response.ErrorMessage = "WinHttpSendRequest failed.";
+		WinHttpCloseHandle(request);
+		WinHttpCloseHandle(connection);
+		WinHttpCloseHandle(session);
+		return response;
+	}
+
+	if (!WinHttpReceiveResponse(request, nullptr))
+	{
+		response.ErrorMessage = "WinHttpReceiveResponse failed.";
+		WinHttpCloseHandle(request);
+		WinHttpCloseHandle(connection);
+		WinHttpCloseHandle(session);
+		return response;
+	}
+
+	DWORD statusCode = 0;
+	DWORD statusCodeSize = sizeof(statusCode);
+
+	if (WinHttpQueryHeaders(
+		request,
+		WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
+		WINHTTP_HEADER_NAME_BY_INDEX,
+		&statusCode,
+		&statusCodeSize,
+		WINHTTP_NO_HEADER_INDEX))
+	{
+		response.StatusCode = static_cast<int>(statusCode);
+	}
+
+	string responseBody;
+
+	while (true)
+	{
+		DWORD bytesAvailable = 0;
+
+		if (!WinHttpQueryDataAvailable(request, &bytesAvailable))
+		{
+			response.ErrorMessage = "WinHttpQueryDataAvailable failed.";
+			break;
+		}
+
+		if (bytesAvailable == 0)
+		{
+			break;
+		}
+
+		string buffer;
+		buffer.resize(bytesAvailable);
+
+		DWORD bytesRead = 0;
+
+		if (!WinHttpReadData(
+			request,
+			&buffer[0],
+			bytesAvailable,
+			&bytesRead))
+		{
+			response.ErrorMessage = "WinHttpReadData failed.";
+			break;
+		}
+
+		buffer.resize(bytesRead);
+		responseBody += buffer;
+	}
+
+	WinHttpCloseHandle(request);
+	WinHttpCloseHandle(connection);
+	WinHttpCloseHandle(session);
+
+	response.Body = responseBody;
+	response.Success = response.StatusCode >= 200 && response.StatusCode < 300;
+
+	if (!response.Success && response.ErrorMessage.empty())
+	{
+		ostringstream oss;
+		oss << "HTTP request failed. StatusCode: " << response.StatusCode
+			<< ", Body: " << response.Body;
+
+		response.ErrorMessage = oss.str();
+	}
+
+	return response;
+}
+
+R2LoadResult R2Connector::RequestLeaderboard() const
+{
+	R2LoadResult result;
+	result.ObjectKey = "GET /leaderboard";
+
+	const string url = WorkerBaseUrl + "/leaderboard";
+
+	vector<pair<string, string>> headers;
+	headers.push_back(make_pair("Accept", "text/plain"));
+
+	const HttpResponse response = SendHttpRequest(
+		"GET",
+		url,
+		"",
+		headers);
+
+	if (!response.Success)
+	{
+		result.Success = false;
+		result.ErrorMessage = response.ErrorMessage;
+		return result;
+	}
+
+	result.Success = true;
+	result.Text = response.Body;
+
+	return result;
+}
+
+R2LoadResult R2Connector::PostRecord(const string& Name, float Time, int Level) const
+{
+	R2LoadResult result;
+	result.ObjectKey = "POST /record";
+
+	const string timeText = FormatTime(Time);
+
+	ostringstream body;
+
+	body << "{";
+	body << "\"time\":\"" << timeText << "\",";
+	body << "\"level\":" << Level << ",";
+	body << "\"name\":\"" << EscapeJsonString(Name) << "\"";
+	body << "}";
+
+	const string url = WorkerBaseUrl + "/record";
+
+	vector<pair<string, string>> headers;
+	headers.push_back(make_pair("Content-Type", "application/json"));
+	headers.push_back(make_pair("Accept", "application/json"));
+	headers.push_back(make_pair("Authorization", "Bearer " + ApiToken));
+
+	const HttpResponse response = SendHttpRequest(
+		"POST",
+		url,
+		body.str(),
+		headers);
+
+	if (!response.Success)
+	{
+		result.Success = false;
+		result.ErrorMessage = response.ErrorMessage;
+		return result;
+	}
+
+	result.Success = true;
+	result.Text = response.Body;
+
+	return result;
 }
