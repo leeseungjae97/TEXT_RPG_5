@@ -10,21 +10,23 @@
 
 static const vector<FItemWeight> ChestItemPool =
 {
-    { ItemId::LONGSWORD,        10 },
-    { ItemId::BOW,              10 },
-    { ItemId::AXE,              10 },
-    { ItemId::STAFF,            10 },
-    { ItemId::LEATHER_HELMET,    8 },
-    { ItemId::LEATHER_ARMOR,     8 },
-    { ItemId::EXPLORER_BOOTS,     8 },
-    { ItemId::PLATE_HELMET,      4 },
-    { ItemId::PLATE_ARMOR,       4 },
-    { ItemId::BOOTS_OF_WIND,       4 },
+    { ItemId::LONGSWORD,        20 },
+    { ItemId::BOW,              20 },
+    { ItemId::AXE,              20 },
+    { ItemId::STAFF,            20 },
+    { ItemId::LEATHER_HELMET,    10 },
+    { ItemId::LEATHER_ARMOR,     10 },
+    { ItemId::EXPLORER_BOOTS,     10 },
+    { ItemId::PLATE_HELMET,      5 },
+    { ItemId::PLATE_ARMOR,       5 },
+    { ItemId::BOOTS_OF_WIND,       5 },
     { ItemId::HP_POTION,        120 },
     { ItemId::STRENGTH_POTION,  50 },
     { ItemId::FIRE_WALL_SCROLL,  20 },
     { ItemId::LIGHTNING_STRIKE_SCROLL,  20 },
     { ItemId::FLAME_POTION,  20 },
+    { ItemId::ORC_TUSK,  100 },
+    { ItemId::SPIDER_EYE,  100 },
 };
 
 ChestManager::ChestManager()

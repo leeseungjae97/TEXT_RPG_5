@@ -27,12 +27,9 @@ UInventoryComponent::UInventoryComponent(AObject* InOwner)
     
     
     AcquireItem(new UsableItem(ItemDB::HP_POTION));
-    AcquireItem(new UsableItem(ItemDB::STRENGTH_POTION));
-    AcquireItem(new UsableItem(ItemDB::LONGSWORD));
-    AcquireItem(new UsableItem(ItemDB::LONGSWORD));
-    AcquireItem(new UsableItem(ItemDB::GOBLIN_LEATHER));
     AcquireItem(new UsableItem(ItemDB::HP_POTION));
     AcquireItem(new UsableItem(ItemDB::HP_POTION));
+    AcquireItem(new UsableItem(ItemDB::LONGSWORD));
 }
 
 UInventoryComponent::~UInventoryComponent()
@@ -770,7 +767,7 @@ void UInventoryComponent::Tick(float DeltaTime)
     //장비 아이템 지급(디버그용)
     if (Input->IsKeyTap(KeyCode::B))
     {
-        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LONGSWORD));
+        /*AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LONGSWORD));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::BOW));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::AXE));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::STAFF));
@@ -779,18 +776,18 @@ void UInventoryComponent::Tick(float DeltaTime)
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::EXPLORER_BOOTS));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_HELMET));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::PLATE_ARMOR));
-        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::BOOTS_OF_WIND));
+        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::BOOTS_OF_WIND));*/
     }
 
     //추가 아이템 지급 소모품 및 골드
     if (Input->IsKeyTap(KeyCode::V))
     {
-        AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::HP_POTION));
+        /*AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::HP_POTION));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::STRENGTH_POTION));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::LIGHTNING_STRIKE_SCROLL));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::FLAME_POTION));
         AcquireItem(ItemManager::GetInstance()->CreateItem(ItemId::FIRE_WALL_SCROLL));
-        AddGold(500);
+        AddGold(500);*/
     }
 
 
