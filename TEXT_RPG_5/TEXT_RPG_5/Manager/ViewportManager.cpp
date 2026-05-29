@@ -1913,7 +1913,7 @@ void ViewportManager::Render2DtoISO()
 		}
 	}
 
-	renderManager->AddRender(1, 1, L"ISO");
+	// renderManager->AddRender(1, 1, L"ISO");
 }
 
 void ViewportManager::OpenInventory()
@@ -2971,5 +2971,5 @@ void ViewportManager::Render2Dto3D()
 		renderManager->PutCell(centerY + 1, centerX, L'|', MakeAttribute(CC_RED));
 	}
 
-	renderManager->AddRender(1, 1, L"3D");
+	// renderManager->AddRender(1, 1, L"3D");
 }

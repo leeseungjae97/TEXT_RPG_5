@@ -353,7 +353,7 @@ void LeaderboardUI::RenderTable(int X, int Y)
 		Renderer->AddRender(rowY, X + 7, to_wstring(entry.Rank), color);
 		Renderer->AddRender(rowY, X + 22, name, color);
 		Renderer->AddRender(rowY, X + 49, to_wstring(entry.Level), color);
-		Renderer->AddRender(rowY, X + 60, TimeManager::FormatSeconds(entry.TimeSeconds), color);
+		Renderer->AddRender(rowY - 2, X + 60, TimeManager::FormatSeconds(entry.TimeSeconds), color);
 		Renderer->AddRender(rowY, X + 84, to_wstring(score), color);
 	}
 }
