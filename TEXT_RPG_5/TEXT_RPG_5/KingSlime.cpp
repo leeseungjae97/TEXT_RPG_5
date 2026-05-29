@@ -149,8 +149,9 @@ vector<FItemWeight> KingSlime::GetDropTable()
 {
     return {
             { ItemId::SLIME_JELLY, 60 },
-            { ItemId::STRENGTH_POTION, 10},
-            { ItemId::STAFF,       20 },
-            { ItemId::LONGSWORD, 30}
+            { ItemId::BOOTS_OF_WIND, 10},
+            { ItemId::STAFF,       40 },
+            { ItemId::BOW, 30},
+            {ItemId::EXPLORER_BOOTS, 20},
         };
 }

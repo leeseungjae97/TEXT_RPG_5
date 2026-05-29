@@ -159,7 +159,7 @@ vector<FItemWeight> OrcMage::GetDropTable()
     return
     {
             { ItemId::ORC_TUSK, 50 },
-            { ItemId::STAFF, 25 },
+            { ItemId::STAFF, 30 },
             { ItemId::FLAME_POTION, 30 },
             { ItemId::LIGHTNING_STRIKE_SCROLL, 30 },
             { ItemId::FIRE_WALL_SCROLL, 30}
