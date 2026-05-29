@@ -34,6 +34,7 @@ void TimeManager::BeginPlay()
 
 	QueryPerformanceCounter(&PrevFrequency);
 	wcout.imbue(std::locale("korean"));
+	wcin.imbue(std::locale("korean"));
 
 	
 }
